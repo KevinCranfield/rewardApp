@@ -1,0 +1,370 @@
+from django.shortcuts import render, redirect, get_object_or_404
+from django.db.models import Count, Q, Prefetch
+from django.http import JsonResponse
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.models import User
+from django.utils import timezone
+from datetime import timedelta
+import random
+
+from .models import Family, Child, Roll, Reward
+
+def get_family(user):
+    family, _ = Family.objects.get_or_create(owner=user)
+    return family
+
+def is_parent_authenticated(request):
+    auth = request.session.get("parent_authed")
+    auth_time = request.session.get("parent_auth_time")
+
+    if not auth or not auth_time:
+        return False
+
+    if timezone.now().timestamp() - auth_time > 300:
+        request.session["parent_authed"] = False
+        return False
+
+    return True
+
+def home(request):
+    return render(request, "game/home.html")
+
+@login_required
+def dashboard(request):
+
+    if not is_parent_authenticated(request):
+        return redirect("enter_pin")
+
+    # 🔄 refresh activity timer
+    request.session["parent_auth_time"] = timezone.now().timestamp()
+
+    family = get_family(request.user)
+
+    children = list(
+        family.children
+        .all()
+        .annotate(available_rewards=Count('rewards', filter=Q(rewards__is_used=False)))
+    )
+
+    # 🔥 attach rewards manually (guaranteed sync fix)
+    rewards = Reward.objects.filter(child__family=family).order_by('-created_at')
+
+    for c in children:
+        c.all_rewards = [r for r in rewards if r.child_id == c.id]
+
+    # add last roll per child (avoid N+1 by fetching once per child id)
+    last_rolls = (
+        Roll.objects
+        .filter(child__in=children)
+        .order_by('child_id', '-id')
+    )
+    last_map = {}
+    for r in last_rolls:
+        if r.child_id not in last_map:
+            last_map[r.child_id] = r.dice
+    for c in children:
+        c.last_roll = last_map.get(c.id)
+
+    # 🎯 build 8x8 snake layout
+    squares = []
+    for row in range(8):
+        nums = list(range(row * 8 + 1, row * 8 + 9))
+        if row % 2 == 1:
+            nums.reverse()
+        squares.insert(0, nums)
+
+    # 🔥 recent rewards history
+    recent_rewards = Reward.objects.filter(
+        child__family=family
+    ).select_related("child").order_by("-created_at")[:15]
+
+    return render(request, "game/parentDashboard.html", {
+        "children": children,
+        "squares": squares,
+        "recent_rewards": recent_rewards
+    })
+
+@login_required
+def child_view(request, child_id):
+
+    family = get_family(request.user)
+    # 🔐 force PIN re-check when returning to dashboard
+    request.session["parent_authed"] = False
+
+    child = Child.objects.filter(
+        id=child_id,
+        family=family
+    ).first()
+
+    if not child:
+        return redirect("dashboard")
+
+    children = family.children.all()
+
+    # rewards count
+    child.available_rewards = child.rewards.filter(is_used=False).count()
+
+    # last roll
+    last_roll = Roll.objects.filter(child=child).order_by("-id").first()
+    child.last_roll = last_roll.dice if last_roll else None
+
+    # progress percentage
+    child.progress_percent = int((child.position / 64) * 100)
+
+    # board
+    squares = []
+    for row in range(8):
+        nums = list(range(row * 8 + 1, row * 8 + 9))
+        if row % 2 == 1:
+            nums.reverse()
+        squares.insert(0, nums)
+
+    return render(request, "game/child.html", {
+        "child": child,
+        "children": children,
+        "squares": squares
+    })
+
+
+@login_required
+def add_child(request):
+
+    if request.method == "POST":
+
+        name = request.POST.get("name")
+        colour = request.POST.get("colour")
+
+        family = get_family(request.user)
+
+        # 🚫 prevent duplicate colours
+        if Child.objects.filter(family=family, colour=colour).exists():
+            return redirect("dashboard")
+
+        if name and colour:
+            Child.objects.create(
+                family=family,
+                name=name,
+                colour=colour
+            )
+
+    return redirect("dashboard")
+
+
+@login_required
+def roll(request):
+
+    if request.method == "POST":
+        child_id = request.POST.get("child_id")
+
+        family = get_family(request.user)
+
+        child = Child.objects.filter(
+            id=child_id,
+            family=family
+        ).first()
+
+        if not child:
+            return JsonResponse({"error": "invalid child"}, status=400)
+
+        # 🔥 ONLY ALLOW ROLL IF REWARD EXISTS
+        reward = child.rewards.filter(is_used=False).first()
+
+        if not reward:
+            return JsonResponse({"error": "no reward"}, status=400)
+
+        dice = random.randint(1, 4)
+        new_pos = min(child.position + dice, 64)
+
+        child.position = new_pos
+        child.save()
+
+        reward.is_used = True
+        reward.save()
+
+        Roll.objects.create(
+            child=child,
+            dice=dice,
+            position_after=new_pos
+        )
+
+        return JsonResponse({
+            "dice": dice,
+            "position": new_pos,
+            "children": list(
+                Child.objects.filter(family=child.family)
+                .values("id", "name", "colour", "position")
+            )
+        })
+    
+
+
+@login_required
+def remove_child(request):
+    if request.method == "POST":
+        family = get_family(request.user)
+        Child.objects.filter(
+            id=request.POST.get("child_id"),
+            family=family
+        ).delete()
+    return redirect("dashboard")
+
+@login_required
+def add_reward(request):
+
+    if request.method == "POST":
+        family = get_family(request.user)
+
+        child = Child.objects.filter(
+            id=request.POST.get("child_id"),
+            family=family
+        ).first()
+
+        if not child:
+            return JsonResponse({"success": False, "error": "Invalid child"}, status=400)
+
+        reason = request.POST.get("reason")
+        custom = request.POST.get("custom_text")
+
+        if reason:
+            reward = Reward.objects.create(
+                child=child,
+                reason=reason,
+                custom_text=custom or ""
+            )
+
+            return JsonResponse({
+                "success": True,
+                "reward": {
+                    "id": reward.id,
+                    "reason": reward.reason,
+                    "custom_text": reward.custom_text
+                }
+            })
+
+        return JsonResponse({"success": False, "error": "No reason provided"}, status=400)
+
+    return JsonResponse({"success": False, "error": "Invalid request"}, status=400)
+
+@login_required
+def change_pin(request):
+
+    if request.method == "POST":
+        family = get_family(request.user)
+
+        new_pin = request.POST.get("new_pin")
+
+        if new_pin and len(new_pin) >= 4:
+            family.parent_pin = new_pin
+            family.save()
+
+    return redirect("dashboard")
+from django.views.decorators.http import require_POST
+
+@login_required
+@require_POST
+def reset_board(request):
+    if not is_parent_authenticated(request):
+        return JsonResponse({"success": False, "error": "Not authorised"}, status=403)
+
+    family = get_family(request.user)
+
+    # 🎯 Reset all children positions
+    Child.objects.filter(family=family).update(position=0)
+
+    # 🎯 Mark all rewards as used (so 'available' becomes 0)
+    Reward.objects.filter(child__family=family).update(is_used=True)
+
+    # 🎯 Clear rolls so 'last roll' and recent gameplay reset (UI shows empty)
+    Roll.objects.filter(child__family=family).delete()
+
+    return JsonResponse({"success": True})
+
+@login_required
+def ping_auth(request):
+    request.session["parent_auth_time"] = timezone.now().timestamp()
+    return JsonResponse({"ok": True})
+
+@login_required
+def enter_pin(request):
+
+    family = get_family(request.user)
+    error = None
+
+    if request.method == "POST":
+        pin = request.POST.get("pin")
+
+        if pin == getattr(family, "parent_pin", "1234"):
+            request.session["parent_authed"] = True
+            request.session["parent_auth_time"] = timezone.now().timestamp()
+            return redirect("dashboard")
+        else:
+            error = "Incorrect PIN"
+
+    return render(request, "game/pin.html", {"error": error})
+
+def login_view(request):
+    if request.user.is_authenticated:
+        return redirect("dashboard")
+
+    error = None
+    if request.method == "POST":
+        user = authenticate(
+            username=request.POST.get("username"),
+            password=request.POST.get("password")
+        )
+        if user:
+            login(request, user)
+            return redirect("dashboard")
+        else:
+            error = "Invalid username or password"
+
+    return render(request, "game/login.html", {"error": error})
+
+
+def logout_view(request):
+    logout(request)
+    return redirect("login")
+
+
+def signup(request):
+    if request.user.is_authenticated:
+        return redirect("dashboard")
+
+    error = None
+
+    if request.method == "POST":
+        username = request.POST.get("username")
+        email = request.POST.get("email")
+        password = request.POST.get("password")
+        confirm = request.POST.get("confirm_password")
+
+        if not username or not email or not password or not confirm:
+            error = "Please fill all fields"
+
+        elif password != confirm:
+            error = "Passwords do not match"
+
+        elif len(password) < 6:
+            error = "Password must be at least 6 characters"
+
+        elif not any(char.isdigit() for char in password):
+            error = "Password must contain a number"
+
+        elif User.objects.filter(username=username).exists():
+            error = "Username already exists"
+
+        elif User.objects.filter(email=email).exists():
+            error = "Email already used"
+
+        else:
+            user = User.objects.create_user(
+                username=username,
+                email=email,
+                password=password
+            )
+
+            login(request, user)
+            return redirect("dashboard")
+
+    return render(request, "game/signup.html", {"error": error})

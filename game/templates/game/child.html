@@ -1,0 +1,86 @@
+{% extends "game/base.html" %}
+
+{% block content %}
+
+<h2 style="text-align:center; display:flex; justify-content:center; align-items:center; gap:10px;">
+    <span style="width:16px; height:16px; border-radius:50%; background: {{ child.colour }}; display:inline-block;"></span>
+    {{ child.name }}'s Game
+</h2>
+
+<!-- 🎯 SINGLE ROLL BUTTON -->
+<div style="text-align:center; margin:20px 0;">
+
+    <button 
+        onclick="roll({{ child.id }})" 
+        class="big-roll"
+        {% if child.available_rewards == 0 %}disabled{% endif %}
+    >
+        🎲 Roll for {{ child.name }}
+    </button>
+
+    {% if child.available_rewards == 0 %}
+        <div style="margin-top:8px; color:#9ca3af; font-size:13px;">
+            No rewards available
+        </div>
+    {% endif %}
+
+</div>
+
+<!-- 📊 PROGRESS -->
+<div class="progress-wrapper">
+
+    <div class="progress-bar">
+        <div 
+            class="progress-fill"
+            style="
+                width: {{ child.progress_percent }}%;
+                background: {{ child.colour }};
+            "
+        ></div>
+    </div>
+
+    <div class="progress-text">
+        {{ child.progress_percent }}%
+    </div>
+
+</div>
+
+<!-- 🎮 BOARD -->
+<div class="board-wrapper">
+
+    <div class="board">
+
+        <!-- SVG overlay MUST be inside board -->
+        <svg class="board-overlay"></svg>
+
+        {% for row in squares %}
+            {% for num in row %}
+                <div class="square" data-square="{{ num }}">
+
+                    <span class="square-number">{{ num }}</span>
+
+                    <div class="token-container">
+
+                        {% for child in children %}
+                            {% if child.position == num %}
+                                <div 
+                                    class="token"
+                                    id="token-{{ child.id }}"
+                                    style="background: {{ child.colour }}"
+                                >
+                                    {{ child.name|slice:":1" }}
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+
+                    </div>
+
+                </div>
+            {% endfor %}
+        {% endfor %}
+
+    </div>
+
+</div>
+
+{% endblock %}

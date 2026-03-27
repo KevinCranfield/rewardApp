@@ -1,0 +1,38 @@
+{% extends "game/base.html" %}
+{% load static %}
+
+{% block content %}
+
+<div class="auth-wrapper">
+
+    <div class="auth-card">
+
+        <img src="{% static 'game/images/logo.png' %}" class="auth-logo">
+
+        <h2>Enter Parent PIN</h2>
+        <p class="auth-sub">Parents only</p>
+
+        {% if error %}
+            <div class="auth-error">{{ error }}</div>
+        {% endif %}
+
+        <form method="post">
+            {% csrf_token %}
+
+            <input 
+                type="password" 
+                name="pin" 
+                placeholder="Enter PIN"
+                maxlength="6"
+                required
+                style="text-align:center; letter-spacing:6px; font-size:18px;"
+            >
+
+            <button type="submit">Unlock</button>
+        </form>
+
+    </div>
+
+</div>
+
+{% endblock %}

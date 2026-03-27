@@ -1,0 +1,30 @@
+{% extends "game/base.html" %}
+{% load static %}
+
+{% block content %}
+
+<div class="home-container">
+
+    <!-- 🔥 LOGO -->
+    <img 
+        src="{% static 'game/images/logo.png' %}" 
+        class="home-logo"
+        alt="Reward Game"
+    >
+
+    <!-- TITLE -->
+    <h1 class="home-title">Reward Game</h1>
+
+    <p class="home-subtitle">
+        Turn chores into a fun game 🎲
+    </p>
+
+    <!-- BUTTONS -->
+    <div class="home-buttons">
+        <a href="/dashboard/" class="home-btn">Parent Dashboard</a>
+        <a href="/child/" class="home-btn secondary">Child View</a>
+    </div>
+
+</div>
+
+{% endblock %}

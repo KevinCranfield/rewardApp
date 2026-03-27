@@ -1,0 +1,60 @@
+from django.db import models
+from django.contrib.auth.models import User
+
+
+class Family(models.Model):
+    owner = models.OneToOneField(User, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f"{self.owner.username}'s family"
+
+class Family(models.Model):
+    owner = models.OneToOneField(User, on_delete=models.CASCADE)
+
+    parent_pin = models.CharField(max_length=10, default="1234")
+    
+class Child(models.Model):
+
+    COLOUR_CHOICES = [
+        ("#ef4444", "Red"),
+        ("#3b82f6", "Blue"),
+        ("#22c55e", "Green"),
+        ("#f59e0b", "Yellow"),
+        ("#a855f7", "Purple"),
+        ("#ec4899", "Pink"),
+    ]
+
+    family = models.ForeignKey(Family, on_delete=models.CASCADE, related_name="children")
+
+    name = models.CharField(max_length=100)
+    colour = models.CharField(max_length=20, choices=COLOUR_CHOICES)
+
+    position = models.IntegerField(default=0)
+
+    def __str__(self):
+        return self.name
+
+
+class Roll(models.Model):
+    child = models.ForeignKey(Child, on_delete=models.CASCADE, related_name="rolls")
+
+    dice = models.IntegerField()
+    position_after = models.IntegerField()
+
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.child.name} rolled {self.dice}"
+
+class Reward(models.Model):
+    child = models.ForeignKey("Child", on_delete=models.CASCADE, related_name="rewards")
+
+    reason = models.CharField(max_length=100)
+    custom_text = models.CharField(max_length=200, blank=True)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    is_used = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"{self.child.name} - {self.reason}"
