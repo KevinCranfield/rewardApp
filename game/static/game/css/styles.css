@@ -1689,7 +1689,7 @@ html, body {
         0 15px 30px rgba(0,0,0,.1),
         0 4px 10px rgba(0,0,0,.05);
 
-    transition: all .25s ease;
+    transition: all .25s cubic-bezier(.2,.8,.2,1);
 }
 
 .game-card:hover {
@@ -1716,7 +1716,7 @@ html, body {
     align-items: center;
 }
 
-.continue-btn {
+.continue-btn{
     padding: 10px 16px;
     border-radius: 12px;
     border: none;
@@ -1726,6 +1726,17 @@ html, body {
     font-weight: 600;
 
     cursor: pointer;
+
+    box-shadow: 0 6px 16px rgba(0,0,0,.25);
+    transition: all .2s ease;
+}
+
+.continue-btn:hover{
+    transform: translateY(-2px);
+}
+
+.continue-btn:active{
+    transform: scale(.95);
 }
 
 /* QUICK ACTIONS */
@@ -1789,4 +1800,10 @@ html, body {
 
 .game-list{
     margin-top:10px;
+}
+
+.welcome-sub{
+    text-align:center;
+    font-size:14px;
+    opacity:0.75;
 }

@@ -4,7 +4,8 @@
 <head>
     <title>{% block title %}Reward Game{% endblock %}</title>
     <link rel="icon" href="/static/game/images/logo.png">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="apple-touch-icon" sizes="180x180" href="{% static 'game/icons/icon-192.png' %}">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <link rel="preload" href="{% static 'game/css/styles.css' %}" as="style" onload="this.rel='stylesheet'">
     <noscript>
       <link rel="stylesheet" href="{% static 'game/css/styles.css' %}">
@@ -14,7 +15,6 @@
     <link rel="preload" href="{% static 'game/js/game.js' %}" as="script">
     <link rel="apple-touch-icon" href="{% static 'game/icons/icon-192.png' %}">
     <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-capable" content="yes">
 </head>
 
 <body>
@@ -133,6 +133,25 @@ window.addEventListener("load", () => {
         }, 400);
     }, 800);
 });
+</script>
+
+<script>
+// iOS install hint
+(function() {
+    const isIOS = /iphone|ipad|ipod/i.test(window.navigator.userAgent);
+    const isInStandalone = window.navigator.standalone === true;
+
+    if (isIOS && !isInStandalone) {
+        const hint = document.getElementById("iosInstallHint");
+        if (hint) {
+            hint.style.display = "block";
+
+            setTimeout(() => {
+                hint.style.display = "none";
+            }, 5000);
+        }
+    }
+})();
 </script>
 
 </body>
