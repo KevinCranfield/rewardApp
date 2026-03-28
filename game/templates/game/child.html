@@ -1,6 +1,8 @@
 {% extends "game/base.html" %}
+{% block body_class %}child-view{% endblock %}
 
 {% block content %}
+<div class="child-view">
 
 <h2 style="text-align:center; display:flex; justify-content:center; align-items:center; gap:10px;">
     <span style="width:16px; height:16px; border-radius:50%; background: {{ child.colour }}; display:inline-block;"></span>
@@ -83,4 +85,5 @@
 
 </div>
 
+</div>
 {% endblock %}

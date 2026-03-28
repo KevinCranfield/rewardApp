@@ -1570,3 +1570,18 @@ body {
         text-align:center;
     }
 }
+
+/* =========================
+   CHILD VIEW BOARD FIT (AUTO SCALE)
+========================= */
+
+/* Slight zoom-out ONLY on child view pages */
+.child-view .board {
+    transform: scale(0.9);
+    transform-origin: top center;
+}
+
+/* Ensure wrapper uses full width */
+.child-view .board-wrapper {
+    max-width: 98vw;
+}
