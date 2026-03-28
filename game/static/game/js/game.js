@@ -719,38 +719,6 @@ if("serviceWorker" in navigator){
         .catch(err => console.log("SW error", err));
 }
 
-let deferredPrompt;
-
-window.addEventListener("beforeinstallprompt", (e) => {
-    e.preventDefault();
-    deferredPrompt = e;
-
-    const btn = document.getElementById("installBtn");
-    if(btn){
-        btn.style.display = "block";
-    }
-});
-
-document.addEventListener("DOMContentLoaded", () => {
-    if (/iphone|ipad|ipod/i.test(navigator.userAgent)) {
-        const isStandalone = window.navigator.standalone;
-        const hint = document.getElementById("iosInstallHint");
-        if (!isStandalone && hint) {
-            hint.style.display = "block";
-        }
-    }
-});
-
-function installApp(){
-    if(deferredPrompt){
-        deferredPrompt.prompt();
-
-        deferredPrompt.userChoice.then(() => {
-            deferredPrompt = null;
-            document.getElementById("installBtn").style.display = "none";
-        });
-    }
-}
 
 // 🔐 Smart inactivity ping (keeps PIN session alive while active)
 function pingActivity(){
