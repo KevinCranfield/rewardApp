@@ -5,9 +5,13 @@
     <title>{% block title %}Reward Game{% endblock %}</title>
     <link rel="icon" href="/static/game/images/logo.png">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="{% static 'game/css/styles.css' %}">
+    <link rel="preload" href="{% static 'game/css/styles.css' %}" as="style" onload="this.rel='stylesheet'">
+    <noscript>
+      <link rel="stylesheet" href="{% static 'game/css/styles.css' %}">
+    </noscript>
     <meta name="theme-color" content="#facc15">
     <link rel="manifest" href="{% static 'game/manifest.json' %}">
+    <link rel="preload" href="{% static 'game/js/game.js' %}" as="script">
     <link rel="apple-touch-icon" href="{% static 'game/icons/icon-192.png' %}">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -62,7 +66,7 @@
     {% endblock %}
 </main>
 
-<script src="{% static 'game/js/game.js' %}"></script>
+<script src="{% static 'game/js/game.js' %}" defer></script>
 <script>
 let deferredPrompt;
 
