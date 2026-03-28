@@ -16,8 +16,21 @@
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
 </head>
-<body>
 
+<body>
+<div id="splash-screen" class="splash">
+  <img src="{% static 'game/images/logo.png' %}" class="splash-logo">
+  <h1>Reward Game</h1>
+  <p class="splash-tagline">
+    🎯 Motivate kids with fun rewards<br>
+    Roll → Progress → Earn 🎉
+  </p>
+  <p style="margin-top:15px; font-size:12px; opacity:0.8;">
+    💡 LED board syncing coming soon 👀
+  </p>
+</div>
+
+<div id="app" style="display:none;">
 <header class="app-header">
     <div class="container header-inner">
 
@@ -65,6 +78,7 @@
     {% block content %}
     {% endblock %}
 </main>
+</div>
 
 <script src="{% static 'game/js/game.js' %}" defer></script>
 <script>
@@ -93,6 +107,33 @@ function installApp() {
 <div id="iosInstallHint" class="ios-install-hint">
     📲 Tap Share → “Add to Home Screen”
 </div>
+
+<script>
+window.addEventListener("load", () => {
+    const splash = document.getElementById("splash-screen");
+    const app = document.getElementById("app");
+
+    const hasSeenSplash = localStorage.getItem("seenSplash");
+
+    if (hasSeenSplash) {
+        // Skip splash on return visits
+        splash.style.display = "none";
+        app.style.display = "block";
+        return;
+    }
+
+    // First visit: show splash
+    setTimeout(() => {
+        splash.style.opacity = "0";
+
+        setTimeout(() => {
+            splash.style.display = "none";
+            app.style.display = "block";
+            localStorage.setItem("seenSplash", "true");
+        }, 400);
+    }, 800);
+});
+</script>
 
 </body>
 </html>
