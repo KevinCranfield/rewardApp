@@ -1572,16 +1572,22 @@ body {
 }
 
 /* =========================
-   CHILD VIEW BOARD FIT (AUTO SCALE)
+   CHILD VIEW BOARD FIT (AUTO SCALE - PERFECT MOBILE)
 ========================= */
 
-/* Slight zoom-out ONLY on child view pages */
-.child-view .board {
-    transform: scale(0.9);
-    transform-origin: top center;
+/* Center wrapper */
+.child-view .board-wrapper {
+    max-width: 100vw;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
-/* Ensure wrapper uses full width */
-.child-view .board-wrapper {
-    max-width: 98vw;
+/* Auto-scale based on screen size */
+.child-view .board {
+    width: min(92vw, 75vh);
+    height: min(92vw, 75vh);
+
+    transform: none; /* remove old scaling */
+    margin: 0 auto;
 }
