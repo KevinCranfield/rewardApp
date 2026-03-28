@@ -3,13 +3,13 @@
 <html>
 <head>
     <title>{% block title %}Reward Game{% endblock %}</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="{% static 'game/css/styles.css' %}">
     <meta name="theme-color" content="#facc15">
     <link rel="manifest" href="{% static 'game/manifest.json' %}">
     <link rel="apple-touch-icon" href="{% static 'game/icons/icon-192.png' %}">
+    <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="default">
 </head>
 <body>
 
@@ -62,6 +62,28 @@
 </main>
 
 <script src="{% static 'game/js/game.js' %}"></script>
+<script>
+let deferredPrompt;
+
+window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+
+    const btn = document.getElementById("installBtn");
+    if (btn) {
+        btn.style.display = "inline-block";
+    }
+});
+
+function installApp() {
+    if (deferredPrompt) {
+        deferredPrompt.prompt();
+        deferredPrompt.userChoice.then(() => {
+            deferredPrompt = null;
+        });
+    }
+}
+</script>
 
 <div id="iosInstallHint" class="ios-install-hint">
     📲 Tap Share → “Add to Home Screen”
