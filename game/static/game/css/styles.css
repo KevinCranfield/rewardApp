@@ -1781,3 +1781,12 @@ html, body {
 #app {
     display:none;
 }
+
+.welcome-title{
+    margin-top:20px;
+    margin-bottom:10px;
+}
+
+.game-list{
+    margin-top:10px;
+}
