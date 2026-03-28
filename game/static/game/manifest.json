@@ -1,9 +1,11 @@
 {
   "name": "Reward Game",
   "short_name": "Rewards",
-  "start_url": "/",
+  "description": "Motivate your kids with fun rewards. Roll, progress and earn prizes.",
+  "start_url": "/?source=pwa",
+  "scope": "/",
   "display": "standalone",
-  "background_color": "#facc15",
+  "background_color": "#7ec5e3",
   "theme_color": "#facc15",
   "orientation": "portrait",
   "icons": [
