@@ -1580,15 +1580,19 @@ body {
     display: none;
 }
 
+html {
+    height: 100%;
+}
+
 /* Subtle premium background */
 body.child-view {
     background: radial-gradient(circle at center, #7ec5e3 0%, #4f9fc0 100%);
+    overflow: hidden;
+    margin: 0;
+    padding: 0;
 }
 
 /* Remove scroll + use full height */
-body.child-view {
-    overflow: hidden;
-}
 
 /* Fullscreen container */
 /* Fullscreen container */
@@ -1647,10 +1651,6 @@ body.child-view::after {
 .child-view .board-wrapper {
     position: relative;
     z-index: 1;
-}
-body.child-view {
-    margin: 0;
-    padding: 0;
 }
 
 html, body {
