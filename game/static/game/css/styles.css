@@ -1658,3 +1658,96 @@ html, body {
     max-width: 100%;
     overflow-x: hidden;
 }
+
+/* =========================
+   HOME SCREEN (NEW)
+========================= */
+
+.home-screen {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.welcome h2 {
+    text-align: center;
+    font-size: 22px;
+    font-weight: 700;
+}
+
+/* GAME LIST */
+.game-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+/* CARD */
+.game-card {
+    background: linear-gradient(145deg,#ffffff,#f1f5f9);
+    padding: 18px;
+    border-radius: 20px;
+
+    text-decoration: none;
+    color: inherit;
+
+    box-shadow:
+        0 15px 30px rgba(0,0,0,.1),
+        0 4px 10px rgba(0,0,0,.05);
+
+    transition: all .25s ease;
+}
+
+.game-card:hover {
+    transform: translateY(-3px) scale(1.01);
+}
+
+/* HEADER */
+.game-card-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.game-card-header h3 {
+    margin: 0;
+    font-size: 18px;
+}
+
+/* BODY */
+.game-card-body {
+    margin-top: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.continue-btn {
+    padding: 10px 16px;
+    border-radius: 12px;
+    border: none;
+
+    background: linear-gradient(135deg,#22c55e,#16a34a);
+    color: white;
+    font-weight: 600;
+
+    cursor: pointer;
+}
+
+/* QUICK ACTIONS */
+.quick-actions {
+    margin-top: 10px;
+    text-align: center;
+}
+
+.action-btn {
+    display: inline-block;
+    padding: 10px 16px;
+    border-radius: 12px;
+
+    background: #6366f1;
+    color: white;
+
+    text-decoration: none;
+    font-weight: 600;
+}
