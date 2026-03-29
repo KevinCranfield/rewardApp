@@ -212,13 +212,23 @@ function animateMovement(childId, start, end){
             if(snakes[finalPos]){
                 console.log("🐍 Snake!", finalPos, "→", snakes[finalPos]);
                 showToast("🐍 Oh no! Snake!");
-                return animateJump(childId, finalPos, snakes[finalPos]);
+
+                setTimeout(() => {
+                    animateJump(childId, finalPos, snakes[finalPos]);
+                }, 200);
+
+                return;
             }
 
             if(ladders[finalPos]){
                 console.log("🪜 Ladder!", finalPos, "→", ladders[finalPos]);
                 showToast("🪜 Climb! Ladder!");
-                return animateJump(childId, finalPos, ladders[finalPos]);
+
+                setTimeout(() => {
+                    animateJump(childId, finalPos, ladders[finalPos]);
+                }, 200);
+
+                return;
             }
 
             // Re-enable roll button for this token
@@ -291,6 +301,61 @@ function animateJump(childId, start, end){
     const ease = t => t*t*(3 - 2*t);
 
     const isLadder = end > start;
+
+    if(isLadder){
+        const steps = 6;
+        let i = 0;
+
+        function stepAnim(){
+            i++;
+
+            const t = i / steps;
+
+            const x = p1.x + (p2.x - p1.x) * t;
+            const y = p1.y + (p2.y - p1.y) * t;
+
+            token.style.position = "absolute";
+            token.style.left = (x - 14) + "px";
+            token.style.top = (y - 14) + "px";
+            token.style.transform = `scale(1.1)`;
+
+            if(i < steps){
+                setTimeout(stepAnim, 120);
+            } else {
+                // snap into square container
+                const targetSquare = document.querySelector(
+                    `[data-square='${end}'] .token-container`
+                );
+
+                if(targetSquare){
+                    token.style.position = "";
+                    token.style.left = "";
+                    token.style.top = "";
+                    token.style.transform = "";
+                    targetSquare.appendChild(token);
+                }
+
+                // win check
+                if(end === 64){
+                    token.classList.add("winner");
+                    playSound('win');
+                    burstConfetti(80);
+                }
+
+                // re-enable roll button
+                if(token && token._rollButton){
+                    token._rollButton.disabled = false;
+                }
+
+                if(window.__lastChildren){
+                    updateTokensUI(window.__lastChildren);
+                }
+            }
+        }
+
+        stepAnim();
+        return;
+    }
 
     function animate(time){
         const progressRaw = Math.min((time - startTime) / duration, 1);
