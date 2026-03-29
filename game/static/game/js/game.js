@@ -38,8 +38,22 @@ function unlockSounds(){
     });
 }
 
-// Unlock on first interaction (silent)
-document.addEventListener("click", unlockSounds, { once: true });
+function showToast(message){
+    const toast = document.getElementById("toast");
+    if(!toast) return;
+
+    toast.textContent = message;
+    toast.classList.remove("hidden");
+
+    toast.style.opacity = "1";
+
+    setTimeout(() => {
+        toast.style.opacity = "0";
+        setTimeout(() => {
+            toast.classList.add("hidden");
+        }, 300);
+    }, 1500);
+}
 
 function playSound(name){
     if(sounds[name]){
@@ -119,19 +133,19 @@ function roll(childId){
         showDice(data.dice);
         showToast("🎲 Rolled " + data.dice);
         if(data.children){
-            updateTokensUI(data.children);
+            window.__lastChildren = data.children;
         }
 
         // 🚨 fallback if movement fails
-        if(!data.position || data.position <= current){
-            console.warn("No movement detected");
+        if(!data.position){
+            console.warn("No movement data");
             if(button) button.disabled = false;
             return;
         }
 
         setTimeout(() => {
             animateMovement(childId, current, data.position);
-        }, 400);
+        }, 100);
 
     })
     .catch(err => {
@@ -165,7 +179,7 @@ function animateMovement(childId, start, end){
 
             // 🎯 WIN CHECK
             if(end === 64){
-                const token = document.getElementById("token-" + childId);
+                token = document.getElementById("token-" + childId);
                 if(token){
                     token.classList.add("winner");
                 }
