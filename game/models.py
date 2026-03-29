@@ -4,15 +4,11 @@ from django.contrib.auth.models import User
 
 class Family(models.Model):
     owner = models.OneToOneField(User, on_delete=models.CASCADE)
+    parent_pin = models.CharField(max_length=10, default="1234")
 
     def __str__(self):
         return f"{self.owner.username}'s family"
 
-class Family(models.Model):
-    owner = models.OneToOneField(User, on_delete=models.CASCADE)
-
-    parent_pin = models.CharField(max_length=10, default="1234")
-    
 class Child(models.Model):
 
     COLOUR_CHOICES = [
@@ -55,6 +51,9 @@ class Reward(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     is_used = models.BooleanField(default=False)
+
+    class Meta:
+        ordering = ["-created_at"]
 
     def __str__(self):
         return f"{self.child.name} - {self.reason}"
