@@ -108,7 +108,8 @@ function roll(childId){
             current = parseInt(square.dataset.square);
         }
     } else {
-        console.error("Token not found!");
+        // first move - no token yet
+        current = 0;
     }
 
     fetch("/roll/", {
