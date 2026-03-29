@@ -13,6 +13,20 @@ const ladders = {
     35: 49,   // upper climb
 };
 
+// 🔊 SOUND SYSTEM
+const sounds = {
+    dice: new Audio('/static/game/sounds/dice.mp3'),
+    win: new Audio('/static/game/sounds/win.mp3'),
+    click: new Audio('/static/game/sounds/click.mp3')
+};
+
+function playSound(name){
+    if(sounds[name]){
+        sounds[name].currentTime = 0;
+        sounds[name].play().catch(()=>{});
+    }
+}
+
 function getSquareCenter(num){
     const el = document.querySelector(`[data-square='${num}']`);
     const board = document.querySelector(".board");
@@ -35,6 +49,7 @@ function roll(childId){
     // 🚫 prevent double clicks
     if(button && button.disabled) return;
     if(button) button.disabled = true;
+    playSound('click');
 
     // Store button reference on token
     const token = document.getElementById("token-" + childId);
@@ -126,9 +141,18 @@ function animateMovement(childId, start, end){
                 if(token){
                     token.classList.add("winner");
                 }
-                burstConfetti(50);
+
+                // 🎉 celebration
+                playSound('win');
+                burstConfetti(80);
+
+                // 🎁 random bonus
+                if(Math.random() < 0.3){
+                    showToast("🎁 BONUS! Extra reward!");
+                }
+
                 console.log("🏆 WINNER!", childId);
-                return; // stop further movement/reload
+                return;
             }
 
             // 🎯 check snakes or ladders AFTER movement
@@ -264,7 +288,14 @@ function animateJump(childId, start, end){
             // win check
             if(end === 64){
                 token.classList.add("winner");
-                burstConfetti(50);
+
+                playSound('win');
+                burstConfetti(80);
+
+                if(Math.random() < 0.3){
+                    showToast("🎁 BONUS! Extra reward!");
+                }
+
                 console.log("🏆 WINNER via jump!", childId);
             }
 
@@ -577,12 +608,14 @@ function showDice(value){
 
     dice.textContent = "🎲 " + value;
 
+    playSound('dice');
+
     dice.style.transition = "all .2s ease";
     dice.style.transform = "translate(-50%, -50%) scale(1)";
 
     setTimeout(() => {
         dice.style.transform = "translate(-50%, -50%) scale(0)";
-    }, 1200);
+    }, 1400);
 }
 
 // 🔐 CSRF helper
