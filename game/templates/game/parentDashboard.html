@@ -1,54 +1,14 @@
 <!-- =========================
-     GAME BOARD (PREMIUM)
+     DASHBOARD ACTIONS
 ========================= -->
-<div class="game-card">
+<div class="section-card dashboard-actions">
 
-    <div class="game-header">
-        <h2>🎮 Family Game Board</h2>
+    <h2>⚡ Quick Actions</h2>
 
-        <div class="game-actions">
-            <button onclick="toggleAddChild()">+ Add Child</button>
-            <button onclick="togglePinSection()">🔐 PIN</button>
-            <button id="resetBoardBtn" class="danger">Reset</button>
-        </div>
-    </div>
-
-    <div class="game-board">
-
-        <div class="board-wrapper">
-
-            <div class="board">
-
-                <svg class="board-overlay"></svg>
-
-                {% for row in squares %}
-                    {% for num in row %}
-                        <div class="square" data-square="{{ num }}" data-pos="{{ num }}">
-
-                            <span class="square-number">{{ num }}</span>
-
-                            <div class="token-container">
-                                {% for child in children %}
-                                    {% if child.position == num %}
-                                        <div 
-                                            class="token"
-                                            id="token-{{ child.id }}"
-                                            style="background: {{ child.colour }}"
-                                        >
-                                            {{ child.name|slice:":1" }}
-                                        </div>
-                                    {% endif %}
-                                {% endfor %}
-                            </div>
-
-                        </div>
-                    {% endfor %}
-                {% endfor %}
-
-            </div>
-
-        </div>
-
+    <div class="action-buttons">
+        <button class="add-toggle-btn" onclick="toggleAddChild()">+ Add Child</button>
+        <button class="add-toggle-btn" onclick="togglePinSection()">🔐 Change PIN</button>
+        <button class="danger-btn" id="resetBoardBtn">🔄 Reset Board</button>
     </div>
 
 </div>
