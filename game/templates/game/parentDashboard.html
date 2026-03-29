@@ -30,11 +30,9 @@
 
                 <a href="/child/{{ child.id }}/" class="play-btn">🎮 Play</a>
 
-                <form method="POST" action="{% url 'add_reward' %}">
-                    {% csrf_token %}
-                    <input type="hidden" name="child_id" value="{{ child.id }}">
-                    <button class="add-reward-btn">+ Add Reward</button>
-                </form>
+                <button class="add-reward-btn" onclick="openRewardModal({{ child.id }})">
+                    + Add Reward
+                </button>
 
                 <button class="remove-btn" onclick="removeChild({{ child.id }})">Remove</button>
 
@@ -61,5 +59,37 @@
     </div>
 
 </div>
+
+<div id="reward-modal" class="modal hidden">
+  <div class="modal-content">
+
+    <h3>Add Reward</h3>
+
+    <form method="POST" action="{% url 'add_reward' %}">
+      {% csrf_token %}
+      <input type="hidden" name="child_id" id="reward-child-id">
+
+      <input type="text" name="reason" placeholder="Reason (e.g. Homework)" required>
+
+      <input type="text" name="comment" placeholder="Optional comment">
+
+      <button class="reward-btn">Add Reward</button>
+    </form>
+
+  </div>
+</div>
+
+<script>
+function openRewardModal(childId){
+  document.getElementById("reward-child-id").value = childId;
+  document.getElementById("reward-modal").classList.remove("hidden");
+}
+
+document.addEventListener("click", e => {
+  if(e.target.id === "reward-modal"){
+    e.target.classList.add("hidden");
+  }
+});
+</script>
 
 {% endblock %}
