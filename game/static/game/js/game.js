@@ -1,3 +1,17 @@
+// 🐍 Snakes & 🪜 Ladders (used for board drawing only)
+const snakes = {
+    62: 44,
+    55: 41,
+    27: 10,
+    33: 18,
+};
+
+const ladders = {
+    3: 22,
+    8: 26,
+    19: 38,
+    35: 49,
+};
 
 // 🔊 SOUND SYSTEM
 const sounds = {
