@@ -12,7 +12,7 @@
     </noscript>
     <meta name="theme-color" content="#facc15">
     <link rel="manifest" href="{% static 'game/manifest.json' %}">
-    <link rel="preload" href="{% static 'game/js/game.js' %}" as="script">
+    <link rel="preload" href="{% static 'game/js/game.js' %}?v=2" as="script">
     <link rel="apple-touch-icon" href="{% static 'game/icons/icon-192.png' %}">
     <meta name="mobile-web-app-capable" content="yes">
 </head>
@@ -158,21 +158,22 @@ window.addEventListener("load", () => {
 <div id="toast" class="toast hidden"></div>
 
 <script>
+// TEMP: Service worker disabled for debugging cache issues
+/*
 if ("serviceWorker" in navigator) {
   navigator.serviceWorker.register("/static/game/js/sw.js").then(reg => {
 
-    // Check for updates every 60 seconds
     setInterval(() => {
       reg.update();
     }, 60000);
 
-    // Reload page when new service worker takes control
     navigator.serviceWorker.addEventListener("controllerchange", () => {
       window.location.reload();
     });
 
   });
 }
+*/
 </script>
 
 </body>
