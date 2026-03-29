@@ -31,7 +31,7 @@
                 <a href="/child/{{ child.id }}/" class="play-btn">🎮 Play</a>
 
                 <div class="reward-section">
-                    <form method="POST" action="{% url 'add_reward' %}">
+                    <form method="POST" action="{% url 'add_reward' %}" class="reward-form">
                         {% csrf_token %}
                         <input type="hidden" name="child_id" value="{{ child.id }}">
 
@@ -44,9 +44,9 @@
                             <option value="Exercise">⚽ Exercise</option>
                         </select>
 
-                        <input type="text" name="comment" class="reward-input" placeholder="Optional comment">
+                        <input type="text" name="custom_text" class="reward-input" placeholder="Optional comment">
 
-                        <button class="reward-btn" disabled>Add Reward</button>
+                        <button type="submit" class="reward-btn">+ Add Reward</button>
                     </form>
                 </div>
 
@@ -75,16 +75,5 @@
     </div>
 
 </div>
-
-<script>
-document.querySelectorAll(".reward-section").forEach(section => {
-    const select = section.querySelector(".reward-select");
-    const button = section.querySelector(".reward-btn");
-
-    select.addEventListener("change", () => {
-        button.disabled = !select.value;
-    });
-});
-</script>
 
 {% endblock %}

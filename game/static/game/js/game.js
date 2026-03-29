@@ -903,3 +903,86 @@ function resetActivityTimer(){
 
 // initial activity
 resetActivityTimer();
+
+// 🎁 REWARD SYSTEM (FINAL FIX)
+document.addEventListener("DOMContentLoaded", () => {
+
+    document.querySelectorAll("form.reward-form, form[action*='reward']").forEach(form => {
+
+        const select = form.querySelector("select[name='reason']");
+        const button = form.querySelector("button[type='submit']");
+
+        if(!select || !button) return;
+
+        // initial state
+        button.disabled = !select.value;
+
+        // enable only when valid
+        select.addEventListener("change", () => {
+            button.disabled = !select.value;
+
+            // 🎨 colour feedback
+            select.classList.remove("homework","behaviour","helping","reading","exercise");
+            const v = select.value.toLowerCase();
+            if(v.includes("homework")) select.classList.add("homework");
+            if(v.includes("behaviour")) select.classList.add("behaviour");
+            if(v.includes("helping")) select.classList.add("helping");
+            if(v.includes("reading")) select.classList.add("reading");
+            if(v.includes("exercise")) select.classList.add("exercise");
+        });
+
+        form.addEventListener("submit", async (e) => {
+            e.preventDefault();
+
+            if(!select.value){
+                showToast("⚠️ Select a reason first");
+                return;
+            }
+
+            button.disabled = true;
+
+            try {
+                const res = await fetch(form.action, {
+                    method: "POST",
+                    body: new FormData(form),
+                    headers: {
+                        "X-CSRFToken": getCSRFToken(),
+                        "X-Requested-With": "XMLHttpRequest"
+                    }
+                });
+
+                const data = await res.json();
+                console.log("REWARD RESPONSE:", data);
+
+                if(data.success){
+                    showToast("✅ " + (data.reward?.reason || "Reward added"));
+
+                    // quick feedback
+                    const original = button.textContent;
+                    button.textContent = "Added!";
+
+                    setTimeout(() => {
+                        button.textContent = original || "+ Add Reward";
+                    }, 1200);
+
+                    form.reset();
+                    button.disabled = true;
+                    select.className = "reward-select";
+
+                    // TEMP: ensure UI reflects change
+                    setTimeout(() => location.reload(), 300);
+
+                } else {
+                    showToast(data.error || "Error adding reward");
+                    button.disabled = false;
+                }
+
+            } catch(err){
+                console.error(err);
+                showToast("⚠️ Network error");
+                button.disabled = false;
+            }
+        });
+
+    });
+});
