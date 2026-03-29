@@ -327,6 +327,9 @@ h2{
    CHILD BIG BUTTON
 ========================= */
 
+/* =========================
+   CHILD BIG BUTTON
+========================= */
 .big-roll{
     padding:18px 28px;
     font-size:18px;
@@ -338,16 +341,30 @@ h2{
     background:linear-gradient(135deg,#22c55e,#16a34a);
     color:white;
 
-    box-shadow:0 8px 20px rgba(0,0,0,.3);
+    box-shadow:
+        0 8px 20px rgba(0,0,0,.3),
+        0 0 12px rgba(34,197,94,.3);
 
     cursor:pointer;
     margin:10px;
+
+    transition:all .2s ease;
 }
 
+/* hover = glow */
+.big-roll:not(:disabled):hover{
+    transform:translateY(-2px) scale(1.02);
+    box-shadow:
+        0 14px 30px rgba(0,0,0,.35),
+        0 0 16px rgba(34,197,94,.6);
+}
+
+/* click */
 .big-roll:active{
-    transform:scale(0.95);
+    transform:scale(.94);
 }
 
+/* disabled */
 .big-roll:disabled{
     background:linear-gradient(135deg,#e5e7eb,#d1d5db);
     color:#9ca3af;
@@ -356,11 +373,35 @@ h2{
     transform:none;
 }
 
-.big-roll:not(:disabled):hover{
-    transform:translateY(-2px) scale(1.02);
-    box-shadow:
-        0 12px 28px rgba(0,0,0,.35),
-        0 0 12px rgba(34,197,94,.5);
+/* 🔥 pulse when rewards available */
+.big-roll.roll-btn:not(:disabled){
+    animation:rollPulse 2s ease-in-out infinite;
+}
+
+@keyframes rollPulse{
+    0%,100%{
+        box-shadow:
+            0 8px 20px rgba(0,0,0,.3),
+            0 0 10px rgba(34,197,94,.3);
+    }
+    50%{
+        box-shadow:
+            0 12px 28px rgba(0,0,0,.35),
+            0 0 20px rgba(34,197,94,.7);
+    }
+}
+
+/* shake animation for disabled button */
+.big-roll:disabled:active{
+    animation:shake .3s ease;
+}
+
+@keyframes shake{
+    0%{ transform:translateX(0); }
+    25%{ transform:translateX(-3px); }
+    50%{ transform:translateX(3px); }
+    75%{ transform:translateX(-2px); }
+    100%{ transform:translateX(0); }
 }
 
 /* =========================
@@ -828,7 +869,86 @@ h2{
     transform:scale(.97);
 }
 
-.reward-select,
+
+.reward-select{
+    width:100%;
+    padding:12px 14px;
+
+    border-radius:12px;
+    border:1px solid #e5e7eb;
+
+    font-size:14px;
+    font-weight:500;
+
+    background:linear-gradient(145deg,#ffffff,#f3f4f6);
+
+    box-shadow:
+        inset 0 2px 4px rgba(0,0,0,.05),
+        0 4px 10px rgba(0,0,0,.05);
+
+    appearance:none;
+    cursor:pointer;
+
+    transition:all .2s ease, transform .12s ease;
+
+    /* arrow */
+    background-image:url("data:image/svg+xml;utf8,<svg fill='%236366f1' height='20' viewBox='0 0 20 20' width='20' xmlns='http://www.w3.org/2000/svg'><path d='M5 7l5 5 5-5'/></svg>");
+    background-repeat:no-repeat;
+    background-position:right 12px center;
+}
+
+.reward-select:hover{
+    transform:translateY(-1px);
+    box-shadow:
+        inset 0 2px 4px rgba(0,0,0,.05),
+        0 8px 18px rgba(99,102,241,.25);
+}
+
+.reward-select:active{
+    transform:scale(0.97);
+}
+
+.reward-select:focus{
+    outline:none;
+    border-color:#6366f1;
+    box-shadow:0 0 0 3px rgba(99,102,241,.25);
+}
+
+.reward-select.homework{
+    border-color:#3b82f6;
+    background:linear-gradient(145deg,#eff6ff,#dbeafe);
+}
+
+.reward-select.behaviour{
+    border-color:#22c55e;
+    background:linear-gradient(145deg,#ecfdf5,#d1fae5);
+}
+
+.reward-select.helping{
+    border-color:#a855f7;
+    background:linear-gradient(145deg,#faf5ff,#ede9fe);
+}
+
+.reward-select.reading{
+    border-color:#f59e0b;
+    background:linear-gradient(145deg,#fffbeb,#fef3c7);
+}
+
+.reward-select.exercise{
+    border-color:#ef4444;
+    background:linear-gradient(145deg,#fef2f2,#fee2e2);
+}
+
+.reward-select.animate{
+    animation:selectPop .2s ease;
+}
+
+@keyframes selectPop{
+    0%{ transform:scale(1); }
+    50%{ transform:scale(1.05); }
+    100%{ transform:scale(1); }
+}
+
 .reward-input{
     width:100%;
     padding:10px;
@@ -837,7 +957,7 @@ h2{
     font-size:14px;
 }
 
-.reward-select:focus,
+
 .reward-input:focus{
     outline:none;
     border-color:#4f46e5;

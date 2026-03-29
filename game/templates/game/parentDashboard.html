@@ -30,9 +30,25 @@
 
                 <a href="/child/{{ child.id }}/" class="play-btn">🎮 Play</a>
 
-                <button class="add-reward-btn" onclick="openRewardModal({{ child.id }})">
-                    + Add Reward
-                </button>
+                <div class="reward-section">
+                    <form method="POST" action="{% url 'add_reward' %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="child_id" value="{{ child.id }}">
+
+                        <select name="reason" class="reward-select" required>
+                            <option value="">Select reason...</option>
+                            <option value="Homework">📚 Homework</option>
+                            <option value="Good Behaviour">😊 Good Behaviour</option>
+                            <option value="Helping">🤝 Helping</option>
+                            <option value="Reading">📖 Reading</option>
+                            <option value="Exercise">⚽ Exercise</option>
+                        </select>
+
+                        <input type="text" name="comment" class="reward-input" placeholder="Optional comment">
+
+                        <button class="reward-btn" disabled>Add Reward</button>
+                    </form>
+                </div>
 
                 <button class="remove-btn" onclick="removeChild({{ child.id }})">Remove</button>
 
@@ -60,35 +76,14 @@
 
 </div>
 
-<div id="reward-modal" class="modal hidden">
-  <div class="modal-content">
-
-    <h3>Add Reward</h3>
-
-    <form method="POST" action="{% url 'add_reward' %}">
-      {% csrf_token %}
-      <input type="hidden" name="child_id" id="reward-child-id">
-
-      <input type="text" name="reason" placeholder="Reason (e.g. Homework)" required>
-
-      <input type="text" name="comment" placeholder="Optional comment">
-
-      <button class="reward-btn">Add Reward</button>
-    </form>
-
-  </div>
-</div>
-
 <script>
-function openRewardModal(childId){
-  document.getElementById("reward-child-id").value = childId;
-  document.getElementById("reward-modal").classList.remove("hidden");
-}
+document.querySelectorAll(".reward-section").forEach(section => {
+    const select = section.querySelector(".reward-select");
+    const button = section.querySelector(".reward-btn");
 
-document.addEventListener("click", e => {
-  if(e.target.id === "reward-modal"){
-    e.target.classList.add("hidden");
-  }
+    select.addEventListener("change", () => {
+        button.disabled = !select.value;
+    });
 });
 </script>
 

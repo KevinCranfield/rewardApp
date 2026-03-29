@@ -57,6 +57,7 @@ function showToast(message){
 
 function playSound(name){
     if(sounds[name]){
+        sounds[name].pause();
         sounds[name].currentTime = 0;
         sounds[name].play().catch(()=>{});
     }
@@ -81,7 +82,7 @@ function roll(childId){
 
     unlockSounds();
 
-    const button = document.querySelector(`button[onclick*="${childId}"]`);
+    const button = document.querySelector(`.roll-btn[data-child="${childId}"]`);
 
     // 🚫 prevent double clicks
     if(button && button.disabled) return;
@@ -143,6 +144,12 @@ function roll(childId){
             return;
         }
 
+        if(current === data.position){
+            console.warn("No movement");
+            if(button) button.disabled = false;
+            return;
+        }
+
         setTimeout(() => {
             animateMovement(childId, current, data.position);
         }, 100);
@@ -163,11 +170,12 @@ function animateMovement(childId, start, end){
         token = document.createElement("div");
         token.className = "token";
         token.id = "token-" + childId;
-
-        // 👇 optional: show initial letter
         token.textContent = "•";
 
-        // 👇 you can improve later with colour
+        const startSquare = document.querySelector(`[data-square='${start || 1}'] .token-container`);
+        if(startSquare){
+            startSquare.appendChild(token);
+        }
     }
 
     let step = start === 0 ? 1 : start + 1;
@@ -258,7 +266,7 @@ function updateTokensUI(children){
         token.textContent = "•";
 
         // Reattach button reference for this token
-        token._rollButton = document.querySelector(`button[onclick*="${child.id}"]`);
+        token._rollButton = document.querySelector(`.roll-btn[data-child="${child.id}"]`);
 
         if(child.colour){
             token.style.background = child.colour;
@@ -795,7 +803,12 @@ function burstConfetti(count = 40){
 
 window.addEventListener("load", () => {
     drawConnections();
-    window.addEventListener("resize", drawConnections);
+
+    let resizeTimeout;
+    window.addEventListener("resize", () => {
+        clearTimeout(resizeTimeout);
+        resizeTimeout = setTimeout(drawConnections, 150);
+    });
 });
 
 

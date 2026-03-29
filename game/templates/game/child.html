@@ -14,10 +14,11 @@
 
     <button 
         onclick="roll({{ child.id }})" 
-        class="big-roll"
+        class="big-roll roll-btn {% if child.available_rewards == 0 %}disabled{% endif %}"
+        data-child="{{ child.id }}"
         {% if child.available_rewards == 0 %}disabled{% endif %}
     >
-        🎲 Roll for {{ child.name }}
+        🎲 Roll ({{ child.available_rewards }})
     </button>
 
     {% if child.available_rewards == 0 %}
@@ -63,14 +64,14 @@
 
                     <div class="token-container">
 
-                        {% for child in children %}
-                            {% if child.position == num %}
+                        {% for c in children %}
+                            {% if c.position == num %}
                                 <div 
                                     class="token"
-                                    id="token-{{ child.id }}"
-                                    style="background: {{ child.colour }}"
+                                    id="token-{{ c.id }}"
+                                    style="background: {{ c.colour }}"
                                 >
-                                    {{ child.name|slice:":1" }}
+                                    {{ c.name|slice:":1" }}
                                 </div>
                             {% endif %}
                         {% endfor %}
