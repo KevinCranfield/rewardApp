@@ -4,20 +4,56 @@
 {% block content %}
 
 <div class="container">
-<!-- =========================
-     DASHBOARD ACTIONS
-========================= -->
-<div class="section-card dashboard-actions">
 
-    <h2>⚡ Quick Actions</h2>
+    <!-- =========================
+         CHILDREN
+    ========================= -->
+    <div class="section-card">
+        <h2>👶 Children</h2>
 
-    <div class="action-buttons">
-        <button class="add-toggle-btn" onclick="toggleAddChild()">+ Add Child</button>
-        <button class="add-toggle-btn" onclick="togglePinSection()">🔐 Change PIN</button>
-        <button class="danger-btn" id="resetBoardBtn">🔄 Reset Board</button>
+        <div class="card-grid">
+            {% for child in children %}
+            <div class="card">
+
+                <div class="child-header">
+                    <div class="color-dot" style="background: {{ child.colour }}"></div>
+                    <strong>{{ child.name }}</strong>
+                </div>
+
+                <div class="child-info">
+                    Position: {{ child.position }}
+                </div>
+
+                <div class="child-info">
+                    Rewards: {{ child.reward_count|default:0 }}
+                </div>
+
+                <a href="/child/{{ child.id }}/" class="play-btn">🎮 Play</a>
+
+                <button class="remove-btn" onclick="removeChild({{ child.id }})">Remove</button>
+
+            </div>
+            {% empty %}
+            <div class="empty-history">No children added yet</div>
+            {% endfor %}
+        </div>
     </div>
 
-</div>
+    <!-- =========================
+         QUICK ACTIONS
+    ========================= -->
+    <div class="section-card dashboard-actions">
+
+        <h2>⚡ Quick Actions</h2>
+
+        <div class="action-buttons">
+            <button class="add-toggle-btn" onclick="toggleAddChild()">+ Add Child</button>
+            <button class="add-toggle-btn" onclick="togglePinSection()">🔐 Change PIN</button>
+            <button class="danger-btn" id="resetBoardBtn">🔄 Reset Board</button>
+        </div>
+
+    </div>
+
 </div>
 
 {% endblock %}
