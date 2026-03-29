@@ -154,7 +154,26 @@ window.addEventListener("load", () => {
 })();
 </script>
 
+
 <div id="toast" class="toast hidden"></div>
+
+<script>
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register("/static/game/js/sw.js").then(reg => {
+
+    // Check for updates every 60 seconds
+    setInterval(() => {
+      reg.update();
+    }, 60000);
+
+    // Reload page when new service worker takes control
+    navigator.serviceWorker.addEventListener("controllerchange", () => {
+      window.location.reload();
+    });
+
+  });
+}
+</script>
 
 </body>
 </html>
