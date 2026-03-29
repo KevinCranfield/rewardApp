@@ -25,7 +25,7 @@
                 </div>
 
                 <div class="child-info">
-                    Rewards: {{ child.reward_count|default:0 }}
+                    Rewards: {{ child.available_rewards|default:0 }}
                 </div>
 
                 <a href="/child/{{ child.id }}/" class="play-btn">🎮 Play</a>
@@ -48,6 +48,19 @@
 
                         <button type="submit" class="reward-btn">+ Add Reward</button>
                     </form>
+                </div>
+
+                <div class="reward-history">
+                    {% for reward in child.all_rewards|slice:":5" %}
+                        <div class="reward-item">
+                            🎁 {{ reward.reason }}
+                            {% if reward.custom_text %}
+                                - {{ reward.custom_text }}
+                            {% endif %}
+                        </div>
+                    {% empty %}
+                        <div class="no-rewards">No rewards yet</div>
+                    {% endfor %}
                 </div>
 
                 <button class="remove-btn" onclick="removeChild({{ child.id }})">Remove</button>
