@@ -409,6 +409,20 @@ h2{
     transition:all .2s ease;
 }
 
+/* Improve button layout inside cards */
+.card form{
+    width:100%;
+}
+
+.card .play-btn,
+.card .add-reward-btn{
+    width:100%;
+}
+
+.card .remove-btn{
+    margin-top:6px;
+}
+
 .card:hover{
     transform:translateY(-3px);
     box-shadow:
@@ -794,6 +808,7 @@ h2{
     box-shadow:0 0 0 2px rgba(79,70,229,.15);
 }
 
+
 .reward-btn{
     margin-top:4px;
 
@@ -824,6 +839,36 @@ h2{
 
 .reward-btn:active{
     transform:scale(.97);
+}
+
+/* =========================
+   ADD REWARD BUTTON (DASHBOARD)
+========================= */
+.add-reward-btn{
+    margin-top:10px;
+    width:100%;
+    padding:10px;
+
+    background:linear-gradient(135deg,#6366f1,#4f46e5);
+    color:white;
+
+    border:none;
+    border-radius:10px;
+    font-weight:600;
+
+    cursor:pointer;
+
+    box-shadow:0 6px 14px rgba(0,0,0,.2);
+    transition:all .2s ease;
+}
+
+.add-reward-btn:hover{
+    transform:translateY(-2px);
+    box-shadow:0 10px 20px rgba(0,0,0,.25);
+}
+
+.add-reward-btn:active{
+    transform:scale(.96);
 }
 
 /* =========================

@@ -30,6 +30,12 @@
 
                 <a href="/child/{{ child.id }}/" class="play-btn">🎮 Play</a>
 
+                <form method="POST" action="{% url 'add_reward' %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="child_id" value="{{ child.id }}">
+                    <button class="add-reward-btn">+ Add Reward</button>
+                </form>
+
                 <button class="remove-btn" onclick="removeChild({{ child.id }})">Remove</button>
 
             </div>
