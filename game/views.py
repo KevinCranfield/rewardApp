@@ -166,9 +166,35 @@ def roll(request):
             return JsonResponse({"error": "no reward"}, status=400)
 
         dice = random.randint(1, 4)
-        new_pos = min(child.position + dice, 64)
 
-        child.position = new_pos
+        SNAKES = {
+            62: 44,
+            55: 41,
+            27: 10,
+            33: 18,
+        }
+
+        LADDERS = {
+            3: 22,
+            8: 26,
+            19: 38,
+            35: 49,
+        }
+
+        start_pos = child.position
+        roll_target = min(start_pos + dice, 64)
+
+        jump = None
+        final_pos = roll_target
+
+        if roll_target in SNAKES:
+            final_pos = SNAKES[roll_target]
+            jump = "snake"
+        elif roll_target in LADDERS:
+            final_pos = LADDERS[roll_target]
+            jump = "ladder"
+
+        child.position = final_pos
         child.save()
 
         reward.is_used = True
@@ -177,12 +203,14 @@ def roll(request):
         Roll.objects.create(
             child=child,
             dice=dice,
-            position_after=new_pos
+            position_after=final_pos
         )
 
         return JsonResponse({
             "dice": dice,
-            "position": new_pos,
+            "position": final_pos,
+            "from": roll_target,
+            "jump": jump,
             "children": list(
                 Child.objects.filter(family=child.family)
                 .values("id", "name", "colour", "position")

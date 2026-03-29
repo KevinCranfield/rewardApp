@@ -1,17 +1,3 @@
-// 🐍 Snakes & 🪜 Ladders
-const snakes = {
-    62: 44,  // top-left snake
-    55: 41,  // right-side snake
-    27: 10,    // bottom snake
-    33: 18,
-};
-
-const ladders = {
-    3: 22,   // bottom-left
-    8: 26,   // right side lower
-    19: 38,  // mid board
-    35: 49,   // upper climb
-};
 
 // 🔊 SOUND SYSTEM
 const sounds = {
@@ -152,7 +138,18 @@ function roll(childId){
         }
 
         setTimeout(() => {
-            animateMovement(childId, current, data.position);
+            if(data.jump){
+                // move to landing square first
+                animateMovement(childId, current, data.from);
+
+                // then animate jump
+                setTimeout(() => {
+                    animateJump(childId, data.from, data.position);
+                }, 800);
+
+            } else {
+                animateMovement(childId, current, data.position);
+            }
         }, 100);
 
     })
@@ -203,31 +200,6 @@ function animateMovement(childId, start, end){
                 }
 
                 console.log("🏆 WINNER!", childId);
-                return;
-            }
-
-            // 🎯 check snakes or ladders AFTER movement
-            let finalPos = end;
-
-            if(snakes[finalPos]){
-                console.log("🐍 Snake!", finalPos, "→", snakes[finalPos]);
-                showToast("🐍 Oh no! Snake!");
-
-                setTimeout(() => {
-                    animateJump(childId, finalPos, snakes[finalPos]);
-                }, 200);
-
-                return;
-            }
-
-            if(ladders[finalPos]){
-                console.log("🪜 Ladder!", finalPos, "→", ladders[finalPos]);
-                showToast("🪜 Climb! Ladder!");
-
-                setTimeout(() => {
-                    animateJump(childId, finalPos, ladders[finalPos]);
-                }, 200);
-
                 return;
             }
 
