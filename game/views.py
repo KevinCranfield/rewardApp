@@ -66,13 +66,6 @@ def dashboard(request):
     for c in children:
         c.last_roll = last_map.get(c.id)
 
-    # 🎯 build 8x8 snake layout
-    squares = []
-    for row in range(8):
-        nums = list(range(row * 8 + 1, row * 8 + 9))
-        if row % 2 == 1:
-            nums.reverse()
-        squares.insert(0, nums)
 
     # 🔥 recent rewards history
     recent_rewards = Reward.objects.filter(
@@ -81,7 +74,6 @@ def dashboard(request):
 
     return render(request, "game/parentDashboard.html", {
         "children": children,
-        "squares": squares,
         "recent_rewards": recent_rewards
     })
 
