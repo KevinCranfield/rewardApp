@@ -1,4 +1,4 @@
-const CACHE_NAME = "reward-game-v2"; // 🔁 bump this on each deploy
+const CACHE_NAME = "reward-game-v3"; // 🔁 bump this on each deploy
 
 // Install - activate immediately
 self.addEventListener("install", event => {
@@ -27,7 +27,13 @@ self.addEventListener("fetch", event => {
     fetch(event.request)
       .then(response => {
         // Cache successful responses
-        if (event.request.method === "GET" && response.status === 200) {
+        const url = new URL(event.request.url);
+
+        if (
+          event.request.method === "GET" &&
+          response.status === 200 &&
+          url.pathname.startsWith("/static/")
+        ) {
           const responseClone = response.clone();
           caches.open(CACHE_NAME).then(cache => {
             cache.put(event.request, responseClone);
