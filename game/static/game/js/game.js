@@ -661,21 +661,33 @@ function showDice(value){
         document.body.appendChild(dice);
     }
 
-    dice.textContent = "🎲 " + value;
-    dice.style.opacity = "1";
-
     playSound('dice');
 
-    dice.style.transition = "all .2s ease";
-    dice.style.transform = "translate(-50%, -50%) scale(1.1)";
+    // 🎲 fake rolling animation
+    let rolls = 0;
+    const rollInterval = setInterval(() => {
+        const random = Math.floor(Math.random()*6) + 1;
+        dice.textContent = "🎲 " + random;
+        rolls++;
 
-    setTimeout(() => {
-        dice.style.transform = "translate(-50%, -50%) scale(1)";
-    }, 120);
+        if(rolls > 6){
+            clearInterval(rollInterval);
 
-    setTimeout(() => {
-        dice.style.transform = "translate(-50%, -50%) scale(0)";
-    }, 1400);
+            // final value
+            dice.textContent = "🎲 " + value;
+
+            dice.style.transition = "all .2s ease";
+            dice.style.transform = "translate(-50%, -50%) scale(1.2)";
+
+            setTimeout(() => {
+                dice.style.transform = "translate(-50%, -50%) scale(1)";
+            }, 120);
+
+            setTimeout(() => {
+                dice.style.transform = "translate(-50%, -50%) scale(0)";
+            }, 1400);
+        }
+    }, 80);
 }
 
 // 🔐 CSRF helper
