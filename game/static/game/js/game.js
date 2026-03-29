@@ -20,12 +20,26 @@ const sounds = {
     click: new Audio('/static/game/sounds/click.mp3')
 };
 
-// 🔓 Unlock sounds on first user interaction (required by some browsers)
-document.addEventListener("click", () => {
+let soundsUnlocked = false;
+
+function unlockSounds(){
+    if(soundsUnlocked) return;
+
+    soundsUnlocked = true;
+
     Object.values(sounds).forEach(s => {
-        s.play().then(() => s.pause()).catch(()=>{});
+        const prevVolume = s.volume ?? 1;
+        s.volume = 0;
+        s.play().then(() => {
+            s.pause();
+            s.currentTime = 0;
+            s.volume = prevVolume;
+        }).catch(()=>{});
     });
-}, { once: true });
+}
+
+// Unlock on first interaction (silent)
+document.addEventListener("click", unlockSounds, { once: true });
 
 function playSound(name){
     if(sounds[name]){
@@ -50,6 +64,8 @@ function getSquareCenter(num){
 }
 
 function roll(childId){
+
+    unlockSounds();
 
     const button = document.querySelector(`button[onclick*="${childId}"]`);
 
