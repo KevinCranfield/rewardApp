@@ -20,6 +20,13 @@ const sounds = {
     click: new Audio('/static/game/sounds/click.mp3')
 };
 
+// 🔓 Unlock sounds on first user interaction (required by some browsers)
+document.addEventListener("click", () => {
+    Object.values(sounds).forEach(s => {
+        s.play().then(() => s.pause()).catch(()=>{});
+    });
+}, { once: true });
+
 function playSound(name){
     if(sounds[name]){
         sounds[name].currentTime = 0;
@@ -50,6 +57,9 @@ function roll(childId){
     if(button && button.disabled) return;
     if(button) button.disabled = true;
     playSound('click');
+    if(navigator.vibrate){
+        navigator.vibrate(30);
+    }
 
     // Store button reference on token
     const token = document.getElementById("token-" + childId);
@@ -91,6 +101,7 @@ function roll(childId){
         console.log("ROLL:", data);
 
         showDice(data.dice);
+        showToast("🎲 Rolled " + data.dice);
         if(data.children){
             updateTokensUI(data.children);
         }
@@ -109,6 +120,7 @@ function roll(childId){
     })
     .catch(err => {
         console.error(err);
+        showToast("⚠️ Network error");
         if(button) button.disabled = false;
     });
 }
@@ -160,11 +172,13 @@ function animateMovement(childId, start, end){
 
             if(snakes[finalPos]){
                 console.log("🐍 Snake!", finalPos, "→", snakes[finalPos]);
+                showToast("🐍 Oh no! Snake!");
                 return animateJump(childId, finalPos, snakes[finalPos]);
             }
 
             if(ladders[finalPos]){
                 console.log("🪜 Ladder!", finalPos, "→", ladders[finalPos]);
+                showToast("🪜 Climb! Ladder!");
                 return animateJump(childId, finalPos, ladders[finalPos]);
             }
 
@@ -212,6 +226,9 @@ function updateTokensUI(children){
         token.className = "token";
         token.id = "token-" + child.id;
         token.textContent = "•";
+
+        // Reattach button reference for this token
+        token._rollButton = document.querySelector(`button[onclick*="${child.id}"]`);
 
         if(child.colour){
             token.style.background = child.colour;
@@ -607,11 +624,16 @@ function showDice(value){
     }
 
     dice.textContent = "🎲 " + value;
+    dice.style.opacity = "1";
 
     playSound('dice');
 
     dice.style.transition = "all .2s ease";
-    dice.style.transform = "translate(-50%, -50%) scale(1)";
+    dice.style.transform = "translate(-50%, -50%) scale(1.1)";
+
+    setTimeout(() => {
+        dice.style.transform = "translate(-50%, -50%) scale(1)";
+    }, 120);
 
     setTimeout(() => {
         dice.style.transform = "translate(-50%, -50%) scale(0)";
@@ -746,12 +768,6 @@ window.addEventListener("load", () => {
     window.addEventListener("resize", drawConnections);
 });
 
-if("serviceWorker" in navigator){
-    navigator.serviceWorker.register("/static/game/js/sw.js")
-        .then(() => console.log("✅ Service Worker registered"))
-        .catch(err => console.log("SW error", err));
-}
-
 
 // 🔐 Smart inactivity ping (keeps PIN session alive while active)
 function pingActivity(){
@@ -765,7 +781,9 @@ function pingActivity(){
 
 document.getElementById("resetBoardBtn")?.addEventListener("click", () => {
 
-    const confirmReset = confirm("⚠️ Reset the board for all players?");
+    playSound('click');
+
+    const confirmReset = confirm("⚠️ This will reset ALL players back to start. Continue?");
     if(!confirmReset) return;
 
     fetch("/reset-board/", {
