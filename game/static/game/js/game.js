@@ -348,6 +348,14 @@ function animateJump(childId, start, end){
                 }
 
                 if(window.__lastChildren){
+                    // 🔧 FIX: update local state to new position (ladder/snake result)
+                    window.__lastChildren = window.__lastChildren.map(c => {
+                        if(c.id == childId){
+                            return { ...c, position: end };
+                        }
+                        return c;
+                    });
+
                     updateTokensUI(window.__lastChildren);
                 }
             }
@@ -425,6 +433,14 @@ function animateJump(childId, start, end){
                 token._rollButton.disabled = false;
             }
             if(window.__lastChildren){
+                // 🔧 FIX: update local state to new position (ladder/snake result)
+                window.__lastChildren = window.__lastChildren.map(c => {
+                    if(c.id == childId){
+                        return { ...c, position: end };
+                    }
+                    return c;
+                });
+
                 updateTokensUI(window.__lastChildren);
             }
         }
