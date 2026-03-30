@@ -30,7 +30,6 @@ def is_parent_authenticated(request):
 def home(request):
     return render(request, "game/home.html")
 
-@login_required
 def dashboard(request):
 
     if not is_parent_authenticated(request):
@@ -125,7 +124,6 @@ def child_view(request, child_id):
     })
 
 
-@login_required
 def add_child(request):
 
     if request.method == "POST":
@@ -149,7 +147,6 @@ def add_child(request):
     return redirect("dashboard")
 
 
-@login_required
 def roll(request):
 
     if request.method == "POST":
@@ -225,7 +222,6 @@ def roll(request):
     
 
 
-@login_required
 def remove_child(request, child_id):
     if request.method == "POST":
         family = get_family(request.user)
@@ -240,7 +236,6 @@ def remove_child(request, child_id):
 
     return redirect("dashboard")
 
-@login_required
 def add_reward(request):
 
     if request.method == "POST":
@@ -277,7 +272,6 @@ def add_reward(request):
 
     return JsonResponse({"success": False, "error": "Invalid request"}, status=400)
 
-@login_required
 def change_pin(request):
 
     if request.method == "POST":
@@ -292,7 +286,6 @@ def change_pin(request):
     return redirect("dashboard")
 from django.views.decorators.http import require_POST
 
-@login_required
 @require_POST
 def reset_board(request):
     if not is_parent_authenticated(request):
@@ -311,12 +304,10 @@ def reset_board(request):
 
     return JsonResponse({"success": True})
 
-@login_required
 def ping_auth(request):
     request.session["parent_auth_time"] = timezone.now().timestamp()
     return JsonResponse({"ok": True})
 
-@login_required
 def enter_pin(request):
 
     family = get_family(request.user)
