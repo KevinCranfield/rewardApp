@@ -57,12 +57,23 @@ h2{
     align-items: center;
 
     padding: 12px 18px;
-    background: white;
 
-    box-shadow: 0 4px 14px rgba(0,0,0,.08);
+    /* GLASS EFFECT */
+    background: rgba(255,255,255,0.7);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+
+    border-bottom: 1px solid rgba(255,255,255,0.3);
+
+    box-shadow: 0 8px 30px rgba(0,0,0,.08);
+
     position: sticky;
     top: 0;
     z-index: 1000;
+}
+
+.navbar:hover{
+    background: rgba(255,255,255,0.85);
 }
 
 .nav-left {
