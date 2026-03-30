@@ -1075,6 +1075,21 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if(!circles.length || !select) return;
 
+    // 🔒 Disable already used colours (SAFE)
+    const usedEl = document.getElementById("usedColours");
+
+    if(usedEl && usedEl.dataset.colours){
+        const used = usedEl.dataset.colours.split(",").map(c => c.trim());
+
+        circles.forEach(circle => {
+            if(used.includes(circle.dataset.colour)){
+                circle.classList.add("disabled");
+                circle.style.opacity = "0.3";
+                circle.style.pointerEvents = "none";
+            }
+        });
+    }
+
     circles.forEach(circle => {
 
         circle.addEventListener("click", () => {
