@@ -15,6 +15,14 @@
     <link rel="preload" href="{% static 'game/js/game.js' %}" as="script">
     <link rel="apple-touch-icon" href="{% static 'game/icons/icon-192.png' %}">
     <meta name="mobile-web-app-capable" content="yes">
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-GZ0ENNSBXC"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);} 
+      gtag('js', new Date());
+      gtag('config', 'G-GZ0ENNSBXC');
+    </script>
 </head>
 
 <body>
