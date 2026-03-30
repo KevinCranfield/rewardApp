@@ -1069,7 +1069,9 @@ document.addEventListener("DOMContentLoaded", () => {
 document.addEventListener("DOMContentLoaded", () => {
 
     const circles = document.querySelectorAll(".colour-circle");
-    const select = document.getElementById("colourSelect");
+    const select = document.querySelector("select[name='colour']");
+
+    console.log("Colour picker init", circles.length, select);
 
     if(!circles.length || !select) return;
 
@@ -1079,8 +1081,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
             const colour = circle.dataset.colour;
 
+            console.log("Clicked colour:", colour);
+
             // sync with dropdown (SAFE fallback)
             select.value = colour;
+
+            // force change event (some browsers need this)
+            select.dispatchEvent(new Event("change"));
 
             // visual selection
             circles.forEach(c => c.classList.remove("selected"));
