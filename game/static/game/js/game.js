@@ -767,14 +767,24 @@ function getCSRFToken() {
 }
 
 function toggleAddChild(){
-    const form = document.getElementById("addChildForm")
-    form.classList.toggle("hidden")
+    const form = document.getElementById("addChildForm");
+    const btn = document.querySelector("button[onclick='toggleAddChild()']");
+
+    if(!form) return;
+
+    form.classList.toggle("hidden");
+
+    if(btn){
+        btn.innerText = form.classList.contains("hidden")
+            ? "➕ Add Child"
+            : "❌ Close";
+    }
 }
 
 // 🔒 Toggle PIN section UI
 function togglePinSection(){
     const section = document.getElementById("pinSection");
-    const btn = document.querySelector("button[onclick='togglePinSection()']");
+    const btn = document.querySelector("[data-action='toggle-pin']") || document.querySelector("button[onclick='togglePinSection()']");
 
     section.classList.toggle("hidden");
 

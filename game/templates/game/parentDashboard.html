@@ -87,6 +87,38 @@
 
     </div>
 
+    <div id="addChildForm" class="section-card hidden">
+        <h3>Add Child</h3>
+
+        <form method="POST" action="{% url 'add_child' %}">
+            {% csrf_token %}
+
+            <input type="text" name="name" placeholder="Child name" required class="reward-input">
+
+            <select name="colour" class="reward-select">
+                <option value="blue">Blue</option>
+                <option value="green">Green</option>
+                <option value="red">Red</option>
+                <option value="yellow">Yellow</option>
+            </select>
+
+            <button type="submit" class="reward-btn">Add Child</button>
+        </form>
+    </div>
+
+    <div id="pinSection" class="section-card hidden">
+        <h3>Change PIN</h3>
+
+        <form method="POST" action="{% url 'change_pin' %}" class="pin-form">
+            {% csrf_token %}
+
+            <input type="password" name="new_pin" placeholder="New PIN" required class="reward-input">
+            <input type="password" name="confirm_pin" placeholder="Confirm PIN" required class="reward-input">
+
+            <button type="submit" class="reward-btn">Update PIN</button>
+        </form>
+    </div>
+
 </div>
 
 {% endblock %}
