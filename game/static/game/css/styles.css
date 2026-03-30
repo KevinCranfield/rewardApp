@@ -558,6 +558,54 @@ h2{
         0 6px 16px rgba(0,0,0,.25);
 }
 
+/* =========================
+   COLOUR CIRCLE PICKER (NEW)
+========================= */
+
+.colour-picker{
+    display:flex;
+    gap:12px;
+    flex-wrap:wrap;
+    margin-top:8px;
+}
+
+.colour-circle{
+    width:38px;
+    height:38px;
+    border-radius:50%;
+    cursor:pointer;
+
+    border:3px solid transparent;
+
+    box-shadow:0 6px 14px rgba(0,0,0,.2);
+
+    transition:all .2s ease;
+}
+
+.colour-circle:hover{
+    transform:scale(1.12);
+}
+
+.colour-circle.selected{
+    transform:scale(1.18);
+    border:3px solid white;
+    box-shadow:
+        0 0 0 3px #6366f1,
+        0 8px 20px rgba(0,0,0,.25);
+}
+
+.colour-circle.disabled{
+    opacity:0.25;
+    filter:grayscale(0.6);
+    cursor:not-allowed;
+    box-shadow:none;
+}
+
+/* subtle press */
+.colour-circle:active{
+    transform:scale(.95);
+}
+
 /* ADD BUTTON */
 
 /* HIDDEN FORM */

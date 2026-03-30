@@ -1064,3 +1064,36 @@ document.addEventListener("DOMContentLoaded", () => {
 
     });
 });
+
+// 🎨 Colour picker (Add Child)
+document.addEventListener("DOMContentLoaded", () => {
+
+    const circles = document.querySelectorAll(".colour-circle");
+    const input = document.getElementById("colourInput");
+
+    if(!circles.length || !input) return;
+
+    // from backend (injected in template)
+    const usedColours = window.usedColours || [];
+
+    circles.forEach(circle => {
+        const colour = circle.dataset.colour;
+
+        // disable already used colours
+        if(usedColours.includes(colour)){
+            circle.classList.add("disabled");
+            return;
+        }
+
+        circle.addEventListener("click", () => {
+            // remove previous selection
+            circles.forEach(c => c.classList.remove("selected"));
+
+            // select current
+            circle.classList.add("selected");
+
+            // set hidden input
+            input.value = colour;
+        });
+    });
+});
