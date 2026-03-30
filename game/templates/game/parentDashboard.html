@@ -31,12 +31,15 @@
                 <a href="/child/{{ child.id }}/" class="play-btn">🎮 Play</a>
 
                 <div class="reward-section">
+                    <div class="helper-text">
+                        👉 Select a reason, then tap <strong>+ Add Reward</strong>
+                    </div>
                     <form method="POST" action="{% url 'add_reward' %}" class="reward-form">
                         {% csrf_token %}
                         <input type="hidden" name="child_id" value="{{ child.id }}">
 
                         <select name="reason" class="reward-select" required>
-                            <option value="">Select reason...</option>
+                            <option value="">👉 Select reason to add reward</option>
                             <option value="Homework">📚 Homework</option>
                             <option value="Good Behaviour">😊 Good Behaviour</option>
                             <option value="Helping">🤝 Helping</option>
@@ -64,7 +67,7 @@
                             </span>
                         </div>
                     {% empty %}
-                        <div class="no-rewards">No rewards yet</div>
+                        <div class="no-rewards">⚠️ No rewards yet — add one above to enable dice rolls</div>
                     {% endfor %}
                 </div>
 
