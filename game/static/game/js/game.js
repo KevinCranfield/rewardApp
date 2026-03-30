@@ -1065,45 +1065,26 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 });
 
-// 🎨 Colour picker (Add Child)
+// 🎨 Colour picker (safe sync with dropdown)
 document.addEventListener("DOMContentLoaded", () => {
 
     const circles = document.querySelectorAll(".colour-circle");
-    const input = document.getElementById("colourInput");
+    const select = document.getElementById("colourSelect");
 
-    if(!circles.length || !input) return;
-
-    // from backend (injected in template)
-    const usedColours = window.usedColours || [];
+    if(!circles.length || !select) return;
 
     circles.forEach(circle => {
-        const colour = circle.dataset.colour;
-
-        // disable already used colours
-        if(usedColours.includes(colour)){
-            circle.classList.add("disabled");
-            return;
-        }
 
         circle.addEventListener("click", () => {
 
-            // 🚫 prevent selecting disabled colours
-            if(circle.classList.contains("disabled")) return;
+            const colour = circle.dataset.colour;
 
-            // remove previous selection
+            // sync with dropdown (SAFE fallback)
+            select.value = colour;
+
+            // visual selection
             circles.forEach(c => c.classList.remove("selected"));
-
-            // select current
             circle.classList.add("selected");
-
-            // set hidden input
-            input.value = colour;
-
-            // ✅ enable Add Child button
-            const addBtn = document.getElementById("addChildBtn");
-            if(addBtn){
-                addBtn.disabled = false;
-            }
         });
     });
 });
