@@ -309,6 +309,7 @@ def ping_auth(request):
     request.session["parent_auth_time"] = timezone.now().timestamp()
     return JsonResponse({"ok": True})
 
+@login_required
 def enter_pin(request):
 
     family = get_family(request.user)
