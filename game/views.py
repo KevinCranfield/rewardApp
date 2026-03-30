@@ -34,7 +34,7 @@ def home(request):
 def dashboard(request):
 
     if not is_parent_authenticated(request):
-        return redirect("enter_pin")
+        return redirect("enter-pin")
 
     # 🔄 refresh activity timer
     request.session["parent_auth_time"] = timezone.now().timestamp()
