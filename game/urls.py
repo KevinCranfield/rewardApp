@@ -10,7 +10,7 @@ urlpatterns = [
 
     # 🎯 ACTIONS
     path("add-child/", views.add_child, name="add_child"),
-    path("remove-child/", views.remove_child, name="remove_child"),
+    path("remove-child/<int:child_id>/", views.remove_child, name="remove_child"),
     path("add-reward/", views.add_reward, name="add_reward"),
     path("roll/", views.roll, name="roll"),
     path("reset-board/", views.reset_board, name="reset_board"),
