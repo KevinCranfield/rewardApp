@@ -30,6 +30,7 @@ def is_parent_authenticated(request):
 def home(request):
     return render(request, "game/home.html")
 
+@login_required
 def dashboard(request):
 
     if not is_parent_authenticated(request):
