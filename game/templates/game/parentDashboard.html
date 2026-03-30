@@ -105,18 +105,17 @@
 
             <input type="text" name="name" placeholder="Child name" required class="reward-input">
 
-            <div class="colour-picker">
-                <input type="hidden" name="colour" id="colourInput" required>
+            <select name="colour" class="reward-select" required>
+                <option value="">Select colour...</option>
+                <option value="blue">Blue</option>
+                <option value="green">Green</option>
+                <option value="red">Red</option>
+                <option value="yellow">Yellow</option>
+                <option value="purple">Purple</option>
+                <option value="orange">Orange</option>
+            </select>
 
-                <div class="colour-circle" data-colour="blue" style="background:#3b82f6"></div>
-                <div class="colour-circle" data-colour="green" style="background:#22c55e"></div>
-                <div class="colour-circle" data-colour="red" style="background:#ef4444"></div>
-                <div class="colour-circle" data-colour="yellow" style="background:#eab308"></div>
-                <div class="colour-circle" data-colour="purple" style="background:#a855f7"></div>
-                <div class="colour-circle" data-colour="orange" style="background:#f97316"></div>
-            </div>
-
-            <button type="submit" class="reward-btn" id="addChildBtn" disabled>Add Child</button>
+            <button type="submit" class="reward-btn">Add Child</button>
         </form>
     </div>
 
@@ -134,10 +133,5 @@
     </div>
 
 </div>
-
-<script>
-    // Safe injection to avoid template crashes
-    window.usedColours = JSON.parse('{{ used_colours|default:"[]"|escapejs }}');
-</script>
 
 {% endblock %}
