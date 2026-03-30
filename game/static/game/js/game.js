@@ -1086,6 +1086,10 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         circle.addEventListener("click", () => {
+
+            // 🚫 prevent selecting disabled colours
+            if(circle.classList.contains("disabled")) return;
+
             // remove previous selection
             circles.forEach(c => c.classList.remove("selected"));
 
@@ -1094,6 +1098,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
             // set hidden input
             input.value = colour;
+
+            // ✅ enable Add Child button
+            const addBtn = document.getElementById("addChildBtn");
+            if(addBtn){
+                addBtn.disabled = false;
+            }
         });
     });
 });

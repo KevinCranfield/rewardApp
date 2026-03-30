@@ -53,17 +53,27 @@
                 <div class="reward-history">
                     {% for reward in child.all_rewards|slice:":5" %}
                         <div class="reward-item">
-                            🎁 {{ reward.reason }}
-                            {% if reward.custom_text %}
-                                - {{ reward.custom_text }}
-                            {% endif %}
+                            <span>
+                                🎁 {{ reward.reason }}
+                                {% if reward.custom_text %}
+                                    - {{ reward.custom_text }}
+                                {% endif %}
+                            </span>
+                            <span class="reward-date">
+                                {{ reward.created_at|date:"d M H:i" }}
+                            </span>
                         </div>
                     {% empty %}
                         <div class="no-rewards">No rewards yet</div>
                     {% endfor %}
                 </div>
 
-                <button class="remove-btn" onclick="removeChild({{ child.id }})">Remove</button>
+                <form method="POST" action="{% url 'remove_child' child.id %}">
+                    {% csrf_token %}
+                    <button type="submit" class="remove-btn" onclick="return confirm('Remove this child?')">
+                        Remove
+                    </button>
+                </form>
 
             </div>
             {% empty %}
@@ -106,7 +116,7 @@
                 <div class="colour-circle" data-colour="orange" style="background:#f97316"></div>
             </div>
 
-            <button type="submit" class="reward-btn">Add Child</button>
+            <button type="submit" class="reward-btn" id="addChildBtn" disabled>Add Child</button>
         </form>
     </div>
 
@@ -124,5 +134,9 @@
     </div>
 
 </div>
+
+<script>
+    window.usedColours = {{ used_colours|safe }};
+</script>
 
 {% endblock %}

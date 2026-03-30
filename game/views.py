@@ -72,9 +72,15 @@ def dashboard(request):
         child__family=family
     ).select_related("child").order_by("-created_at")[:15]
 
+    used_colours = list(
+        Child.objects.filter(family=family)
+        .values_list("colour", flat=True)
+    )
+
     return render(request, "game/parentDashboard.html", {
         "children": children,
-        "recent_rewards": recent_rewards
+        "recent_rewards": recent_rewards,
+        "used_colours": used_colours
     })
 
 @login_required
@@ -220,13 +226,18 @@ def roll(request):
 
 
 @login_required
-def remove_child(request):
+def remove_child(request, child_id):
     if request.method == "POST":
         family = get_family(request.user)
-        Child.objects.filter(
-            id=request.POST.get("child_id"),
+
+        child = Child.objects.filter(
+            id=child_id,
             family=family
-        ).delete()
+        ).first()
+
+        if child:
+            child.delete()
+
     return redirect("dashboard")
 
 @login_required
