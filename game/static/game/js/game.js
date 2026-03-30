@@ -1065,11 +1065,11 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 });
 
-// 🎨 Colour picker (safe sync with dropdown)
+// 🎨 Colour picker (safe sync with hidden input)
 document.addEventListener("DOMContentLoaded", () => {
 
     const circles = document.querySelectorAll(".colour-circle");
-    const select = document.querySelector("select[name='colour']");
+    const select = document.getElementById("colourInput");
 
     console.log("Colour picker init", circles.length, select);
 
@@ -1098,7 +1098,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
             console.log("Clicked colour:", colour);
 
-            // sync with dropdown (SAFE fallback)
+            // sync with hidden input (SAFE fallback)
             select.value = colour;
 
             // force change event (some browsers need this)
