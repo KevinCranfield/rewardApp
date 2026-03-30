@@ -39,46 +39,35 @@
 </div>
 
 <div id="app" style="display:none;">
-<header class="app-header">
-    <div class="container header-inner">
+<header class="navbar">
+    <div class="nav-left">
+        <img src="{% static 'game/images/logo.png' %}" class="nav-logo">
+        <span class="nav-title">Reward Game</span>
+    </div>
 
-        <div class="logo">
-            <img src="{% static 'game/images/logo.png' %}" alt="logo">
-            <span>Reward Game</span>
-        </div>
+    <div class="nav-right">
+        <a href="/">Home</a>
+        <a href="/dashboard/">Dashboard</a>
 
-        <nav class="nav">
-            <a href="/">Home</a>
-            <a href="/dashboard/">Dashboard</a>
-
-            {% if children %}
-                <div class="child-nav">
-                    {% for c in children %}
-                        <a href="/child/{{ c.id }}/"
-                           class="child-link {% if request.path == "/child/"|add:c.id|stringformat:"s"|add:"/" %}active-child{% endif %}">
-                            <span class="nav-dot" style="background: {{ c.colour }}"></span>
-                            {{ c.name }}
-                        </a>
-                    {% endfor %}
-                </div>
-            {% endif %}
-        {% if request.user.is_authenticated %}
-            <div class="user-nav">
-                <span class="user-name">👤 {{ request.user.username }}</span>
-                <a href="/logout/" class="logout-btn">Logout</a>
-                <button onclick="installApp()" id="installBtn" style="display:none;" class="install-btn">
-                    📲 Install
-                </button>
-            </div>
-        {% else %}
-            <div class="user-nav">
-                <a href="/login/">Login</a>
-                <a href="/signup/">Sign Up</a>
-            </div>
+        {% if children %}
+            {% for c in children %}
+                <a href="/child/{{ c.id }}/" class="child-link">
+                    <span class="nav-dot" style="background: {{ c.colour }}"></span>
+                    {{ c.name }}
+                </a>
+            {% endfor %}
         {% endif %}
 
-        </nav>
-
+        {% if request.user.is_authenticated %}
+            <span class="nav-user">👤 {{ request.user.username }}</span>
+            <a href="/logout/" class="nav-link">Logout</a>
+            <button onclick="installApp()" id="installBtn" style="display:none;" class="nav-btn">
+                📲 Install
+            </button>
+        {% else %}
+            <a href="/login/" class="nav-link">Login</a>
+            <a href="/signup/" class="nav-btn">Sign Up</a>
+        {% endif %}
     </div>
 </header>
 

@@ -47,6 +47,96 @@ h2{
    HEADER
 ========================= */
 
+/* =========================
+   MODERN NAVBAR
+========================= */
+
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    padding: 12px 18px;
+    background: white;
+
+    box-shadow: 0 4px 14px rgba(0,0,0,.08);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.nav-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.nav-logo {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+}
+
+.nav-title {
+    font-weight: 700;
+    font-size: 18px;
+}
+
+.nav-right {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex-wrap: wrap;
+}
+
+.nav-right a {
+    text-decoration: none;
+    color: #374151;
+    font-weight: 500;
+    font-size: 14px;
+}
+
+.nav-link:hover {
+    color: #4f46e5;
+}
+
+.nav-btn {
+    padding: 8px 14px;
+    border-radius: 10px;
+
+    background: linear-gradient(135deg,#6366f1,#4338ca);
+    color: white !important;
+
+    font-weight: 600;
+
+    box-shadow: 0 6px 14px rgba(99,102,241,.3);
+    transition: all .2s ease;
+}
+
+.nav-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 10px 20px rgba(99,102,241,.4);
+}
+
+.nav-user {
+    font-size: 13px;
+    opacity: 0.8;
+}
+
+/* mobile tweaks */
+@media (max-width: 600px) {
+    .navbar {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    .nav-right {
+        width: 100%;
+        justify-content: space-between;
+    }
+}
+
 .app-header{
     background:white;
     box-shadow:0 6px 20px rgba(0,0,0,.08);
