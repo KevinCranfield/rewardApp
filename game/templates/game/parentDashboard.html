@@ -136,7 +136,8 @@
 </div>
 
 <script>
-    window.usedColours = {{ used_colours|safe }};
+    // Safe injection to avoid template crashes
+    window.usedColours = JSON.parse('{{ used_colours|default:"[]"|escapejs }}');
 </script>
 
 {% endblock %}
