@@ -1048,13 +1048,37 @@ button, a {
 }
 
 .no-rewards {
-    font-size: 13px;
-    color: #dc2626;
-    font-weight: 500;
+    font-size: 14px;
+    color: #991b1b; /* darker red */
+    font-weight: 700;
     text-align: center;
-    padding: 10px;
+    padding: 12px;
     background: #fee2e2;
-    border-radius: 10px;
+    border-radius: 12px;
+    border: 1px solid #fecaca;
+}
+
+.roll-status{
+    margin-top:10px;
+    font-size:14px;
+    font-weight:600;
+    text-align:center;
+}
+
+.roll-status.available{
+    color:#1f2937;
+}
+
+.roll-status.empty{
+    color:#b91c1c;
+    background:#fee2e2;
+    padding:10px;
+    border-radius:10px;
+}
+
+.child-view .roll-status.empty{
+    color:#7f1d1d;
+    background:#fecaca;
 }
 
 .add-reward-toggle{
