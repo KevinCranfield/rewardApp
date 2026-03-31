@@ -678,11 +678,11 @@ function drawConnections(){
 
         // prong 1 (slight curve to one side)
         const prong1 = document.createElementNS("http://www.w3.org/2000/svg", "path");
-        const c1x = baseX + fx * (tLen * 0.5) + sx * spread; // control point
-        const c1y = baseY + fy * (tLen * 0.5) + sy * spread;
+        const t1cx = baseX + fx * (tLen * 0.5) + sx * spread; // control point
+        const t1cy = baseY + fy * (tLen * 0.5) + sy * spread;
         const e1x = baseX + fx * tLen + sx * (spread * 1.2);   // end point
         const e1y = baseY + fy * tLen + sy * (spread * 1.2);
-        prong1.setAttribute("d", `M ${baseX} ${baseY} Q ${c1x} ${c1y} ${e1x} ${e1y}`);
+        prong1.setAttribute("d", `M ${baseX} ${baseY} Q ${t1cx} ${t1cy} ${e1x} ${e1y}`);
         prong1.setAttribute("stroke", "#ef4444");
         prong1.setAttribute("stroke-width", "1.5");
         prong1.setAttribute("fill", "none");
@@ -692,11 +692,11 @@ function drawConnections(){
 
         // prong 2 (mirror curve to other side)
         const prong2 = document.createElementNS("http://www.w3.org/2000/svg", "path");
-        const c2x = baseX + fx * (tLen * 0.5) - sx * spread;
-        const c2y = baseY + fy * (tLen * 0.5) - sy * spread;
+        const t2cx = baseX + fx * (tLen * 0.5) - sx * spread;
+        const t2cy = baseY + fy * (tLen * 0.5) - sy * spread;
         const e2x = baseX + fx * tLen - sx * (spread * 1.2);
         const e2y = baseY + fy * tLen - sy * (spread * 1.2);
-        prong2.setAttribute("d", `M ${baseX} ${baseY} Q ${c2x} ${c2y} ${e2x} ${e2y}`);
+        prong2.setAttribute("d", `M ${baseX} ${baseY} Q ${t2cx} ${t2cy} ${e2x} ${e2y}`);
         prong2.setAttribute("stroke", "#ef4444");
         prong2.setAttribute("stroke-width", "1.5");
         prong2.setAttribute("fill", "none");
@@ -867,7 +867,15 @@ function burstConfetti(count = 40){
 
 window.addEventListener("load", () => {
 
-    drawConnections();
+    // ⚠️ delay drawing because app may still be hidden (splash)
+    setTimeout(() => {
+        drawConnections();
+    }, 300);
+
+    // redraw again once fully visible (extra safety)
+    setTimeout(() => {
+        drawConnections();
+    }, 800);
 
     let resizeTimeout;
     window.addEventListener("resize", () => {
