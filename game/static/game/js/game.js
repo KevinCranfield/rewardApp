@@ -134,6 +134,13 @@ function roll(childId){
 
         showDice(data.dice);
         showToast("🎲 Rolled " + data.dice);
+        // 🎉 mini celebration on roll (quick feedback)
+        try{
+            burstConfetti(20);
+            if(navigator.vibrate){
+                navigator.vibrate(20);
+            }
+        }catch(e){}
         if(data.children){
             window.__lastChildren = data.children;
         }
