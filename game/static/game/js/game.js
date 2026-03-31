@@ -585,7 +585,19 @@ function drawConnections(){
 
         const angle = Math.atan2(p2.y - p1.y, p2.x - p1.x);
 
-        const d = `M ${p1.x} ${p1.y} Q ${midX + curveOffset} ${midY} ${p2.x} ${p2.y}`;
+        // create perpendicular vector for sideways wiggle
+        const px = -dy / length;
+        const py = dx / length;
+
+        // two control points for a wiggly snake
+        const c1x = midX + px * curveOffset;
+        const c1y = midY + py * curveOffset;
+
+        const c2x = midX - px * curveOffset;
+        const c2y = midY - py * curveOffset;
+
+        // two-segment curve for more wiggle
+        const d = `M ${p1.x} ${p1.y} Q ${c1x} ${c1y} ${midX} ${midY} Q ${c2x} ${c2y} ${p2.x} ${p2.y}`;
 
         // OUTLINE (gives thickness + premium look)
         const outline = document.createElementNS("http://www.w3.org/2000/svg", "path");
