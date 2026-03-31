@@ -983,6 +983,17 @@ button, a {
     }
 }
 
+@keyframes logoPop{
+    from{
+        transform:scale(.8);
+        opacity:0;
+    }
+    to{
+        transform:scale(1);
+        opacity:1;
+    }
+}
+
 .home-title{
     font-size:28px;
     font-weight:700;
@@ -2305,13 +2316,18 @@ html, body {
     text-align:center;
     color:white;
     z-index:9999;
-    transition:opacity .4s ease;
+    transition:opacity .4s ease, transform .4s ease;
+}
+
+.splash.fade-out{
+    opacity:0;
+    transform:scale(1.05);
 }
 
 .splash-logo {
     width:100px;
     margin-bottom:20px;
-    animation: popIn .5s ease;
+    animation: logoPop .6s ease;
 }
 
 .splash-tagline {
@@ -2327,8 +2343,24 @@ html, body {
 }
 
 /* Prevent flicker on load */
-#app {
+#app{
     display:none;
+    opacity:0;
+}
+
+#app.fade-in{
+    animation:appFade .4s ease forwards;
+}
+
+@keyframes appFade{
+    from{
+        opacity:0;
+        transform:translateY(10px);
+    }
+    to{
+        opacity:1;
+        transform:translateY(0);
+    }
 }
 
 .welcome-title{

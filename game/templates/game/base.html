@@ -26,7 +26,30 @@
 <style>
 body{visibility:hidden;}
 body.loaded{visibility:visible;}
-#app{display:none;}
+
+#app{
+    display:none;
+    opacity:0;
+}
+
+#app.fade-in{
+    animation:appFade .4s ease forwards;
+}
+
+@keyframes appFade{
+    from{opacity:0; transform:translateY(10px);} 
+    to{opacity:1; transform:translateY(0);} 
+}
+
+.splash{
+    opacity:1;
+    transition:opacity .4s ease, transform .4s ease;
+}
+
+.splash.fade-out{
+    opacity:0;
+    transform:scale(1.05);
+}
 </style>
 </head>
 
@@ -119,24 +142,34 @@ window.addEventListener("load", () => {
     const splash = document.getElementById("splash");
     const app = document.getElementById("app");
 
-    const hasSeenSplash = localStorage.getItem("seenSplash");
+    // reveal body (prevents flicker)
+    document.body.classList.add("loaded");
 
-    if (hasSeenSplash) {
-        // Skip splash on return visits
-        splash.style.display = "none";
-        app.style.display = "block";
+    if(!splash || !app){
+        if(app) app.style.display = "block";
         return;
     }
 
-    // First visit: show splash
+    const hasSeenSplash = localStorage.getItem("seenSplash");
+
+    if (hasSeenSplash) {
+        splash.style.display = "none";
+        app.style.display = "block";
+        app.classList.add("fade-in");
+        return;
+    }
+
+    // first visit: premium animation
     setTimeout(() => {
-        splash.style.opacity = "0";
+        splash.classList.add("fade-out");
 
         setTimeout(() => {
             splash.style.display = "none";
             app.style.display = "block";
+            app.classList.add("fade-in");
             localStorage.setItem("seenSplash", "true");
         }, 400);
+
     }, 600);
 });
 </script>
