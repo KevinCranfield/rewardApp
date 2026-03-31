@@ -2186,6 +2186,29 @@ body.child-view {
     transform: none; /* remove floating offset */
     position: relative;
     z-index: 1;
+
+    /* subtle blue right-side glow */
+    background: linear-gradient(
+        to right,
+        transparent 70%,
+        rgba(59,130,246,0.25) 85%,
+        rgba(37,99,235,0.35) 100%
+    );
+}
+
+.child-view .board-wrapper::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+
+    background: radial-gradient(
+        circle at 95% 50%,
+        rgba(59,130,246,0.35),
+        transparent 60%
+    );
+
+    opacity: 0.7;
 }
 
 /* Perfect responsive board */
