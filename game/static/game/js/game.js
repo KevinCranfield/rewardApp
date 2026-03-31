@@ -982,24 +982,45 @@ function resetActivityTimer(){
 // initial activity
 resetActivityTimer();
 
-// 🎁 REWARD SYSTEM (FINAL FIX)
+// 🎁 REWARD SYSTEM (UPGRADED UX)
 document.addEventListener("DOMContentLoaded", () => {
 
     document.querySelectorAll("form.reward-form, form[action*='reward']").forEach(form => {
 
         const select = form.querySelector("select[name='reason']");
+        const input = form.querySelector("input[name='custom_reason']");
         const button = form.querySelector("button[type='submit']");
 
         if(!select || !button) return;
 
+        function updateState(){
+            const hasSelect = select.value && select.value.trim() !== "";
+            const hasInput = input && input.value.trim() !== "";
+            button.disabled = !(hasSelect || hasInput);
+        }
+
         // initial state
-        button.disabled = !select.value;
+        updateState();
 
-        // enable only when valid
+        // typing custom → clear dropdown
+        if(input){
+            input.addEventListener("input", () => {
+                if(input.value.trim().length > 0){
+                    select.value = "";
+                    input.style.borderColor = "#4f46e5";
+                } else {
+                    input.style.borderColor = "";
+                }
+                updateState();
+            });
+        }
+
+        // selecting dropdown → clear input
         select.addEventListener("change", () => {
-            button.disabled = !select.value;
+            if(select.value && input){
+                input.value = "";
+            }
 
-            // 🎨 colour feedback
             select.classList.remove("homework","behaviour","helping","reading","exercise");
             const v = select.value.toLowerCase();
             if(v.includes("homework")) select.classList.add("homework");
@@ -1007,13 +1028,18 @@ document.addEventListener("DOMContentLoaded", () => {
             if(v.includes("helping")) select.classList.add("helping");
             if(v.includes("reading")) select.classList.add("reading");
             if(v.includes("exercise")) select.classList.add("exercise");
+
+            updateState();
         });
 
         form.addEventListener("submit", async (e) => {
             e.preventDefault();
 
-            if(!select.value){
-                showToast("⚠️ Select a reason first");
+            const hasSelect = select.value && select.value.trim() !== "";
+            const hasInput = input && input.value.trim() !== "";
+
+            if(!hasSelect && !hasInput){
+                showToast("⚠️ Select or type a reason");
                 return;
             }
 
@@ -1030,12 +1056,10 @@ document.addEventListener("DOMContentLoaded", () => {
                 });
 
                 const data = await res.json();
-                console.log("REWARD RESPONSE:", data);
 
                 if(data.success){
-                    showToast("✅ " + (data.reward?.reason || "Reward added"));
+                    showToast("🎉 Reward added! Ready to roll 🎲");
 
-                    // quick feedback
                     const original = button.textContent;
                     button.textContent = "Added!";
 
@@ -1047,7 +1071,11 @@ document.addEventListener("DOMContentLoaded", () => {
                     button.disabled = true;
                     select.className = "reward-select";
 
-                    // TEMP: ensure UI reflects change
+                    if(input){
+                        input.style.borderColor = "";
+                    }
+
+                    // optional: refresh UI after short delay
                     setTimeout(() => location.reload(), 300);
 
                 } else {
@@ -1063,6 +1091,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
 
     });
+
 });
 
 // 🎨 Colour picker (safe sync with hidden input)

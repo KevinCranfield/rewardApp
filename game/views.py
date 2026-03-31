@@ -255,13 +255,20 @@ def add_reward(request):
             return JsonResponse({"success": False, "error": "Invalid child"}, status=400)
 
         reason = request.POST.get("reason")
-        custom = request.POST.get("custom_text")
+        custom = request.POST.get("custom_reason")
 
-        if reason:
+        # Use custom reason if provided
+        if custom and custom.strip():
+            reason = custom.strip()
+
+        # Still save custom_text for now (optional, legacy field)
+        custom_text = request.POST.get("custom_text")
+
+        if reason and reason.strip():
             reward = Reward.objects.create(
                 child=child,
                 reason=reason,
-                custom_text=custom or ""
+                custom_text=custom_text or ""
             )
 
             return JsonResponse({
