@@ -825,52 +825,6 @@ window.addEventListener("submit", function(e){
     }
 });
 
-const style = document.createElement("style");
-style.innerHTML = `
-@keyframes tongueFlick {
-    0%, 80%, 100% { opacity: 0; }
-    85% { opacity: 1; }
-}
-
-.snake-body {
-    animation: snakeGlow 3s ease-in-out infinite;
-}
-
-.snake-tongue {
-    animation: tongueFlick 2.5s ease-in-out infinite;
-}
-
-@keyframes snakeGlow {
-    0%, 100% { filter: drop-shadow(0 1px 2px rgba(0,0,0,.2)); }
-    50% { filter: drop-shadow(0 3px 6px rgba(34,197,94,.4)); }
-}
-
-/* 🎉 Confetti */
-.confetti-piece{
-    position: fixed;
-    width: 8px;
-    height: 12px;
-    opacity: 0.9;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    pointer-events: none;
-    z-index: 9999;
-    animation: confettiFall 1200ms ease-out forwards;
-}
-
-@keyframes confettiFall{
-    0%{
-        transform: translate(-50%, -50%) rotate(0deg);
-        opacity: 1;
-    }
-    100%{
-        transform: translate(var(--dx), var(--dy)) rotate(360deg);
-        opacity: 0;
-    }
-}
-`;
-document.head.appendChild(style);
 
 function burstConfetti(count = 40){
     const colors = ["#22c55e", "#3b82f6", "#f59e0b", "#ef4444", "#a855f7"];
@@ -898,9 +852,8 @@ function burstConfetti(count = 40){
     }
 }
 
+
 window.addEventListener("load", () => {
-    // ✅ reveal app after CSS is ready
-    document.body.classList.add("loaded");
 
     drawConnections();
 
@@ -1092,7 +1045,6 @@ document.addEventListener("DOMContentLoaded", () => {
                     }
 
                     // optional: refresh UI after short delay
-                    setTimeout(() => location.reload(), 300);
 
                 } else {
                     showToast(data.error || "Error adding reward");

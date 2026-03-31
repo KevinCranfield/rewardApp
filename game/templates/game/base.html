@@ -23,10 +23,15 @@
       gtag('js', new Date());
       gtag('config', 'G-GZ0ENNSBXC');
     </script>
+<style>
+body{visibility:hidden;}
+body.loaded{visibility:visible;}
+#app{display:none;}
+</style>
 </head>
 
 <body>
-<div id="splash-screen" class="splash">
+<div id="splash" class="splash">
   <img src="{% static 'game/images/logo.png' %}" class="splash-logo">
   <h1>Reward Game</h1>
   <p class="splash-tagline">
@@ -38,7 +43,7 @@
   </p>
 </div>
 
-<div id="app" style="display:none;">
+<div id="app">
 <header class="navbar">
     <div class="nav-left">
         <img src="{% static 'game/images/logo.png' %}" class="nav-logo">
@@ -111,7 +116,7 @@ function installApp() {
 
 <script>
 window.addEventListener("load", () => {
-    const splash = document.getElementById("splash-screen");
+    const splash = document.getElementById("splash");
     const app = document.getElementById("app");
 
     const hasSeenSplash = localStorage.getItem("seenSplash");
@@ -132,7 +137,7 @@ window.addEventListener("load", () => {
             app.style.display = "block";
             localStorage.setItem("seenSplash", "true");
         }, 400);
-    }, 800);
+    }, 600);
 });
 </script>
 
@@ -161,7 +166,7 @@ window.addEventListener("load", () => {
     {% if request.user.is_authenticated %}
         <a href="/dashboard/" class="nav-item">⚙️<span>Parent</span></a>
     {% endif %}
-    <a href="/" class="nav-item">🎮<span>Play</span></a>
+    <a href="/child/" class="nav-item">🎮<span>Play</span></a>
 </div>
 
 <div id="toast" class="toast hidden"></div>
