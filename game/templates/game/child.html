@@ -22,11 +22,11 @@
     </button>
 
     {% if child.available_rewards > 0 %}
-        <div style="margin-top:8px; color:#6b7280; font-size:13px;">
+        <div class="roll-status available">
             🎯 {{ child.available_rewards }} roll{{ child.available_rewards|pluralize }} available
         </div>
     {% else %}
-        <div style="margin-top:8px; color:#9ca3af; font-size:13px;">
+        <div class="roll-status empty">
             No more rolls — go earn another reward 🙂
         </div>
     {% endif %}
