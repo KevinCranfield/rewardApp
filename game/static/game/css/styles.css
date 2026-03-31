@@ -10,6 +10,7 @@ body{
     padding:0;
     overflow-x:hidden;
     animation:fadeIn .3s ease;
+    visibility:hidden;
 }
 button{
     cursor:pointer;
@@ -2546,4 +2547,8 @@ html, body {
     30%{ transform:translateY(-4px); }
     60%{ transform:translateY(2px); }
     100%{ transform:translateY(0); }
+}
+
+body.loaded{
+    visibility:visible;
 }

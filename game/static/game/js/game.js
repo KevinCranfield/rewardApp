@@ -899,6 +899,9 @@ function burstConfetti(count = 40){
 }
 
 window.addEventListener("load", () => {
+    // ✅ reveal app after CSS is ready
+    document.body.classList.add("loaded");
+
     drawConnections();
 
     let resizeTimeout;
