@@ -1107,3 +1107,17 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
 });
+// 🔧 SAFETY: ensure app becomes visible (prevents blank screen if splash fails)
+document.addEventListener("DOMContentLoaded", () => {
+    document.body.classList.add("loaded");
+
+    const app = document.getElementById("app");
+    if(app){
+        app.style.display = "block";
+    }
+
+    const splash = document.getElementById("splash");
+    if(splash){
+        splash.style.display = "none";
+    }
+});
