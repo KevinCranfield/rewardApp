@@ -1007,9 +1007,10 @@ document.addEventListener("DOMContentLoaded", () => {
             input.addEventListener("input", () => {
                 if(input.value.trim().length > 0){
                     select.value = "";
-                    input.style.borderColor = "#4f46e5";
+                    input.classList.add("active");
+                    select.classList.remove("active");
                 } else {
-                    input.style.borderColor = "";
+                    input.classList.remove("active");
                 }
                 updateState();
             });
@@ -1019,6 +1020,10 @@ document.addEventListener("DOMContentLoaded", () => {
         select.addEventListener("change", () => {
             if(select.value && input){
                 input.value = "";
+                input.classList.remove("active");
+                select.classList.add("active");
+            } else {
+                select.classList.remove("active");
             }
 
             select.classList.remove("homework","behaviour","helping","reading","exercise");
@@ -1070,9 +1075,10 @@ document.addEventListener("DOMContentLoaded", () => {
                     form.reset();
                     button.disabled = true;
                     select.className = "reward-select";
+                    select.classList.remove("active");
 
                     if(input){
-                        input.style.borderColor = "";
+                        input.classList.remove("active");
                     }
 
                     // optional: refresh UI after short delay
