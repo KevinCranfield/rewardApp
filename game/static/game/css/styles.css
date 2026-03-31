@@ -1048,6 +1048,29 @@ button, a {
     margin-bottom: 4px;
 }
 
+.helper-steps{
+    background: rgba(255,255,255,0.92);
+    padding: 12px 14px;
+    border-radius: 12px;
+    font-size: 13px;
+    line-height: 1.5;
+    margin-bottom: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,.08);
+    border: 1px solid rgba(99,102,241,0.15);
+}
+
+.helper-steps strong{
+    display:block;
+    margin-bottom:4px;
+    color:#4f46e5;
+    font-weight:600;
+}
+
+/* subtle entrance animation */
+.helper-steps{
+    animation:fadeSlide .25s ease;
+}
+
 .helper-text strong {
     color: #4f46e5;
 }

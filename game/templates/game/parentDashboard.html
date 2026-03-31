@@ -28,11 +28,13 @@
                     Rewards: {{ child.available_rewards|default:0 }}
                 </div>
 
-                <a href="/child/{{ child.id }}/" class="play-btn">🎮 Play</a>
 
                 <div class="reward-section">
-                    <div class="helper-text">
-                        👉 Select a reason, then tap <strong>+ Add Reward</strong>
+                    <div class="helper-steps">
+                        <strong>🎯 How it works:</strong><br>
+                        1. Select a reason OR type your own<br>
+                        2. Tap “+ Add Reward”<br>
+                        3. Child can roll the dice 🎲
                     </div>
                     <form method="POST" action="{% url 'add_reward' %}" class="reward-form">
                         {% csrf_token %}
@@ -71,6 +73,7 @@
                     {% endfor %}
                 </div>
 
+                <a href="/child/{{ child.id }}/" class="play-btn">🎮 Play</a>
                 <form method="POST" action="{% url 'remove_child' child.id %}">
                     {% csrf_token %}
                     <button type="submit" class="remove-btn" onclick="return confirm('Remove this child?')">
