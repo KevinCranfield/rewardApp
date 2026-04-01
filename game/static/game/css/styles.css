@@ -1416,6 +1416,70 @@ button, a {
 }
 
 /* =========================
+   REWARD TIER BUTTONS
+========================= */
+
+.reward-buttons{
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    margin-top:10px;
+}
+
+.bronze-btn{
+    background:linear-gradient(135deg,#b45309,#92400e);
+    color:white;
+}
+
+.bronze-btn:hover{
+    box-shadow:0 0 14px rgba(180,83,9,.6);
+    transform:translateY(-2px);
+}
+
+.silver-btn{
+    background:linear-gradient(135deg,#9ca3af,#6b7280);
+    color:white;
+}
+
+.silver-btn:hover{
+    box-shadow:0 0 14px rgba(156,163,175,.6);
+    transform:translateY(-2px);
+}
+
+.gold-btn{
+    background:linear-gradient(135deg,#facc15,#ca8a04);
+    color:#1f2937;
+    font-weight:700;
+}
+
+.gold-btn:hover{
+    box-shadow:0 0 18px rgba(250,204,21,.9);
+    transform:translateY(-2px) scale(1.02);
+}
+
+/* subtle shine animation for gold */
+.gold-btn{
+    position:relative;
+    overflow:hidden;
+}
+
+.gold-btn::after{
+    content:"";
+    position:absolute;
+    top:0;
+    left:-100%;
+    width:100%;
+    height:100%;
+    background:linear-gradient(120deg, transparent, rgba(255,255,255,.4), transparent);
+    animation:goldShine 2.5s infinite;
+}
+
+@keyframes goldShine{
+    0%{ left:-100%; }
+    100%{ left:100%; }
+}
+
+/* =========================
    REWARD HISTORY (PREMIUM STYLE)
 ========================= */
 

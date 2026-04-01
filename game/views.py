@@ -271,21 +271,29 @@ def add_reward(request):
 
         # Still save custom_text for now (optional, legacy field)
         custom_text = request.POST.get("custom_text")
+        rolls = int(request.POST.get("rolls", 1))
 
         if reason and reason.strip():
-            reward = Reward.objects.create(
-                child=child,
-                reason=reason,
-                custom_text=custom_text or ""
-            )
+            created_rewards = []
+
+            for _ in range(rolls):
+                reward = Reward.objects.create(
+                    child=child,
+                    reason=reason,
+                    custom_text=custom_text or ""
+                )
+                created_rewards.append(reward)
 
             return JsonResponse({
                 "success": True,
-                "reward": {
-                    "id": reward.id,
-                    "reason": reward.reason,
-                    "custom_text": reward.custom_text
-                }
+                "count": rolls,
+                "rewards": [
+                    {
+                        "id": r.id,
+                        "reason": r.reason,
+                        "custom_text": r.custom_text
+                    } for r in created_rewards
+                ]
             })
 
         return JsonResponse({"success": False, "error": "No reason provided"}, status=400)
