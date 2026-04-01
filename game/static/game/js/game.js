@@ -1210,6 +1210,20 @@ document.addEventListener("DOMContentLoaded", () => {
                     const count = data.count || 1;
                     showToast(`🎉 +${count} roll${count > 1 ? 's' : ''} added!`);
 
+                    // 🔥 live update rolls in dashboard card (no refresh)
+                    const card = form.closest('.card');
+                    if(card){
+                        const rollsEl = card.querySelector('[data-rolls]');
+                        if(rollsEl){
+                            const current = parseInt(rollsEl.textContent.replace(/\D/g,'')) || 0;
+                            rollsEl.textContent = `Rolls added: ${current + count}`;
+
+                            // optional glow feedback
+                            rollsEl.classList.add("reward-highlight");
+                            setTimeout(()=> rollsEl.classList.remove("reward-highlight"), 600);
+                        }
+                    }
+
                     const original = button.textContent;
                     button.textContent = "Added!";
 
