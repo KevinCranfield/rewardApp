@@ -14,17 +14,17 @@
 
     <button 
         onclick="roll({{ child.id }})" 
-        class="big-roll roll-btn {% if child.available_rewards == 0 %}disabled{% endif %}"
+        class="big-roll roll-btn {% if child.rolls_available == 0 %}disabled{% endif %}"
         data-child="{{ child.id }}"
         data-child-name="{{ child.name }}"
-        {% if child.available_rewards == 0 %}disabled{% endif %}
+        {% if child.rolls_available == 0 %}disabled{% endif %}
     >
         🎲 Roll
     </button>
 
-    {% if child.available_rewards > 0 %}
+    {% if child.rolls_available > 0 %}
         <div class="roll-status available" data-child="{{ child.id }}">
-            🎯 {{ child.available_rewards }} roll{{ child.available_rewards|pluralize }} available
+            🎯 {{ child.rolls_available }} roll{{ child.rolls_available|pluralize }} available
         </div>
     {% else %}
         <div class="roll-status empty" data-child="{{ child.id }}">
