@@ -211,10 +211,34 @@ function roll(childId){
             window.__lastChildren = data.children;
         }
 
+        // 🔄 update rolls available UI
+        if(data.rolls_remaining !== undefined){
+            const rollEl = document.querySelector(`.rewards-available[data-child="${childId}"]`);
+            if(rollEl){
+                rollEl.innerText = "Rewards Available: " + data.rolls_remaining;
+            }
+
+            // 🔴 show warning when empty
+            const status = document.querySelector(`.roll-status[data-child="${childId}"]`);
+            if(status){
+                if(data.rolls_remaining === 0){
+                    status.classList.add("empty");
+                    status.innerText = "⚠️ No rolls available";
+                } else {
+                    status.classList.remove("empty");
+                    status.innerText = "🎲 Ready to roll";
+                }
+            }
+        }
+
         // 🚨 fallback if movement fails
         if(!data.position){
             console.warn("No movement data");
             if(button) button.disabled = false;
+            // 🛟 safety: re-enable button if something fails
+            setTimeout(() => {
+                if(button) button.disabled = false;
+            }, 2500);
             return;
         }
 
@@ -261,6 +285,11 @@ function animateMovement(childId, start, end){
                 token = document.getElementById("token-" + childId);
                 if(token){
                     token.classList.add("winner");
+                }
+
+                // 🔓 re-enable button even on win (allows continue mode)
+                if(token && token._rollButton){
+                    token._rollButton.disabled = false;
                 }
 
                 triggerWinOverlay(childId);
@@ -375,6 +404,12 @@ function animateJump(childId, start, end){
                 // win check
                 if(end === 64){
                     token.classList.add("winner");
+
+                    // 🔓 ensure roll button is re-enabled
+                    if(token && token._rollButton){
+                        token._rollButton.disabled = false;
+                    }
+
                     triggerWinOverlay(childId);
                 }
 
@@ -453,6 +488,12 @@ function animateJump(childId, start, end){
             // win check
             if(end === 64){
                 token.classList.add("winner");
+
+                // 🔓 ensure roll button is re-enabled
+                if(token && token._rollButton){
+                    token._rollButton.disabled = false;
+                }
+
                 triggerWinOverlay(childId);
             }
 
