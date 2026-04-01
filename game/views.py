@@ -52,6 +52,7 @@ def dashboard(request):
 
     for c in children:
         c.all_rewards = [r for r in rewards if r.child_id == c.id]
+        c.rolls_available = c.rewards.filter(is_used=False).count()
 
     # add last roll per child (avoid N+1 by fetching once per child id)
     last_rolls = (
