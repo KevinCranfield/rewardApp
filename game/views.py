@@ -153,7 +153,12 @@ def add_child(request):
 def roll(request):
 
     if request.method == "POST":
-        child_id = request.POST.get("child_id")
+        import json
+        try:
+            data = json.loads(request.body)
+            child_id = data.get("child_id")
+        except:
+            child_id = request.POST.get("child_id")
 
         family = get_family(request.user)
 
@@ -212,11 +217,14 @@ def roll(request):
             position_after=final_pos
         )
 
+        rolls_remaining = child.rewards.filter(is_used=False).count()
+
         return JsonResponse({
             "dice": dice,
             "position": final_pos,
             "from": roll_target,
             "jump": jump,
+            "rolls_remaining": rolls_remaining,
             "children": list(
                 Child.objects.filter(family=child.family)
                 .values("id", "name", "colour", "position")
@@ -308,7 +316,7 @@ def reset_board(request):
     family = get_family(request.user)
 
     # 🎯 Reset all children positions
-    Child.objects.filter(family=family).update(position=0)
+    Child.objects.filter(family=family).update(position=1)
 
     # 🎯 Mark all rewards as used (so 'available' becomes 0)
     Reward.objects.filter(child__family=family).update(is_used=True)

@@ -199,6 +199,12 @@ function roll(childId){
                 animateMovement(childId, current, data.position);
             }
 
+            // fallback: re-enable if no movement triggers
+            setTimeout(() => {
+                if(button && data.rolls_remaining > 0){
+                    button.disabled = false;
+                }
+            }, 1500);
         });
         showToast("🎲 Rolled " + data.dice);
         // 🎉 mini celebration on roll (quick feedback)
@@ -247,6 +253,18 @@ function roll(childId){
             }
         }
 
+        // 🔐 control button based on rolls
+        if (button){
+            if(data.rolls_remaining === 0){
+                button.disabled = true;
+            } else {
+                // allow re-enable AFTER animation
+                setTimeout(() => {
+                    button.disabled = false;
+                }, 1200);
+            }
+        }
+
         // 🚨 fallback if movement fails
         if(!data.position){
             console.warn("No movement data");
@@ -257,6 +275,13 @@ function roll(childId){
             }, 2500);
             return;
         }
+
+        // 🛟 safety: always re-enable after 2.5s if something fails
+        setTimeout(() => {
+            if(button && data.rolls_remaining > 0){
+                button.disabled = false;
+            }
+        }, 2500);
 
         if(current === data.position){
             console.warn("No movement");
