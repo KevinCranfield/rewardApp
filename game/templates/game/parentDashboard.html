@@ -25,7 +25,7 @@
                 </div>
 
                 <div class="child-info">
-                    Rewards: {{ child.available_rewards|default:0 }}
+                    Rewards: {{ child.rewards.filter(is_used=False).count }}
                 </div>
 
 
