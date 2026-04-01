@@ -185,7 +185,20 @@ function roll(childId){
 
         console.log("ROLL:", data);
 
-        showDice(data.dice);
+        showDice(data.dice, () => {
+
+            if(data.jump){
+                animateMovement(childId, current, data.from);
+
+                setTimeout(() => {
+                    animateJump(childId, data.from, data.position);
+                }, 800);
+
+            } else {
+                animateMovement(childId, current, data.position);
+            }
+
+        });
         showToast("🎲 Rolled " + data.dice);
         // 🎉 mini celebration on roll (quick feedback)
         try{
@@ -211,20 +224,6 @@ function roll(childId){
             return;
         }
 
-        setTimeout(() => {
-            if(data.jump){
-                // move to landing square first
-                animateMovement(childId, current, data.from);
-
-                // then animate jump
-                setTimeout(() => {
-                    animateJump(childId, data.from, data.position);
-                }, 800);
-
-            } else {
-                animateMovement(childId, current, data.position);
-            }
-        }, 100);
 
     })
     .catch(err => {
@@ -762,7 +761,7 @@ function drawConnections(){
     }
 }
 
-function showDice(value){
+function showDice(value, onComplete){
 
     let dice = document.getElementById("dice-popup");
 
@@ -786,8 +785,8 @@ function showDice(value){
 
     playSound('dice');
 
-    // 🎲 fake rolling animation
     let rolls = 0;
+
     const rollInterval = setInterval(() => {
         const random = Math.floor(Math.random()*6) + 1;
         dice.textContent = "🎲 " + random;
@@ -808,6 +807,10 @@ function showDice(value){
 
             setTimeout(() => {
                 dice.style.transform = "translate(-50%, -50%) scale(0)";
+
+                // 🔥 THIS is the key fix
+                if(onComplete) onComplete();
+
             }, 1400);
         }
     }, 80);
