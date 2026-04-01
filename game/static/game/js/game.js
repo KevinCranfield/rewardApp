@@ -1186,9 +1186,17 @@ document.addEventListener("DOMContentLoaded", () => {
             button.disabled = true;
 
             try {
+                const formData = new FormData(form);
+
+                // ✅ capture which button (bronze/silver/gold) was clicked
+                const submitter = e.submitter;
+                if (submitter && submitter.name === "rolls") {
+                    formData.set("rolls", submitter.value);
+                }
+
                 const res = await fetch(form.action, {
                     method: "POST",
-                    body: new FormData(form),
+                    body: formData,
                     headers: {
                         "X-CSRFToken": getCSRFToken(),
                         "X-Requested-With": "XMLHttpRequest"
