@@ -2,7 +2,7 @@
 {% block body_class %}child-view{% endblock %}
 
 {% block content %}
-<div class="child-view">
+<div class="child-view" data-child-name="{{ child.name }}" data-child-id="{{ child.id }}">
 
 <h2 style="text-align:center; display:flex; justify-content:center; align-items:center; gap:10px;">
     <span style="width:16px; height:16px; border-radius:50%; background: {{ child.colour }}; display:inline-block;"></span>
@@ -16,6 +16,7 @@
         onclick="roll({{ child.id }})" 
         class="big-roll roll-btn {% if child.available_rewards == 0 %}disabled{% endif %}"
         data-child="{{ child.id }}"
+        data-child-name="{{ child.name }}"
         {% if child.available_rewards == 0 %}disabled{% endif %}
     >
         🎲 Roll
@@ -52,10 +53,16 @@
 
 </div>
 
+<!-- Hidden helpers for JS -->
+<div id="game-meta" style="display:none;"
+     data-child-name="{{ child.name }}"
+     data-child-id="{{ child.id }}">
+</div>
+
 <!-- 🎮 BOARD -->
 <div class="board-wrapper">
 
-    <div class="board">
+    <div class="board" id="game-board">
 
         <!-- SVG overlay MUST be inside board -->
         <svg class="board-overlay"></svg>

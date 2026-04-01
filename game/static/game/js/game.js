@@ -1,3 +1,56 @@
+function triggerWinOverlay(childId){
+
+    const meta = document.getElementById("game-meta");
+    const name = meta?.dataset.childName || "Player";
+
+    // create overlay
+    let overlay = document.getElementById("win-overlay");
+
+    if(!overlay){
+        overlay = document.createElement("div");
+        overlay.id = "win-overlay";
+
+        overlay.style.position = "fixed";
+        overlay.style.inset = "0";
+        overlay.style.background = "rgba(0,0,0,0.85)";
+        overlay.style.display = "flex";
+        overlay.style.flexDirection = "column";
+        overlay.style.justifyContent = "center";
+        overlay.style.alignItems = "center";
+        overlay.style.zIndex = "99999";
+        overlay.style.color = "white";
+        overlay.style.textAlign = "center";
+
+        overlay.innerHTML = `
+            <h1 style="font-size:32px; margin-bottom:10px;">🎉 ${name} WINS!</h1>
+            <p style="margin-bottom:20px;">You reached the finish! 🏁</p>
+            <div style="display:flex; gap:12px;">
+                <button id="continue-game" style="padding:12px 18px; border-radius:10px; border:none; background:#22c55e; color:white; font-weight:bold;">Continue</button>
+                <button id="reset-game" style="padding:12px 18px; border-radius:10px; border:none; background:#ef4444; color:white; font-weight:bold;">Restart</button>
+            </div>
+        `;
+
+        document.body.appendChild(overlay);
+
+        // buttons
+        overlay.querySelector("#continue-game").onclick = () => {
+            overlay.remove();
+        };
+
+        overlay.querySelector("#reset-game").onclick = () => {
+            window.location.reload();
+        };
+    }
+
+    // fireworks
+    burstConfetti(120);
+
+    if(navigator.vibrate){
+        navigator.vibrate([100,50,100]);
+    }
+
+    playSound("win");
+}
 // 🐍 Snakes & 🪜 Ladders (used for board drawing only)
 const snakes = {
     62: 44,
@@ -211,15 +264,7 @@ function animateMovement(childId, start, end){
                     token.classList.add("winner");
                 }
 
-                // 🎉 celebration
-                playSound('win');
-                burstConfetti(80);
-
-                // 🎁 random bonus
-                if(Math.random() < 0.3){
-                    showToast("🎁 BONUS! Extra reward!");
-                }
-
+                triggerWinOverlay(childId);
                 console.log("🏆 WINNER!", childId);
                 return;
             }
@@ -331,8 +376,7 @@ function animateJump(childId, start, end){
                 // win check
                 if(end === 64){
                     token.classList.add("winner");
-                    playSound('win');
-                    burstConfetti(80);
+                    triggerWinOverlay(childId);
                 }
 
                 // re-enable roll button
@@ -410,15 +454,7 @@ function animateJump(childId, start, end){
             // win check
             if(end === 64){
                 token.classList.add("winner");
-
-                playSound('win');
-                burstConfetti(80);
-
-                if(Math.random() < 0.3){
-                    showToast("🎁 BONUS! Extra reward!");
-                }
-
-                console.log("🏆 WINNER via jump!", childId);
+                triggerWinOverlay(childId);
             }
 
             // Re-enable roll button for this token
@@ -867,21 +903,52 @@ function burstConfetti(count = 40){
 
 window.addEventListener("load", () => {
 
-    // ⚠️ delay drawing because app may still be hidden (splash)
-    setTimeout(() => {
-        drawConnections();
-    }, 300);
-
-    // redraw again once fully visible (extra safety)
-    setTimeout(() => {
-        drawConnections();
-    }, 800);
+    // 🎯 Draw board AFTER layout is ready
+    setTimeout(drawConnections, 200);
+    setTimeout(drawConnections, 700);
 
     let resizeTimeout;
     window.addEventListener("resize", () => {
         clearTimeout(resizeTimeout);
         resizeTimeout = setTimeout(drawConnections, 150);
     });
+
+    // =====================================
+    // ✨ PREMIUM SPLASH TRANSITION (FINAL)
+    // =====================================
+
+    const splash = document.getElementById("splash");
+    const app = document.getElementById("app");
+
+    // Always show body
+    document.body.classList.add("loaded");
+
+    if(app){
+        app.style.display = "block";
+    }
+
+    // Smooth fade transition
+    if(splash && app){
+
+        // slight delay = removes flash + feels premium
+        setTimeout(() => {
+
+            requestAnimationFrame(() => {
+                splash.classList.add("fade-out");
+                app.classList.add("fade-in");
+            });
+
+            // remove splash after animation
+            setTimeout(() => {
+                splash.style.display = "none";
+            }, 400);
+
+        }, 150);
+
+    } else if(splash){
+        // fallback safety
+        splash.style.display = "none";
+    }
 });
 
 
@@ -1126,18 +1193,4 @@ document.addEventListener("DOMContentLoaded", () => {
             circle.classList.add("selected");
         });
     });
-});
-// 🔧 SAFETY: ensure app becomes visible (prevents blank screen if splash fails)
-document.addEventListener("DOMContentLoaded", () => {
-    document.body.classList.add("loaded");
-
-    const app = document.getElementById("app");
-    if(app){
-        app.style.display = "block";
-    }
-
-    const splash = document.getElementById("splash");
-    if(splash){
-        splash.style.display = "none";
-    }
 });

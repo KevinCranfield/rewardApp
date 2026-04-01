@@ -401,6 +401,7 @@ button, a {
 .square[data-square="64"]{
     position:relative;
     z-index:3;
+    overflow: visible;
 }
 
 .square[data-square="64"]::before{
@@ -419,7 +420,7 @@ button, a {
 
     filter: blur(12px);
     animation: winGlow 2s ease-in-out infinite;
-    z-index:0; /* stay above board but below content */
+    z-index:-1; /* stay above board but below content */
 }
 
 .square[data-square="64"] > *{
@@ -2686,5 +2687,24 @@ body.loaded{
 }
 .square[data-square="64"]{
     box-shadow:
-        0 0 20px rgba(34,197,94,0.6);
+        0 0 25px rgba(34,197,94,0.9),
+        0 0 50px rgba(34,197,94,0.7),
+        0 0 80px rgba(34,197,94,0.5);
+    outline: 2px solid rgba(34,197,94,0.6);
+    animation: winPulse 1.8s ease-in-out infinite;
+}
+
+@keyframes winPulse{
+    0%,100%{
+        box-shadow:
+            0 0 25px rgba(34,197,94,0.9),
+            0 0 50px rgba(34,197,94,0.7),
+            0 0 80px rgba(34,197,94,0.5);
+    }
+    50%{
+        box-shadow:
+            0 0 40px rgba(34,197,94,1),
+            0 0 70px rgba(34,197,94,0.9),
+            0 0 120px rgba(34,197,94,0.7);
+    }
 }
