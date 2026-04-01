@@ -170,6 +170,9 @@ def roll(request):
         if not child:
             return JsonResponse({"error": "invalid child"}, status=400)
 
+        print("[ROLL] child_id:", child.id)
+        print("[ROLL] unused rewards BEFORE:", child.rewards.filter(is_used=False).count())
+
         # 🔥 ONLY ALLOW ROLL IF REWARD EXISTS
         reward = child.rewards.filter(is_used=False).first()
 
@@ -211,6 +214,9 @@ def roll(request):
         reward.is_used = True
         reward.save()
 
+        print("[ROLL] used reward id:", reward.id)
+        print("[ROLL] unused rewards AFTER:", child.rewards.filter(is_used=False).count())
+
         Roll.objects.create(
             child=child,
             dice=dice,
@@ -218,6 +224,8 @@ def roll(request):
         )
 
         rolls_remaining = child.rewards.filter(is_used=False).count()
+
+        print("[ROLL] rolls_remaining sent:", rolls_remaining)
 
         return JsonResponse({
             "dice": dice,
@@ -271,6 +279,9 @@ def add_reward(request):
 
         rolls = max(1, min(int(request.POST.get("rolls", 1)), 3))
 
+        print("[ADD_REWARD] child_id:", child.id)
+        print("[ADD_REWARD] rolls requested:", rolls)
+
         if reason and reason.strip():
             created_rewards = []
 
@@ -280,7 +291,11 @@ def add_reward(request):
                     reason=reason,
                     custom_text=custom_text or ""
                 )
+                print(f"[ADD_REWARD] created reward id={reward.id} for child={child.id}")
                 created_rewards.append(reward)
+
+            total_unused = child.rewards.filter(is_used=False).count()
+            print("[ADD_REWARD] total unused rewards now:", total_unused)
 
             return JsonResponse({
                 "success": True,
