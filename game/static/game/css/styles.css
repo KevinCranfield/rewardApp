@@ -399,27 +399,26 @@ button, a {
 /* ✨ WIN ZONE GLOW */
 .square[data-pos="64"]{
     position:relative;
-    overflow:hidden;
-    z-index:2;
+    z-index:5; /* ensure above board + overlay */
 }
 
 .square[data-pos="64"]::before{
     content:"";
     position:absolute;
-    inset:-8px; /* bigger glow */
-    border-radius:12px;
+    inset:-14px; /* push glow outside tile */
+    border-radius:16px;
 
     background: radial-gradient(
         circle at center,
-        rgba(34,197,94,0.95) 0%,
-        rgba(34,197,94,0.7) 30%,
-        rgba(34,197,94,0.35) 60%,
-        transparent 80%
+        rgba(34,197,94,1) 0%,
+        rgba(34,197,94,0.8) 30%,
+        rgba(34,197,94,0.4) 60%,
+        transparent 85%
     );
 
-    filter: blur(8px);
+    filter: blur(12px);
     animation: winGlow 2s ease-in-out infinite;
-    z-index:0;
+    z-index:-1; /* sit behind tile but still visible */
 }
 
 @keyframes winGlow{
@@ -2681,6 +2680,7 @@ body.loaded{
 }
 .square[data-pos="64"]{
     box-shadow:
-        0 0 20px rgba(34,197,94,0.7),
-        0 0 40px rgba(34,197,94,0.5);
+        0 0 30px rgba(34,197,94,0.9),
+        0 0 60px rgba(34,197,94,0.7),
+        0 0 90px rgba(34,197,94,0.5);
 }
