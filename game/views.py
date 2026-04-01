@@ -262,16 +262,14 @@ def add_reward(request):
         if not child:
             return JsonResponse({"success": False, "error": "Invalid child"}, status=400)
 
-        reason = request.POST.get("reason")
-        custom = request.POST.get("custom_reason")
-
         # Use custom reason if provided
-        if custom and custom.strip():
-            reason = custom.strip()
-
-        # Still save custom_text for now (optional, legacy field)
         custom_text = request.POST.get("custom_text")
-        rolls = int(request.POST.get("rolls", 1))
+        if custom_text and custom_text.strip():
+            reason = custom_text.strip()
+        else:
+            reason = request.POST.get("reason")
+
+        rolls = max(1, min(int(request.POST.get("rolls", 1)), 3))
 
         if reason and reason.strip():
             created_rewards = []
