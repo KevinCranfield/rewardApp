@@ -376,7 +376,7 @@ button, a {
         inset 0 -3px 6px rgba(0,0,0,0.15);
 }
 
-.square[data-pos="1"]::after{
+.square[data-square="1"]::after{
     content:"START";
     position:absolute;
     bottom:4px;
@@ -386,7 +386,7 @@ button, a {
     color:#065f46;
 }
 
-.square[data-pos="64"]::after{
+.square[data-square="64"]::after{
     content:"FINISH";
     position:absolute;
     bottom:4px;
@@ -397,15 +397,16 @@ button, a {
 }
 
 /* ✨ WIN ZONE GLOW */
-.square[data-pos="64"]{
+/* ✨ WIN ZONE GLOW */
+.square[data-square="64"]{
     position:relative;
-    z-index:5; /* ensure above board + overlay */
+    z-index:3;
 }
 
-.square[data-pos="64"]::before{
+.square[data-square="64"]::before{
     content:"";
     position:absolute;
-    inset:-14px; /* push glow outside tile */
+    inset:-14px;
     border-radius:16px;
 
     background: radial-gradient(
@@ -418,7 +419,12 @@ button, a {
 
     filter: blur(12px);
     animation: winGlow 2s ease-in-out infinite;
-    z-index:-1; /* sit behind tile but still visible */
+    z-index:0; /* stay above board but below content */
+}
+
+.square[data-square="64"] > *{
+    position:relative;
+    z-index:2;
 }
 
 @keyframes winGlow{
@@ -462,7 +468,7 @@ button, a {
     position:absolute;
     inset:0;
     pointer-events:none;
-    z-index:3;
+    z-index:1;
 }
 
 /* =========================
@@ -2678,9 +2684,7 @@ html, body {
 body.loaded{
     visibility:visible;
 }
-.square[data-pos="64"]{
+.square[data-square="64"]{
     box-shadow:
-        0 0 30px rgba(34,197,94,0.9),
-        0 0 60px rgba(34,197,94,0.7),
-        0 0 90px rgba(34,197,94,0.5);
+        0 0 20px rgba(34,197,94,0.6);
 }
