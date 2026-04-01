@@ -69,7 +69,7 @@ const ladders = {
 // 🔊 SOUND SYSTEM
 const sounds = {
     dice: new Audio('/static/game/sounds/dice.mp3'),
-    win: new Audio('/static/game/sounds/win.mp3'),
+    win: new Audio('/static/game/sounds/big_win.mp3'),
     click: new Audio('/static/game/sounds/click.mp3')
 };
 
