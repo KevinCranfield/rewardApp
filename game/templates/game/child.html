@@ -23,12 +23,12 @@
     </button>
 
     {% if child.available_rewards > 0 %}
-        <div class="roll-status available">
+        <div class="roll-status available" data-child="{{ child.id }}">
             🎯 {{ child.available_rewards }} roll{{ child.available_rewards|pluralize }} available
         </div>
     {% else %}
-        <div class="roll-status empty">
-            No more rolls — go earn another reward 🙂
+        <div class="roll-status empty" data-child="{{ child.id }}">
+            ⚠️ No more rolls — go earn another reward 🙂
         </div>
     {% endif %}
 

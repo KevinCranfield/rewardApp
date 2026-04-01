@@ -184,6 +184,7 @@ function roll(childId){
         }
 
         console.log("ROLL:", data);
+        console.log("Rolls remaining:", data.rolls_remaining);
 
         showDice(data.dice, () => {
 
@@ -211,22 +212,37 @@ function roll(childId){
             window.__lastChildren = data.children;
         }
 
-        // 🔄 update rolls available UI
-        if(data.rolls_remaining !== undefined){
-            const rollEl = document.querySelector(`.rewards-available[data-child="${childId}"]`);
-            if(rollEl){
-                rollEl.innerText = "Rewards Available: " + data.rolls_remaining;
-            }
+        // 🔄 update rolls available UI (robust)
+        if (data.rolls_remaining !== undefined) {
 
-            // 🔴 show warning when empty
+            // 🔹 Try multiple selectors (covers badge + legacy UI)
+            const rollEls = document.querySelectorAll(
+                `.rewards-available[data-child="${childId}"], .rolls-available[data-child="${childId}"], .roll-badge[data-child="${childId}"]`
+            );
+
+            rollEls.forEach(el => {
+                const n = data.rolls_remaining;
+                el.innerText = n === 1
+                    ? "🎯 1 roll available"
+                    : `🎯 ${n} rolls available`;
+
+                // visual state
+                if (n === 0) {
+                    el.classList.add("empty");
+                } else {
+                    el.classList.remove("empty");
+                }
+            });
+
+            // 🔴 status banner logic (THIS is the important one)
             const status = document.querySelector(`.roll-status[data-child="${childId}"]`);
-            if(status){
-                if(data.rolls_remaining === 0){
+            if (status) {
+                if (data.rolls_remaining === 0) {
                     status.classList.add("empty");
-                    status.innerText = "⚠️ No rolls available";
+                    status.innerText = "⚠️ No more rolls — go earn another reward 🙂";
                 } else {
                     status.classList.remove("empty");
-                    status.innerText = "🎲 Ready to roll";
+                    status.innerText = "🎲 Tap roll to play";
                 }
             }
         }
