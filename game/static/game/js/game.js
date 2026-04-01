@@ -1123,7 +1123,7 @@ document.addEventListener("DOMContentLoaded", () => {
     document.querySelectorAll("form.reward-form, form[action*='reward']").forEach(form => {
 
         const select = form.querySelector("select[name='reason']");
-        const input = form.querySelector("input[name='custom_reason']");
+        const input = form.querySelector("input[name='custom_text']");
         const button = form.querySelector("button[type='submit']");
 
         if(!select || !button) return;
@@ -1198,10 +1198,22 @@ document.addEventListener("DOMContentLoaded", () => {
                 const data = await res.json();
 
                 if(data.success){
-                    showToast("🎉 Reward added! Ready to roll 🎲");
+                    // SHOW HOW MANY ROLLS WERE ADDED (use backend response)
+                    const count = data.count || 1;
+                    showToast(`🎉 +${count} roll${count > 1 ? 's' : ''} added!`);
 
                     const original = button.textContent;
                     button.textContent = "Added!";
+
+                    // ADD BUTTON CLICK FEEDBACK (visual success)
+                    button.classList.add("success");
+                    setTimeout(()=> button.classList.remove("success"), 600);
+
+                    // OPTIONAL: small confetti burst on reward add
+                    try{
+                        burstConfetti(15);
+                        if(navigator.vibrate){ navigator.vibrate(15); }
+                    }catch(e){}
 
                     setTimeout(() => {
                         button.textContent = original || "+ Add Reward";

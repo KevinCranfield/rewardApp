@@ -33,7 +33,7 @@
                     <div class="helper-steps">
                         <strong>🎯 How it works:</strong><br>
                         1. Select a reason OR type your own<br>
-                        2. Tap “+ Add Reward”<br>
+                        2. Choose Bronze / Silver / Gold<br>
                         3. Child can roll the dice 🎲
                     </div>
                     <form method="POST" action="{% url 'add_reward' %}" class="reward-form">
@@ -49,17 +49,17 @@
                             <option value="Exercise">⚽ Exercise</option>
                         </select>
 
-                        <input type="text" name="custom_reason" class="reward-input" placeholder="Or type your own reason (e.g. Brushed teeth)">
+                        <input type="text" name="custom_text" class="reward-input" placeholder="Or type your own reason (e.g. Brushed teeth)">
 
                         <div class="reward-buttons">
                             <button type="submit" name="rolls" value="1" class="reward-btn bronze-btn">
-                                🟤 Add 1 Roll
+                                🟤 Bronze (+1 Roll)
                             </button>
                             <button type="submit" name="rolls" value="2" class="reward-btn silver-btn">
-                                ⚪ Add 2 Rolls
+                                ⚪ Silver (+2 Rolls)
                             </button>
                             <button type="submit" name="rolls" value="3" class="reward-btn gold-btn">
-                                🟡 Add 3 Rolls
+                                🟡 Gold (+3 Rolls)
                             </button>
                         </div>
                     </form>
@@ -152,23 +152,3 @@
 </div>
 
 {% endblock %}
-<style>
-.reward-buttons{
-    display:flex;
-    flex-direction:column;
-    gap:8px;
-}
-
-.bronze-btn{
-    background:linear-gradient(135deg,#b45309,#92400e);
-}
-
-.silver-btn{
-    background:linear-gradient(135deg,#9ca3af,#6b7280);
-}
-
-.gold-btn{
-    background:linear-gradient(135deg,#facc15,#ca8a04);
-    color:#1f2937;
-}
-</style>
