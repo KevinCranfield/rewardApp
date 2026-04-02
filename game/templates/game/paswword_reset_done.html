@@ -1,0 +1,23 @@
+{% extends "game/base.html" %}
+{% load static %}
+
+{% block title %}Check Your Email — Reward Game{% endblock %}
+
+{% block content %}
+
+<div class="auth-wrapper">
+    <div class="auth-card">
+
+        <img src="{% static 'game/images/logo.png' %}" class="auth-logo" width="70" height="70" alt="Reward Game">
+
+        <h2>📬 Check Your Email</h2>
+        <p class="auth-sub">If an account exists for that address, we've sent a password reset link. Check your inbox (and spam folder).</p>
+
+        <div class="auth-footer">
+            <a href="/login/">Back to login</a>
+        </div>
+
+    </div>
+</div>
+
+{% endblock %}
