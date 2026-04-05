@@ -328,9 +328,9 @@ def reset_board(request):
 
     return JsonResponse({"success": True, "children": children})
 
-@login_required
 def ping_auth(request):
-    request.session["parent_auth_time"] = timezone.now().timestamp()
+    if request.user.is_authenticated:
+        request.session["parent_auth_time"] = timezone.now().timestamp()
     return JsonResponse({"ok": True})
 
 @login_required
