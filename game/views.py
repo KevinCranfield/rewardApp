@@ -28,7 +28,11 @@ def is_parent_authenticated(request):
     return True
 
 def home(request):
-    return render(request, "game/home.html")
+    children = []
+    if request.user.is_authenticated:
+        family = get_family(request.user)
+        children = family.children.all()
+    return render(request, "game/home.html", {"children": children})
 
 @login_required
 def dashboard(request):
@@ -36,25 +40,18 @@ def dashboard(request):
     if not is_parent_authenticated(request):
         return redirect("enter_pin")
 
-    # 🔄 refresh activity timer
     request.session["parent_auth_time"] = timezone.now().timestamp()
 
     family = get_family(request.user)
 
-    children = list(
-        family.children
-        .all()
-        .annotate(available_rewards=Count('rewards', filter=Q(rewards__is_used=False)))
-    )
+    children = list(family.children.all())
 
-    # 🔥 attach rewards manually (guaranteed sync fix)
     rewards = Reward.objects.filter(child__family=family).order_by('-created_at')
 
     for c in children:
         c.all_rewards = [r for r in rewards if r.child_id == c.id]
         c.rolls_available = c.rewards.filter(is_used=False).count()
 
-    # add last roll per child (avoid N+1 by fetching once per child id)
     last_rolls = (
         Roll.objects
         .filter(child__in=children)
@@ -67,8 +64,6 @@ def dashboard(request):
     for c in children:
         c.last_roll = last_map.get(c.id)
 
-
-    # 🔥 recent rewards history
     recent_rewards = Reward.objects.filter(
         child__family=family
     ).select_related("child").order_by("-created_at")[:15]
@@ -88,7 +83,6 @@ def dashboard(request):
 def child_view(request, child_id):
 
     family = get_family(request.user)
-    # 🔐 force PIN re-check when returning to dashboard
     request.session["parent_authed"] = False
 
     child = Child.objects.filter(
@@ -101,17 +95,14 @@ def child_view(request, child_id):
 
     children = family.children.all()
 
-    # rewards count
-    child.available_rewards = child.rewards.filter(is_used=False).count()
+    # ✅ Fix: use rolls_available to match template
+    child.rolls_available = child.rewards.filter(is_used=False).count()
 
-    # last roll
     last_roll = Roll.objects.filter(child=child).order_by("-id").first()
     child.last_roll = last_roll.dice if last_roll else None
 
-    # progress percentage
     child.progress_percent = int((child.position / 64) * 100)
 
-    # board
     squares = []
     for row in range(8):
         nums = list(range(row * 8 + 1, row * 8 + 9))
@@ -136,7 +127,6 @@ def add_child(request):
 
         family = get_family(request.user)
 
-        # 🚫 prevent duplicate colours
         if Child.objects.filter(family=family, colour=colour).exists():
             return redirect("dashboard")
 
@@ -171,10 +161,6 @@ def roll(request):
         if not child:
             return JsonResponse({"error": "invalid child"}, status=400)
 
-        print("[ROLL] child_id:", child.id)
-        print("[ROLL] unused rewards BEFORE:", child.rewards.filter(is_used=False).count())
-
-        # 🔥 ONLY ALLOW ROLL IF REWARD EXISTS
         reward = child.rewards.filter(is_used=False).first()
 
         if not reward:
@@ -215,9 +201,6 @@ def roll(request):
         reward.is_used = True
         reward.save()
 
-        print("[ROLL] used reward id:", reward.id)
-        print("[ROLL] unused rewards AFTER:", child.rewards.filter(is_used=False).count())
-
         Roll.objects.create(
             child=child,
             dice=dice,
@@ -225,8 +208,6 @@ def roll(request):
         )
 
         rolls_remaining = child.rewards.filter(is_used=False).count()
-
-        print("[ROLL] rolls_remaining sent:", rolls_remaining)
 
         return JsonResponse({
             "dice": dice,
@@ -239,7 +220,6 @@ def roll(request):
                 .values("id", "name", "colour", "position")
             )
         })
-    
 
 
 @login_required
@@ -271,7 +251,6 @@ def add_reward(request):
         if not child:
             return JsonResponse({"success": False, "error": "Invalid child"}, status=400)
 
-        # Use custom reason if provided
         custom_text = request.POST.get("custom_text")
         if custom_text and custom_text.strip():
             reason = custom_text.strip()
@@ -279,9 +258,6 @@ def add_reward(request):
             reason = request.POST.get("reason")
 
         rolls = max(1, min(int(request.POST.get("rolls", 1)), 3))
-
-        print("[ADD_REWARD] child_id:", child.id)
-        print("[ADD_REWARD] rolls requested:", rolls)
 
         if reason and reason.strip():
             created_rewards = []
@@ -292,15 +268,14 @@ def add_reward(request):
                     reason=reason,
                     custom_text=custom_text or ""
                 )
-                print(f"[ADD_REWARD] created reward id={reward.id} for child={child.id}")
                 created_rewards.append(reward)
 
             total_unused = child.rewards.filter(is_used=False).count()
-            print("[ADD_REWARD] total unused rewards now:", total_unused)
 
             return JsonResponse({
                 "success": True,
                 "count": rolls,
+                "rolls_remaining": total_unused,
                 "rewards": [
                     {
                         "id": r.id,
@@ -327,6 +302,7 @@ def change_pin(request):
             family.save()
 
     return redirect("dashboard")
+
 from django.views.decorators.http import require_POST
 
 @login_required
@@ -337,16 +313,20 @@ def reset_board(request):
 
     family = get_family(request.user)
 
-    # 🎯 Reset all children positions
     Child.objects.filter(family=family).update(position=1)
-
-    # 🎯 Mark all rewards as used (so 'available' becomes 0)
     Reward.objects.filter(child__family=family).update(is_used=True)
-
-    # 🎯 Clear rolls so 'last roll' and recent gameplay reset (UI shows empty)
     Roll.objects.filter(child__family=family).delete()
 
-    return JsonResponse({"success": True})
+    # ✅ Fix: return children data so dashboard JS can update cards without refresh
+    children = list(
+        Child.objects.filter(family=family)
+        .values("id", "name", "colour", "position")
+    )
+
+    for c in children:
+        c["rolls_available"] = 0
+
+    return JsonResponse({"success": True, "children": children})
 
 @login_required
 def ping_auth(request):
