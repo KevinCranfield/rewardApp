@@ -1,226 +1,71 @@
+{% extends "game/base.html" %}
 {% load static %}
-<!DOCTYPE html>
-<html>
-<head>
-    <title>{% block title %}Reward Game{% endblock %}</title>
-    <meta name="description" content="Motivate kids with rewards! Roll the dice, climb ladders, earn prizes. A fun family reward system.">
-    <link rel="icon" type="image/png" sizes="32x32" href="{% static 'game/icons/icon-192.png' %}">
-    <link rel="apple-touch-icon" sizes="180x180" href="{% static 'game/icons/icon-192.png' %}">
-    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-    <link rel="stylesheet" href="{% static 'game/css/styles.css' %}">
-    <meta name="theme-color" content="#facc15">
-    <link rel="manifest" href="{% static 'game/manifest.json' %}">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <!-- Google Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-GZ0ENNSBXC"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'G-GZ0ENNSBXC');
-    </script>
-<style>
-body{visibility:hidden;}
-body.loaded{visibility:visible;}
 
-#app{
-    display:none;
-    opacity:0;
-}
+{% block title %}Login — Reward Game{% endblock %}
 
-#app.fade-in{
-    animation:appFade .4s ease forwards;
-}
+{% block content %}
 
-@keyframes appFade{
-    from{opacity:0; transform:translateY(10px);}
-    to{opacity:1; transform:translateY(0);}
-}
+<div class="auth-wrapper">
 
-.splash{
-    opacity:1;
-    transition:opacity .4s ease, transform .4s ease;
-}
+    <div class="auth-card">
 
-.splash.fade-out{
-    opacity:0;
-    transform:scale(1.05);
-}
-</style>
-</head>
+        <img src="{% static 'game/images/logo.png' %}" class="auth-logo" width="70" height="70" alt="Reward Game">
 
-<body>
-<div id="splash" class="splash">
-  <img src="{% static 'game/images/logo.png' %}" class="splash-logo" width="120" height="120" alt="Reward Game logo">
-  <h1>Reward Game</h1>
-  <p class="splash-tagline">
-    🎯 Motivate kids with fun rewards<br>
-    Roll → Progress → Earn 🎉
-  </p>
-  <p style="margin-top:15px; font-size:12px; opacity:0.8;">
-    💡 LED board syncing coming soon 👀
-  </p>
-</div>
+        <h2>Welcome Back</h2>
+        <p class="auth-sub">Login to your family dashboard</p>
 
-<div id="app">
-<header class="navbar">
-    <div class="nav-left">
-        <img src="{% static 'game/images/logo.png' %}" class="nav-logo" width="32" height="32" alt="Reward Game">
-        <span class="nav-title">Reward Game</span>
-    </div>
-
-    <div class="nav-right">
-        <a href="/">Home</a>
-        {% if request.user.is_authenticated %}
-            <a href="/dashboard/">Dashboard</a>
+        {% if error %}
+            <div class="auth-error" role="alert">{{ error }}</div>
         {% endif %}
 
-        {% if children %}
-            {% for c in children %}
-                <a href="/child/{{ c.id }}/" class="child-link">
-                    <span class="nav-dot" style="background: {{ c.colour }}"></span>
-                    {{ c.name }}
-                </a>
-            {% endfor %}
-        {% endif %}
+        <form method="post" novalidate>
+            {% csrf_token %}
 
-        {% if request.user.is_authenticated %}
-            <span class="nav-user">👤 {{ request.user.username }}</span>
-            <a href="/logout/" class="nav-link">Logout</a>
-            <button onclick="installApp()" id="installBtn" style="display:none;" class="nav-btn">
-                📲 Install
-            </button>
-        {% else %}
-            <a href="/login/" class="nav-link">Login</a>
-            <a href="/signup/" class="nav-btn">Sign Up</a>
-        {% endif %}
-    </div>
-</header>
+            <label class="auth-label" for="id_username">Username</label>
+            <input
+                type="text"
+                id="id_username"
+                name="username"
+                placeholder="Your username"
+                autocomplete="username"
+                required
+            >
 
-<main class="container">
-    <div class="page">
-        {% block content %}
-        {% endblock %}
+            <label class="auth-label" for="id_password">Password</label>
+            <div class="password-wrap">
+                <input
+                    type="password"
+                    id="id_password"
+                    name="password"
+                    placeholder="Your password"
+                    autocomplete="current-password"
+                    required
+                >
+                <button type="button" class="show-pw-btn" onclick="togglePassword('id_password', this)" aria-label="Show password">👁</button>
+            </div>
+
+            <a href="/forgot-password/" class="forgot-link">Forgot password?</a>
+
+            <button type="submit">Login</button>
+        </form>
+
+        <div class="auth-footer">
+            <span>New here?</span>
+            <a href="/signup/">Create account</a>
+        </div>
+
     </div>
-</main>
+
 </div>
 
-<script src="{% static 'game/js/game.js' %}" defer></script>
-
 <script>
-let deferredPrompt;
-
-window.addEventListener('beforeinstallprompt', (e) => {
-    e.preventDefault();
-    deferredPrompt = e;
-    const btn = document.getElementById("installBtn");
-    if (btn) btn.style.display = "inline-block";
-});
-
-function installApp() {
-    if (deferredPrompt) {
-        deferredPrompt.prompt();
-        deferredPrompt.userChoice.then(() => {
-            deferredPrompt = null;
-        });
-    }
+function togglePassword(inputId, btn) {
+    const input = document.getElementById(inputId);
+    if (!input) return;
+    const isHidden = input.type === 'password';
+    input.type = isHidden ? 'text' : 'password';
+    btn.textContent = isHidden ? '🙈' : '👁';
 }
 </script>
 
-<div id="iosInstallHint" class="ios-install-hint">
-    📲 Tap Share → "Add to Home Screen"
-</div>
-
-<!-- Splash transition (single owner — game.js does NOT touch splash) -->
-<script>
-window.addEventListener("load", () => {
-    const splash = document.getElementById("splash");
-    const app = document.getElementById("app");
-
-    document.body.classList.add("loaded");
-
-    if(!splash || !app){
-        if(app) app.style.display = "block";
-        return;
-    }
-
-    const hasSeenSplash = localStorage.getItem("seenSplash");
-
-    if(hasSeenSplash){
-        splash.style.display = "none";
-        app.style.display = "block";
-        app.classList.add("fade-in");
-        return;
-    }
-
-    // First visit: full animation
-    setTimeout(() => {
-        splash.classList.add("fade-out");
-        setTimeout(() => {
-            splash.style.display = "none";
-            app.style.display = "block";
-            app.classList.add("fade-in");
-            localStorage.setItem("seenSplash", "true");
-        }, 400);
-    }, 600);
-});
-</script>
-
-<!-- iOS install hint -->
-<script>
-(function() {
-    const isIOS = /iphone|ipad|ipod/i.test(window.navigator.userAgent);
-    const isInStandalone = window.navigator.standalone === true;
-
-    if(isIOS && !isInStandalone){
-        const hint = document.getElementById("iosInstallHint");
-        if(hint){
-            hint.style.display = "block";
-            setTimeout(() => { hint.style.display = "none"; }, 5000);
-        }
-    }
-})();
-</script>
-
-<div class="bottom-nav">
-    <a href="/" class="nav-item">🏠<span>Home</span></a>
-    {% if request.user.is_authenticated %}
-        <a href="/dashboard/" class="nav-item">⚙️<span>Parent</span></a>
-    {% endif %}
-    <a href="/child/" class="nav-item">🎮<span>Play</span></a>
-</div>
-
-<div id="toast" class="toast hidden"></div>
-
-<!-- Service worker with safe update notification (no mid-session reload) -->
-<script>
-if('serviceWorker' in navigator){
-    navigator.serviceWorker.register('/static/game/js/sw.js').then(reg => {
-
-        setInterval(() => { reg.update(); }, 60000);
-
-        reg.onupdatefound = () => {
-            const newWorker = reg.installing;
-            newWorker.onstatechange = () => {
-                if(newWorker.state === 'installed' && navigator.serviceWorker.controller){
-                    // Show toast instead of forcing a reload mid-session
-                    const toast = document.getElementById("toast");
-                    if(toast){
-                        toast.textContent = "🔄 Update available — tap to refresh";
-                        toast.classList.remove("hidden");
-                        toast.style.opacity = "1";
-                        toast.style.cursor = "pointer";
-                        toast.onclick = () => window.location.reload();
-                    }
-                }
-            };
-        };
-
-    });
-}
-</script>
-
-</body>
-</html>
+{% endblock %}
