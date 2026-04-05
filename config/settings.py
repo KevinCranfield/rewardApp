@@ -30,7 +30,7 @@ STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 SECRET_KEY = 'django-insecure-#0$8$9x94@1xj%(pe_z2fxg00wo^b&um&am$lmbc4ko783w3w7'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ["rewardapp.live", "www.rewardapp.live", "134.209.18.202"]
 
