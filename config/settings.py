@@ -12,9 +12,7 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 # TEST LINE again 
 from pathlib import Path
 import os
-
 from dotenv import load_dotenv
-import os
 load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -125,9 +123,9 @@ USE_I18N = True
 
 USE_TZ = True
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-SECURE_SSL_REDIRECT = True
-SESSION_COOKIE_SECURE = True
-CSRF_COOKIE_SECURE = True
+SECURE_SSL_REDIRECT = False
+SESSION_COOKIE_SECURE = False
+CSRF_COOKIE_SECURE = False
 
 
 # Static files (CSS, JavaScript, Images)
