@@ -135,9 +135,16 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 
 
-# TEMP: Use filebased email backend to store emails in files
-EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
-EMAIL_FILE_PATH = '/home/rewardApp/emails'
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+
+EMAIL_HOST = 'smtp.sendgrid.net'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+
+EMAIL_HOST_USER = 'apikey'  # literally this word
+EMAIL_HOST_PASSWORD = os.environ.get('SENDGRID_API_KEY')
+
+DEFAULT_FROM_EMAIL = 'noreply@rewardapp.live'
 
 
 LOGGING = {
