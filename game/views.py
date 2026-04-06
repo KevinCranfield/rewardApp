@@ -428,3 +428,7 @@ class CustomPasswordResetForm(PasswordResetForm):
 
 class CustomPasswordResetView(PasswordResetView):
     form_class = CustomPasswordResetForm
+    template_name = "game/password_reset.html"
+    email_template_name = "game/password_reset_email.html"
+    subject_template_name = "game/password_reset_subject.txt"
+    success_url = "/forgot-password/done/"
