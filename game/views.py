@@ -382,8 +382,8 @@ def signup(request):
     error = None
 
     if request.method == "POST":
-        username = request.POST.get("username")
-        email = request.POST.get("email")
+        username = (request.POST.get("username") or "").strip()
+        email = (request.POST.get("email") or "").strip().lower()
         password = request.POST.get("password")
         confirm = request.POST.get("confirm_password")
 
@@ -402,7 +402,7 @@ def signup(request):
         elif User.objects.filter(username=username).exists():
             error = "Username already exists"
 
-        elif User.objects.filter(email=email).exists():
+        elif User.objects.filter(email__iexact=email).exists():
             error = "Email already used"
 
         else:
