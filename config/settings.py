@@ -27,12 +27,13 @@ STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-#0$8$9x94@1xj%(pe_z2fxg00wo^b&um&am$lmbc4ko783w3w7'
+SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = ["rewardapp.live", "www.rewardapp.live", "134.209.18.202"]
+ALLOWED_HOSTS = ["rewardapp.live", "www.rewardapp.live"]
+CSRF_TRUSTED_ORIGINS = ["https://rewardapp.live", "https://www.rewardapp.live"]
 
 
 # Application definition
@@ -123,6 +124,10 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 
 USE_TZ = True
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+SECURE_SSL_REDIRECT = True
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
 
 
 # Static files (CSS, JavaScript, Images)
@@ -144,7 +149,7 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'apikey'  # literally this word
 EMAIL_HOST_PASSWORD = os.environ.get('SENDGRID_API_KEY')
 
-DEFAULT_FROM_EMAIL = 'noreply@rewardapp.live'
+DEFAULT_FROM_EMAIL = 'Reward App <noreply@rewardapp.live>'
 
 
 LOGGING = {
