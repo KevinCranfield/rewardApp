@@ -13,8 +13,10 @@
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <!-- Google Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-GZ0ENNSBXC"></script>
+    <!-- Preload splash logo (largest above-the-fold image) -->
+    <link rel="preload" as="image" href="{% static 'game/images/logo.webp' %}" type="image/webp">
+    <!-- Google Analytics (deferred so it doesn't block render) -->
+    <script defer src="https://www.googletagmanager.com/gtag/js?id=G-GZ0ENNSBXC"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
@@ -53,7 +55,10 @@ body.loaded{visibility:visible;}
 
 <body>
 <div id="splash" class="splash">
-  <img src="{% static 'game/images/logo.png' %}" class="splash-logo" width="120" height="120" alt="Reward Game logo">
+  <picture>
+    <source srcset="{% static 'game/images/logo.webp' %}" type="image/webp">
+    <img src="{% static 'game/images/logo.png' %}" class="splash-logo" width="120" height="120" alt="Reward Game logo">
+  </picture>
   <h1>Reward Game</h1>
   <p class="splash-tagline">
     🎯 Motivate kids with fun rewards<br>
@@ -67,7 +72,10 @@ body.loaded{visibility:visible;}
 <div id="app">
 <header class="navbar">
     <div class="nav-left">
-        <img src="{% static 'game/images/logo.png' %}" class="nav-logo" width="32" height="32" alt="Reward Game">
+        <picture>
+          <source srcset="{% static 'game/images/logo.webp' %}" type="image/webp">
+          <img src="{% static 'game/images/logo.png' %}" class="nav-logo" width="32" height="32" alt="Reward Game">
+        </picture>
         <span class="nav-title">Reward Game</span>
     </div>
 
