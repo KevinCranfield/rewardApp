@@ -4,6 +4,8 @@ from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
+from django.contrib.auth.views import PasswordResetView
+from django.contrib.auth.forms import PasswordResetForm
 from django.utils import timezone
 from datetime import timedelta
 import random
@@ -416,3 +418,13 @@ def signup(request):
             return redirect("dashboard")
 
     return render(request, "game/signup.html", {"error": error})
+
+
+# Custom password reset form and view using case-insensitive email lookup
+class CustomPasswordResetForm(PasswordResetForm):
+    def get_users(self, email):
+        email = (email or "").strip()
+        return User.objects.filter(email__iexact=email, is_active=True)
+
+class CustomPasswordResetView(PasswordResetView):
+    form_class = CustomPasswordResetForm

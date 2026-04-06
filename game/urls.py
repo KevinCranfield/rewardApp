@@ -27,7 +27,7 @@ urlpatterns = [
     path("ping-auth/", views.ping_auth, name="ping_auth"),
 
     # 🔑 PASSWORD RESET
-    path("forgot-password/", auth_views.PasswordResetView.as_view(
+    path("forgot-password/", views.CustomPasswordResetView.as_view(
         template_name="game/password_reset.html",
         email_template_name="game/password_reset_email.html",
         subject_template_name="game/password_reset_subject.txt",
