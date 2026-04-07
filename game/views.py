@@ -432,3 +432,6 @@ class CustomPasswordResetView(PasswordResetView):
     email_template_name = "game/password_reset_email.html"
     subject_template_name = "game/password_reset_subject.txt"
     success_url = "/forgot-password/done/"
+
+def sentry_test(request):
+    raise Exception("Sentry test error!")
