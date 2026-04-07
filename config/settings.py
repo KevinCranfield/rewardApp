@@ -43,10 +43,12 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'game',
+    'axes',
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'axes.middleware.AxesMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -133,6 +135,7 @@ SECURE_HSTS_PRELOAD = True
 SECURE_BROWSER_XSS_FILTER = True
 SECURE_CONTENT_TYPE_NOSNIFF = True
 X_FRAME_OPTIONS = 'DENY'
+SECURE_REFERRER_POLICY = "same-origin"
 
 
 # Static files (CSS, JavaScript, Images)
@@ -171,10 +174,17 @@ from sentry_sdk.integrations.django import DjangoIntegration
 
 SENTRY_DSN = os.environ.get('SENTRY_DSN')
 
-if SENTRY_DSN:
+if not DEBUG and SENTRY_DSN:
     sentry_sdk.init(
         dsn=SENTRY_DSN,
         integrations=[DjangoIntegration()],
-        traces_sample_rate=0.2,
+        traces_sample_rate=0.1,
         send_default_pii=True,
+        release="rewardapp@1.0",
     )
+
+# Django Axes (login protection)
+AXES_FAILURE_LIMIT = 5
+AXES_COOLOFF_TIME = 1  # hours
+AXES_LOCKOUT_TEMPLATE = None
+AXES_RESET_ON_SUCCESS = True
