@@ -167,7 +167,14 @@ LOGGING = {
 }
 
 import sentry_sdk
-sentry_sdk.init(
-    dsn=os.environ.get('SENTRY_DSN'),
-    traces_sample_rate=0.2,
-)
+from sentry_sdk.integrations.django import DjangoIntegration
+
+SENTRY_DSN = os.environ.get('SENTRY_DSN')
+
+if SENTRY_DSN:
+    sentry_sdk.init(
+        dsn=SENTRY_DSN,
+        integrations=[DjangoIntegration()],
+        traces_sample_rate=0.2,
+        send_default_pii=True,
+    )

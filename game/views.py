@@ -434,4 +434,6 @@ class CustomPasswordResetView(PasswordResetView):
     success_url = "/forgot-password/done/"
 
 def sentry_test(request):
-    raise Exception("Sentry test error!")
+    # Force a server error for Sentry testing
+    division_by_zero = 1 / 0
+    return JsonResponse({"ok": True})
