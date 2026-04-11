@@ -33,6 +33,16 @@ def is_parent_authenticated(request):
     return True
 
 
+def home(request):
+    children = []
+    if request.user.is_authenticated:
+        family = get_family(request.user)
+        children = family.children.all()
+
+    return render(request, "game/home.html", {
+        "children": children
+    })
+
 def login_view(request):
     if request.method == "POST":
         username = request.POST.get("username")
