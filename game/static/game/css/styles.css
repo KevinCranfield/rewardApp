@@ -2429,3 +2429,49 @@ body.loaded{ visibility:visible; }
     color: #991b1b;
     border: 1px solid #fca5a5;
 }
+
+/* =========================
+   CHESTS
+========================= */
+
+.chests-row {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    padding: 10px 16px;
+}
+
+.chest-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 14px 18px;
+    border: none;
+    border-radius: 16px;
+    cursor: pointer;
+    transition: all .2s ease;
+    box-shadow: 0 6px 16px rgba(0,0,0,.2);
+    min-width: 80px;
+}
+
+.chest-bronze { background: linear-gradient(135deg, #b45309, #92400e); color: white; }
+.chest-silver { background: linear-gradient(135deg, #9ca3af, #6b7280); color: white; }
+.chest-gold   { background: linear-gradient(135deg, #facc15, #ca8a04); color: #1f2937; }
+
+.chest-btn:hover { transform: translateY(-3px) scale(1.05); }
+.chest-btn:active { transform: scale(.95); }
+
+.chest-icon { font-size: 28px; }
+.chest-label { font-size: 13px; font-weight: 700; }
+.chest-tap { font-size: 11px; opacity: 0.8; }
+
+.chest-opening {
+    animation: chestShake .4s ease;
+}
+
+@keyframes chestShake {
+    0%  { transform: rotate(0deg) scale(1); }
+    25% { transform: rotate(-8deg) scale(1.1); }
+    50% { transform: rotate(8deg) scale(1.15); }
