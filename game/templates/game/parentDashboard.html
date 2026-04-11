@@ -27,7 +27,7 @@
                 </div>
 
                 <div class="child-info" data-rolls>
-                    Rolls added: {{ child.rolls_available }}
+                    Chests waiting: {{ child.unopened_chests|length }}
                 </div>
 
                 <div class="reward-section">
@@ -35,7 +35,7 @@
                         <strong>🎯 How it works:</strong><br>
                         1. Select a reason OR type your own<br>
                         2. Choose a chest (Bronze / Silver / Gold)<br>
-                        3. Child opens the chest in their view 🎁
+                        3. Child opens the chest 🎁
                     </div>
                     <form method="POST" action="{% url 'add_reward' %}" class="reward-form">
                         {% csrf_token %}
@@ -80,7 +80,7 @@
                             </span>
                         </div>
                     {% empty %}
-                        <div class="no-rewards">⚠️ No rewards yet — add one above to enable dice rolls</div>
+                        <div class="no-rewards">⚠️ No chests yet — add one above to create a chest</div>
                     {% endfor %}
                 </div>
 
