@@ -9,6 +9,7 @@ class Family(models.Model):
     def __str__(self):
         return f"{self.owner.username}'s family"
 
+
 class Child(models.Model):
 
     COLOUR_CHOICES = [
@@ -47,18 +48,18 @@ class Chest(models.Model):
     TIER_CHOICES = [
         ("bronze", "Bronze"),
         ("silver", "Silver"),
-        ("gold",   "Gold"),
+        ("gold", "Gold"),
     ]
 
     ROLLS_BY_TIER = {
         "bronze": 1,
         "silver": 2,
-        "gold":   3,
+        "gold": 3,
     }
 
-    child     = models.ForeignKey(Child, on_delete=models.CASCADE, related_name="chests")
-    tier      = models.CharField(max_length=10, choices=TIER_CHOICES)
-    reason    = models.CharField(max_length=200, blank=True)
+    child = models.ForeignKey(Child, on_delete=models.CASCADE, related_name="chests")
+    tier = models.CharField(max_length=10, choices=TIER_CHOICES)
+    reason = models.CharField(max_length=200, blank=True)
 
     is_opened = models.BooleanField(default=False)
     opened_at = models.DateTimeField(null=True, blank=True)
@@ -69,7 +70,7 @@ class Chest(models.Model):
 
     @property
     def rolls_awarded(self):
-        return self.ROLLS_BY_TIER[self.tier]
+        return self.ROLLS_BY_TIER.get(self.tier, 1)
 
     def __str__(self):
         return f"{self.child.name} — {self.tier} chest ({'opened' if self.is_opened else 'unopened'})"
@@ -90,4 +91,3 @@ class Reward(models.Model):
 
     def __str__(self):
         return f"{self.child.name} - {self.reason}"
-
