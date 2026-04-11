@@ -38,86 +38,36 @@ def home(request):
 
 @login_required
 def dashboard(request):
-
     if not is_parent_authenticated(request):
         return redirect("enter_pin")
 
     request.session["parent_auth_time"] = timezone.now().timestamp()
 
     family = get_family(request.user)
-
     children = list(family.children.all())
 
-    rewards = Reward.objects.filter(child__family=family).order_by('-created_at')
-
     for c in children:
-        c.all_rewards = [r for r in rewards if r.child_id == c.id]
-        c.rolls_available = c.rewards.filter(is_used=False).count()
-        c.unopened_chests = c.chests.filter(is_opened=False).count()
+        c.unopened_chests = c.chests.filter(is_opened=False).order_by('-created_at')
+        c.all_rewards = Reward.objects.filter(child=c).order_by('-created_at')
 
-    last_rolls = (
-        Roll.objects
-        .filter(child__in=children)
-        .order_by('child_id', '-id')
-    )
-    last_map = {}
-    for r in last_rolls:
-        if r.child_id not in last_map:
-            last_map[r.child_id] = r.dice
-    for c in children:
-        c.last_roll = last_map.get(c.id)
-
-    recent_rewards = Reward.objects.filter(
-        child__family=family
-    ).select_related("child").order_by("-created_at")[:15]
-
-    used_colours = list(
-        Child.objects.filter(family=family)
-        .values_list("colour", flat=True)
-    )
-
-    return render(request, "game/parentDashboard.html", {
+    context = {
         "children": children,
-        "recent_rewards": recent_rewards,
-        "used_colours": used_colours
-    })
+        "used_colours": [c.colour for c in children],
+    }
+
+    return render(request, "game/parentDashboard.html", context)
+
 
 @login_required
 def child_view(request, child_id):
 
     family = get_family(request.user)
-    request.session["parent_authed"] = False
-
-    child = Child.objects.filter(
-        id=child_id,
-        family=family
-    ).first()
-
-    if not child:
-        return redirect("dashboard")
-
-    children = family.children.all()
-
-    child.rolls_available = child.rewards.filter(is_used=False).count()
-    child.unopened_chests = child.chests.filter(is_opened=False)
-
-    last_roll = Roll.objects.filter(child=child).order_by("-id").first()
-    child.last_roll = last_roll.dice if last_roll else None
-
-    child.progress_percent = int((child.position / 64) * 100)
-
-    squares = []
-    for row in range(8):
-        nums = list(range(row * 8 + 1, row * 8 + 9))
-        if row % 2 == 1:
-            nums.reverse()
-        squares.insert(0, nums)
-
-    return render(request, "game/child.html", {
-        "child": child,
-        "children": children,
-        "squares": squares
-    })
+    child = get_object_or_404(Child, id=child_id, family=family)
+    
+    child.unopened_chests = child.chests.filter(is_opened=False).order_by('-created_at')
+    child.rolls_available = Reward.objects.filter(child=child, is_used=False).count()
+    
+    return render(request, "game/child.html", {"child": child})
 
 
 @login_required
@@ -265,7 +215,6 @@ def add_reward(request):
         tier_name = tier_map.get(tier, "bronze")
 
         if reason and reason.strip():
-            # Create a chest instead of rewards
             chest = Chest.objects.create(
                 child=child,
                 tier=tier_name,
@@ -291,56 +240,7 @@ def add_reward(request):
 
 
 @login_required
-def give_chest(request):
-    """Parent gives a chest (bronze/silver/gold) to a child."""
-    if request.method == "POST":
-        import json
-        try:
-            data = json.loads(request.body)
-        except:
-            data = request.POST
-
-        family = get_family(request.user)
-
-        child = Child.objects.filter(
-            id=data.get("child_id"),
-            family=family
-        ).first()
-
-        if not child:
-            return JsonResponse({"success": False, "error": "Invalid child"}, status=400)
-
-        tier = data.get("tier", "bronze")
-        if tier not in ("bronze", "silver", "gold"):
-            return JsonResponse({"success": False, "error": "Invalid tier"}, status=400)
-
-        reason = (data.get("reason") or "").strip()
-
-        chest = Chest.objects.create(
-            child=child,
-            tier=tier,
-            reason=reason,
-        )
-
-        unopened_count = child.chests.filter(is_opened=False).count()
-
-        return JsonResponse({
-            "success": True,
-            "chest": {
-                "id": chest.id,
-                "tier": chest.tier,
-                "rolls_awarded": chest.rolls_awarded,
-                "reason": chest.reason,
-            },
-            "unopened_chests": unopened_count,
-        })
-
-    return JsonResponse({"success": False, "error": "Invalid request"}, status=400)
-
-
-@login_required
 def open_chest(request):
-    """Child opens a chest — converts to rolls."""
     if request.method == "POST":
         import json
         
@@ -358,15 +258,12 @@ def open_chest(request):
         if not chest:
             return JsonResponse({"success": False, "error": "Chest not found"}, status=400)
         
-        # Mark chest as opened
         chest.is_opened = True
         chest.opened_at = timezone.now()
         chest.save()
         
-        # Get rolls awarded for this tier
         rolls_awarded = chest.rolls_awarded
         
-        # Create reward objects for the rolls (or track directly)
         for _ in range(rolls_awarded):
             Reward.objects.create(
                 child=chest.child,
@@ -374,10 +271,7 @@ def open_chest(request):
                 is_used=False
             )
         
-        # Get remaining unopened chests
         unopened_count = chest.child.chests.filter(is_opened=False).count()
-        
-        # Get total available rolls
         total_rolls = chest.child.rewards.filter(is_used=False).count()
         
         return JsonResponse({
@@ -409,113 +303,13 @@ from django.views.decorators.http import require_POST
 @login_required
 @require_POST
 def reset_board(request):
-    if not is_parent_authenticated(request):
-        return JsonResponse({"success": False, "error": "Not authorised"}, status=403)
-
     family = get_family(request.user)
-
-    Child.objects.filter(family=family).update(position=1)
-    Reward.objects.filter(child__family=family).update(is_used=True)
+    
     Roll.objects.filter(child__family=family).delete()
-
-    children = list(
-        Child.objects.filter(family=family)
-        .values("id", "name", "colour", "position")
-    )
-
-    for c in children:
-        c["rolls_available"] = 0
-
-    return JsonResponse({"success": True, "children": children})
-
-def ping_auth(request):
-    if request.user.is_authenticated:
-        request.session["parent_auth_time"] = timezone.now().timestamp()
-    return JsonResponse({"ok": True})
-
-@login_required
-def enter_pin(request):
-
-    family = get_family(request.user)
-    error = None
-
-    if request.method == "POST":
-        pin = request.POST.get("pin")
-
-        if pin == getattr(family, "parent_pin", "1234"):
-            request.session["parent_authed"] = True
-            request.session["parent_auth_time"] = timezone.now().timestamp()
-            return redirect("dashboard")
-        else:
-            error = "Incorrect PIN"
-
-    return render(request, "game/pin.html", {"error": error})
-
-def login_view(request):
-    if request.user.is_authenticated:
-        return redirect("dashboard")
-
-    error = None
-    if request.method == "POST":
-        user = authenticate(
-            username=request.POST.get("username"),
-            password=request.POST.get("password")
-        )
-        if user:
-            login(request, user)
-            return redirect("dashboard")
-        else:
-            error = "Invalid username or password"
-
-    return render(request, "game/login.html", {"error": error})
-
-
-def logout_view(request):
-    logout(request)
-    return redirect("login")
-
-
-def signup(request):
-    if request.user.is_authenticated:
-        return redirect("dashboard")
-
-    error = None
-
-    if request.method == "POST":
-        username = (request.POST.get("username") or "").strip()
-        email = (request.POST.get("email") or "").strip().lower()
-        password = request.POST.get("password")
-        confirm = request.POST.get("confirm_password")
-
-        if not username or not email or not password or not confirm:
-            error = "Please fill all fields"
-
-        elif password != confirm:
-            error = "Passwords do not match"
-
-        elif len(password) < 6:
-            error = "Password must be at least 6 characters"
-
-        elif not any(char.isdigit() for char in password):
-            error = "Password must contain a number"
-
-        elif User.objects.filter(username=username).exists():
-            error = "Username already exists"
-
-        elif User.objects.filter(email__iexact=email).exists():
-            error = "Email already used"
-
-        else:
-            user = User.objects.create_user(
-                username=username,
-                email=email,
-                password=password
-            )
-
-            login(request, user)
-            return redirect("dashboard")
-
-    return render(request, "game/signup.html", {"error": error})
+    Reward.objects.filter(child__family=family).delete()
+    Chest.objects.filter(child__family=family).delete()
+    
+    return JsonResponse({"success": True})
 
 
 # Custom password reset form and view using case-insensitive email lookup
