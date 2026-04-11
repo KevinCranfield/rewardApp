@@ -10,9 +10,10 @@
 </h2>
 
 <!-- 📦 CHESTS -->
-{% if child.unopened_chests %}
+{% if child.chests.all %}
 <div class="chests-row" id="chests-row">
-    {% for chest in child.unopened_chests %}
+    {% for chest in child.chests.all %}
+        {% if not chest.is_opened %}
     <button
         class="chest-btn chest-{{ chest.tier }}"
         data-chest-id="{{ chest.id }}"
@@ -28,6 +29,7 @@
         <span class="chest-label">{{ chest.tier|capfirst }}</span>
         <span class="chest-tap">Tap to open!</span>
     </button>
+        {% endif %}
     {% endfor %}
 </div>
 {% endif %}
