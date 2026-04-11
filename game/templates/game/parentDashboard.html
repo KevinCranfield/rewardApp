@@ -34,8 +34,8 @@
                     <div class="helper-steps">
                         <strong>🎯 How it works:</strong><br>
                         1. Select a reason OR type your own<br>
-                        2. Choose Bronze / Silver / Gold<br>
-                        3. Child can roll the dice 🎲
+                        2. Choose a chest (Bronze / Silver / Gold)<br>
+                        3. Child opens the chest in their view 🎁
                     </div>
                     <form method="POST" action="{% url 'add_reward' %}" class="reward-form">
                         {% csrf_token %}
@@ -53,14 +53,14 @@
                         <input type="text" name="custom_text" class="reward-input" placeholder="Or type your own reason (e.g. Brushed teeth)">
 
                         <div class="reward-buttons">
-                            <button type="submit" name="rolls" value="1" class="reward-btn bronze-btn">
-                                🟤 Bronze (+1 Roll)
+                            <button type="submit" name="tier" value="1" class="reward-btn bronze-btn">
+                                🟤 Bronze Chest (+1 Roll)
                             </button>
-                            <button type="submit" name="rolls" value="2" class="reward-btn silver-btn">
-                                ⚪ Silver (+2 Rolls)
+                            <button type="submit" name="tier" value="2" class="reward-btn silver-btn">
+                                ⚪ Silver Chest (+2 Rolls)
                             </button>
-                            <button type="submit" name="rolls" value="3" class="reward-btn gold-btn">
-                                🟡 Gold (+3 Rolls)
+                            <button type="submit" name="tier" value="3" class="reward-btn gold-btn">
+                                🟡 Gold Chest (+3 Rolls)
                             </button>
                         </div>
                     </form>

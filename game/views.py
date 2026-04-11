@@ -260,32 +260,29 @@ def add_reward(request):
         else:
             reason = request.POST.get("reason")
 
-        rolls = max(1, min(int(request.POST.get("rolls", 1)), 3))
+        tier = request.POST.get("tier", "1")
+        tier_map = {"1": "bronze", "2": "silver", "3": "gold"}
+        tier_name = tier_map.get(tier, "bronze")
 
         if reason and reason.strip():
-            created_rewards = []
+            # Create a chest instead of rewards
+            chest = Chest.objects.create(
+                child=child,
+                tier=tier_name,
+                reason=reason,
+            )
 
-            for _ in range(rolls):
-                reward = Reward.objects.create(
-                    child=child,
-                    reason=reason,
-                    custom_text=custom_text or ""
-                )
-                created_rewards.append(reward)
-
-            total_unused = child.rewards.filter(is_used=False).count()
+            unopened_count = child.chests.filter(is_opened=False).count()
 
             return JsonResponse({
                 "success": True,
-                "count": rolls,
-                "rolls_remaining": total_unused,
-                "rewards": [
-                    {
-                        "id": r.id,
-                        "reason": r.reason,
-                        "custom_text": r.custom_text
-                    } for r in created_rewards
-                ]
+                "chest": {
+                    "id": chest.id,
+                    "tier": chest.tier,
+                    "rolls_awarded": chest.rolls_awarded,
+                    "reason": chest.reason,
+                },
+                "unopened_chests": unopened_count,
             })
 
         return JsonResponse({"success": False, "error": "No reason provided"}, status=400)
@@ -346,47 +343,50 @@ def open_chest(request):
     """Child opens a chest — converts to rolls."""
     if request.method == "POST":
         import json
-        try:
-            data = json.loads(request.body)
-        except:
-            data = request.POST
-
+        
+        data = json.loads(request.body)
+        chest_id = data.get("chest_id")
+        
         family = get_family(request.user)
-
+        
         chest = Chest.objects.filter(
-            id=data.get("chest_id"),
+            id=chest_id,
             child__family=family,
-            is_opened=False,
-        ).select_related("child").first()
-
+            is_opened=False
+        ).first()
+        
         if not chest:
-            return JsonResponse({"success": False, "error": "Chest not found"}, status=404)
-
+            return JsonResponse({"success": False, "error": "Chest not found"}, status=400)
+        
         # Mark chest as opened
         chest.is_opened = True
         chest.opened_at = timezone.now()
         chest.save()
-
-        # Create the rolls
-        child = chest.child
-        for _ in range(chest.rolls_awarded):
+        
+        # Get rolls awarded for this tier
+        rolls_awarded = chest.rolls_awarded
+        
+        # Create reward objects for the rolls (or track directly)
+        for _ in range(rolls_awarded):
             Reward.objects.create(
-                child=child,
-                reason=f"{chest.tier.capitalize()} chest",
-                custom_text=chest.reason,
+                child=chest.child,
+                reason=chest.reason,
+                is_used=False
             )
-
-        rolls_remaining = child.rewards.filter(is_used=False).count()
-        unopened_chests = child.chests.filter(is_opened=False).count()
-
+        
+        # Get remaining unopened chests
+        unopened_count = chest.child.chests.filter(is_opened=False).count()
+        
+        # Get total available rolls
+        total_rolls = chest.child.rewards.filter(is_used=False).count()
+        
         return JsonResponse({
             "success": True,
-            "tier": chest.tier,
-            "rolls_awarded": chest.rolls_awarded,
-            "rolls_remaining": rolls_remaining,
-            "unopened_chests": unopened_chests,
+            "rolls_awarded": rolls_awarded,
+            "rolls_remaining": total_rolls,
+            "unopened_chests": unopened_count,
         })
-
+    
     return JsonResponse({"success": False, "error": "Invalid request"}, status=400)
 
 
