@@ -107,7 +107,14 @@ def roll(request):
 
     roll_value = random.randint(1, 6)
 
-    Roll.objects.create(child=child, value=roll_value)
+    child.position += roll_value
+    child.save()
+
+    Roll.objects.create(
+        child=child,
+        value=roll_value,
+        position_after=child.position
+    )
 
     return JsonResponse({
         "success": True,
@@ -157,8 +164,12 @@ def add_reward(request):
 @login_required
 @require_POST
 def open_chest(request):
-    data = json.loads(request.body)
-    chest_id = data.get("chest_id")
+    chest_id = None
+    if request.content_type == "application/json":
+        data = json.loads(request.body)
+        chest_id = data.get("chest_id")
+    else:
+        chest_id = request.POST.get("chest_id")
 
     family = get_family(request.user)
 
@@ -193,6 +204,7 @@ def open_chest(request):
     return JsonResponse({
         "success": True,
         "rolls_awarded": chest.rolls_awarded,
+        "rolls": chest.rolls_awarded,
         "rolls_remaining": total_rolls,
         "unopened_chests": unopened_count,
     })
