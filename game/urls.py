@@ -16,6 +16,10 @@ urlpatterns = [
     path("roll/", views.roll, name="roll"),
     path("reset-board/", views.reset_board, name="reset_board"),
 
+    # 🎁 CHESTS
+    path("give-chest/", views.give_chest, name="give_chest"),
+    path("open-chest/", views.open_chest, name="open_chest"),
+
     # 🔐 AUTH
     path("login/", views.login_view, name="login"),
     path("signup/", views.signup, name="signup"),
@@ -49,3 +53,4 @@ urlpatterns = [
 
     path("sentry-test/", views.sentry_test, name="sentry_test"),
 ]
+
