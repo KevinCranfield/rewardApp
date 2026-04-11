@@ -2411,3 +2411,21 @@ body.loaded{ visibility:visible; }
 .auth-card .show-pw-btn:active {
     transform: translateY(-50%);
 }
+
+.chest-feedback {
+    margin-top: 8px;
+    padding: 10px 14px;
+    border-radius: 12px;
+    font-size: 13px;
+    font-weight: 600;
+}
+.chest-success {
+    background: #d1fae5;
+    color: #065f46;
+    border: 1px solid #6ee7b7;
+}
+.chest-error {
+    background: #fee2e2;
+    color: #991b1b;
+    border: 1px solid #fca5a5;
+}
