@@ -35,13 +35,13 @@ class Child(models.Model):
 class Roll(models.Model):
     child = models.ForeignKey(Child, on_delete=models.CASCADE, related_name="rolls")
 
-    dice = models.IntegerField()
-    position_after = models.IntegerField()
+    value = models.IntegerField()
+    position_after = models.IntegerField(default=0)
 
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"{self.child.name} rolled {self.dice}"
+        return f"{self.child.name} rolled {self.value}"
 
 
 class Chest(models.Model):
