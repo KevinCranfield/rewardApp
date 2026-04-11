@@ -121,6 +121,7 @@ async function openChest(btn) {
 
     btn.disabled = true;
     btn.classList.add("chest-opening");
+    await new Promise(resolve => setTimeout(resolve, 500));
 
     try {
         const res = await fetch("/open-chest/", {
@@ -175,6 +176,7 @@ function showChestReveal(tier, rollsAwarded, rollsRemaining) {
     title.style.color = t.colour;
     rolls.textContent = `+${rollsAwarded} roll${rollsAwarded > 1 ? "s" : ""} added! 🎲`;
 
+    overlay.classList.add("hidden");
     overlay.classList.remove("hidden");
     overlay.classList.add("chest-overlay-show");
 
@@ -199,5 +201,60 @@ function closeChestOverlay() {
     overlay.classList.add("hidden");
 }
 </script>
+
+<style>
+.chest-btn {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.chest-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+.chest-opening {
+    animation: chestShake 0.5s ease;
+}
+
+@keyframes chestShake {
+    0% { transform: rotate(0deg); }
+    25% { transform: rotate(-5deg); }
+    50% { transform: rotate(5deg); }
+    75% { transform: rotate(-5deg); }
+    100% { transform: rotate(0deg); }
+}
+
+.chest-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 999;
+}
+
+.hidden {
+    display: none;
+}
+
+.chest-reveal-card {
+    background: white;
+    padding: 30px;
+    border-radius: 16px;
+    text-align: center;
+    transform: scale(0.8);
+    opacity: 0;
+    transition: all 0.3s ease;
+}
+
+.chest-overlay-show .chest-reveal-card {
+    transform: scale(1);
+    opacity: 1;
+}
+</style>
 
 {% endblock %}
