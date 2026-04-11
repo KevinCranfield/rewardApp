@@ -1,0 +1,17 @@
+[
+  {
+    "id": "deploy",
+    "execute-command": "/home/rewardApp/deploy.sh",
+    "command-working-directory": "/home/rewardApp",
+    "trigger-rule": {
+      "match": {
+        "type": "payload-hash-sha256",
+        "secret": "hdy;{bO)*qt7HNv}(%JKwRAch;TARo]j",
+        "parameter": {
+          "source": "header",
+          "name": "X-Hub-Signature-256"
+        }
+      }
+    }
+  }
+]
