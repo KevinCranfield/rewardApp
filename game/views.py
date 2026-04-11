@@ -60,7 +60,6 @@ def dashboard(request):
 
 @login_required
 def child_view(request, child_id):
-
     family = get_family(request.user)
     child = get_object_or_404(Child, id=child_id, family=family)
     
@@ -72,127 +71,56 @@ def child_view(request, child_id):
 
 @login_required
 def add_child(request):
-
     if request.method == "POST":
-
+        family = get_family(request.user)
         name = request.POST.get("name")
         colour = request.POST.get("colour")
-
-        family = get_family(request.user)
-
-        if Child.objects.filter(family=family, colour=colour).exists():
-            return redirect("dashboard")
-
+        
         if name and colour:
-            Child.objects.create(
-                family=family,
-                name=name,
-                colour=colour
-            )
-
+            Child.objects.create(family=family, name=name, colour=colour)
+        
+        return redirect("dashboard")
+    
     return redirect("dashboard")
 
 
 @login_required
 def roll(request):
-
     if request.method == "POST":
-        import json
-        try:
-            data = json.loads(request.body)
-            child_id = data.get("child_id")
-        except:
-            child_id = request.POST.get("child_id")
-
         family = get_family(request.user)
-
-        child = Child.objects.filter(
-            id=child_id,
-            family=family
-        ).first()
-
+        child_id = request.POST.get("child_id")
+        
+        child = Child.objects.filter(id=child_id, family=family).first()
         if not child:
-            return JsonResponse({"error": "invalid child"}, status=400)
-
-        reward = child.rewards.filter(is_used=False).first()
-
+            return JsonResponse({"success": False, "error": "Invalid child"}, status=400)
+        
+        reward = Reward.objects.filter(child=child, is_used=False).first()
         if not reward:
-            return JsonResponse({"error": "no reward"}, status=400)
-
-        dice = random.randint(1, 4)
-
-        SNAKES = {
-            62: 44,
-            55: 41,
-            27: 10,
-            33: 18,
-        }
-
-        LADDERS = {
-            3: 22,
-            8: 26,
-            19: 38,
-            35: 49,
-        }
-
-        start_pos = child.position
-        roll_target = min(start_pos + dice, 64)
-
-        jump = None
-        final_pos = roll_target
-
-        if roll_target in SNAKES:
-            final_pos = SNAKES[roll_target]
-            jump = "snake"
-        elif roll_target in LADDERS:
-            final_pos = LADDERS[roll_target]
-            jump = "ladder"
-
-        child.position = final_pos
-        child.save()
-
+            return JsonResponse({"success": False, "error": "No rolls available"}, status=400)
+        
         reward.is_used = True
         reward.save()
-
-        Roll.objects.create(
-            child=child,
-            dice=dice,
-            position_after=final_pos
-        )
-
-        rolls_remaining = child.rewards.filter(is_used=False).count()
-
+        
+        roll = Roll.objects.create(child=child, value=0)  # Dice roll happens on frontend
+        
         return JsonResponse({
-            "dice": dice,
-            "position": final_pos,
-            "from": roll_target,
-            "jump": jump,
-            "rolls_remaining": rolls_remaining,
-            "children": list(
-                Child.objects.filter(family=child.family)
-                .values("id", "name", "colour", "position")
-            )
+            "success": True,
+            "rolls_remaining": Reward.objects.filter(child=child, is_used=False).count()
         })
+    
+    return JsonResponse({"success": False, "error": "Invalid request"}, status=400)
 
 
 @login_required
 def remove_child(request, child_id):
-    if request.method == "POST":
-        family = get_family(request.user)
-
-        child = Child.objects.filter(
-            id=child_id,
-            family=family
-        ).first()
-
-        if child:
-            child.delete()
-
+    family = get_family(request.user)
+    child = get_object_or_404(Child, id=child_id, family=family)
+    child.delete()
     return redirect("dashboard")
+
 
 @login_required
 def add_reward(request):
-
     if request.method == "POST":
         family = get_family(request.user)
 
@@ -202,7 +130,7 @@ def add_reward(request):
         ).first()
 
         if not child:
-            return JsonResponse({"success": False, "error": "Invalid child"}, status=400)
+            return redirect("dashboard")
 
         custom_text = request.POST.get("custom_text")
         if custom_text and custom_text.strip():
@@ -215,28 +143,15 @@ def add_reward(request):
         tier_name = tier_map.get(tier, "bronze")
 
         if reason and reason.strip():
-            chest = Chest.objects.create(
+            Chest.objects.create(
                 child=child,
                 tier=tier_name,
                 reason=reason,
             )
 
-            unopened_count = child.chests.filter(is_opened=False).count()
+        return redirect("dashboard")
 
-            return JsonResponse({
-                "success": True,
-                "chest": {
-                    "id": chest.id,
-                    "tier": chest.tier,
-                    "rolls_awarded": chest.rolls_awarded,
-                    "reason": chest.reason,
-                },
-                "unopened_chests": unopened_count,
-            })
-
-        return JsonResponse({"success": False, "error": "No reason provided"}, status=400)
-
-    return JsonResponse({"success": False, "error": "Invalid request"}, status=400)
+    return redirect("dashboard")
 
 
 @login_required
@@ -286,19 +201,41 @@ def open_chest(request):
 
 @login_required
 def change_pin(request):
-
     if request.method == "POST":
         family = get_family(request.user)
-
         new_pin = request.POST.get("new_pin")
-
-        if new_pin and len(new_pin) >= 4:
+        confirm_pin = request.POST.get("confirm_pin")
+        
+        if new_pin == confirm_pin and new_pin:
             family.parent_pin = new_pin
             family.save()
-
+            return redirect("dashboard")
+    
     return redirect("dashboard")
 
-from django.views.decorators.http import require_POST
+
+def enter_pin(request):
+    if request.method == "POST":
+        family = get_family(request.user)
+        pin = request.POST.get("pin")
+        
+        if pin == family.parent_pin:
+            request.session["parent_authed"] = True
+            request.session["parent_auth_time"] = timezone.now().timestamp()
+            return redirect("dashboard")
+        else:
+            return render(request, "game/enter_pin.html", {"error": "Invalid PIN"})
+    
+    return render(request, "game/enter_pin.html")
+
+
+def ping_auth(request):
+    """Keep parent session alive"""
+    if is_parent_authenticated(request):
+        request.session["parent_auth_time"] = timezone.now().timestamp()
+        return JsonResponse({"success": True})
+    return JsonResponse({"success": False}, status=401)
+
 
 @login_required
 @require_POST
@@ -312,20 +249,7 @@ def reset_board(request):
     return JsonResponse({"success": True})
 
 
-# Custom password reset form and view using case-insensitive email lookup
-class CustomPasswordResetForm(PasswordResetForm):
-    def get_users(self, email):
-        email = (email or "").strip()
-        return User.objects.filter(email__iexact=email, is_active=True)
-
-class CustomPasswordResetView(PasswordResetView):
-    form_class = CustomPasswordResetForm
-    template_name = "game/password_reset.html"
-    email_template_name = "game/password_reset_email.html"
-    subject_template_name = "game/password_reset_subject.txt"
-    success_url = "/forgot-password/done/"
-
-def sentry_test(request):
-    division_by_zero = 1 / 0
-    return JsonResponse({"ok": True})
+def give_chest(request):
+    """Alias for add_reward"""
+    return add_reward(request)
 
