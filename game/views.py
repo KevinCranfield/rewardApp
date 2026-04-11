@@ -10,7 +10,7 @@ from django.utils import timezone
 from datetime import timedelta
 import random
 
-from .models import Family, Child, Roll, Reward
+from .models import Family, Child, Roll, Reward, Chest
 
 def get_family(user):
     family, _ = Family.objects.get_or_create(owner=user)
@@ -53,6 +53,7 @@ def dashboard(request):
     for c in children:
         c.all_rewards = [r for r in rewards if r.child_id == c.id]
         c.rolls_available = c.rewards.filter(is_used=False).count()
+        c.unopened_chests = c.chests.filter(is_opened=False).count()
 
     last_rolls = (
         Roll.objects
@@ -97,8 +98,8 @@ def child_view(request, child_id):
 
     children = family.children.all()
 
-    # ✅ Fix: use rolls_available to match template
     child.rolls_available = child.rewards.filter(is_used=False).count()
+    child.unopened_chests = child.chests.filter(is_opened=False)
 
     last_roll = Roll.objects.filter(child=child).order_by("-id").first()
     child.last_roll = last_roll.dice if last_roll else None
@@ -291,6 +292,104 @@ def add_reward(request):
 
     return JsonResponse({"success": False, "error": "Invalid request"}, status=400)
 
+
+@login_required
+def give_chest(request):
+    """Parent gives a chest (bronze/silver/gold) to a child."""
+    if request.method == "POST":
+        import json
+        try:
+            data = json.loads(request.body)
+        except:
+            data = request.POST
+
+        family = get_family(request.user)
+
+        child = Child.objects.filter(
+            id=data.get("child_id"),
+            family=family
+        ).first()
+
+        if not child:
+            return JsonResponse({"success": False, "error": "Invalid child"}, status=400)
+
+        tier = data.get("tier", "bronze")
+        if tier not in ("bronze", "silver", "gold"):
+            return JsonResponse({"success": False, "error": "Invalid tier"}, status=400)
+
+        reason = (data.get("reason") or "").strip()
+
+        chest = Chest.objects.create(
+            child=child,
+            tier=tier,
+            reason=reason,
+        )
+
+        unopened_count = child.chests.filter(is_opened=False).count()
+
+        return JsonResponse({
+            "success": True,
+            "chest": {
+                "id": chest.id,
+                "tier": chest.tier,
+                "rolls_awarded": chest.rolls_awarded,
+                "reason": chest.reason,
+            },
+            "unopened_chests": unopened_count,
+        })
+
+    return JsonResponse({"success": False, "error": "Invalid request"}, status=400)
+
+
+@login_required
+def open_chest(request):
+    """Child opens a chest — converts to rolls."""
+    if request.method == "POST":
+        import json
+        try:
+            data = json.loads(request.body)
+        except:
+            data = request.POST
+
+        family = get_family(request.user)
+
+        chest = Chest.objects.filter(
+            id=data.get("chest_id"),
+            child__family=family,
+            is_opened=False,
+        ).select_related("child").first()
+
+        if not chest:
+            return JsonResponse({"success": False, "error": "Chest not found"}, status=404)
+
+        # Mark chest as opened
+        chest.is_opened = True
+        chest.opened_at = timezone.now()
+        chest.save()
+
+        # Create the rolls
+        child = chest.child
+        for _ in range(chest.rolls_awarded):
+            Reward.objects.create(
+                child=child,
+                reason=f"{chest.tier.capitalize()} chest",
+                custom_text=chest.reason,
+            )
+
+        rolls_remaining = child.rewards.filter(is_used=False).count()
+        unopened_chests = child.chests.filter(is_opened=False).count()
+
+        return JsonResponse({
+            "success": True,
+            "tier": chest.tier,
+            "rolls_awarded": chest.rolls_awarded,
+            "rolls_remaining": rolls_remaining,
+            "unopened_chests": unopened_chests,
+        })
+
+    return JsonResponse({"success": False, "error": "Invalid request"}, status=400)
+
+
 @login_required
 def change_pin(request):
 
@@ -319,7 +418,6 @@ def reset_board(request):
     Reward.objects.filter(child__family=family).update(is_used=True)
     Roll.objects.filter(child__family=family).delete()
 
-    # ✅ Fix: return children data so dashboard JS can update cards without refresh
     children = list(
         Child.objects.filter(family=family)
         .values("id", "name", "colour", "position")
@@ -434,6 +532,6 @@ class CustomPasswordResetView(PasswordResetView):
     success_url = "/forgot-password/done/"
 
 def sentry_test(request):
-    # Force a server error for Sentry testing
     division_by_zero = 1 / 0
     return JsonResponse({"ok": True})
+
