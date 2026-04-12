@@ -8,6 +8,8 @@ from django.utils import timezone
 import random
 import json
 
+from django.contrib.auth.views import PasswordResetView
+
 from .models import Family, Child, Roll, Reward, Chest
 
 
@@ -308,6 +310,28 @@ def signup(request):
     return render(request, "game/signup.html")
 
 
+# New function to change the parent's PIN
+@login_required
+def change_pin(request):
+    family = get_family(request.user)
+
+    if request.method == "POST":
+        new_pin = request.POST.get("pin")
+
+        if new_pin:
+            family.parent_pin = new_pin
+            family.save()
+            return redirect("dashboard")
+
+    return render(request, "game/change_pin.html")
+
+
+# Simple test endpoint for monitoring
+@login_required
+def sentry_test(request):
+    return JsonResponse({"status": "ok"})
+
+
 
 # New function to check parent authentication via AJAX
 @login_required
@@ -315,3 +339,8 @@ def ping_auth(request):
     if is_parent_authenticated(request):
         return JsonResponse({"authenticated": True})
     return JsonResponse({"authenticated": False}, status=401)
+
+
+# Custom password reset view
+class CustomPasswordResetView(PasswordResetView):
+    template_name = "registration/password_reset_form.html"
