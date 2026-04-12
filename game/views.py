@@ -151,15 +151,18 @@ def give_chest(request):
     if not child:
         return JsonResponse({"success": False}, status=400)
 
-    tier = request.POST.get("tier", "1")
+    tier = request.POST.get("tier", "bronze")
 
     tier_map = {
         "1": "bronze",
         "2": "silver",
         "3": "gold",
+        "bronze": "bronze",
+        "silver": "silver",
+        "gold": "gold",
     }
 
-    tier_name = tier_map.get(tier, "bronze")
+    tier_name = tier_map.get(str(tier).lower(), "bronze")
 
     chest = Chest.objects.create(
         child=child,
@@ -193,9 +196,18 @@ def add_reward(request):
     if not reason:
         return JsonResponse({"success": False, "error": "Missing reason"}, status=400)
 
-    tier = request.POST.get("tier", "1")
-    tier_map = {"1": "bronze", "2": "silver", "3": "gold"}
-    tier_name = tier_map.get(tier, "bronze")
+    tier = request.POST.get("tier", "bronze")
+
+    tier_map = {
+        "1": "bronze",
+        "2": "silver",
+        "3": "gold",
+        "bronze": "bronze",
+        "silver": "silver",
+        "gold": "gold",
+    }
+
+    tier_name = tier_map.get(str(tier).lower(), "bronze")
 
     chest = Chest.objects.create(
         child=child,
@@ -282,6 +294,7 @@ def roll(request):
 
     return JsonResponse({
         "success": True,
+        "dice": roll_value,
         "roll": roll_value,
         "position": child.position,
         "rolls_remaining": remaining
