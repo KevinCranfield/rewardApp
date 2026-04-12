@@ -129,10 +129,13 @@ async function openChest(btn) {
         const res = await fetch("/open-chest/", {
             method: "POST",
             headers: {
-                "Content-Type": "application/json",
+                "Content-Type": "application/x-www-form-urlencoded",
                 "X-CSRFToken": CSRF,
             },
-            body: JSON.stringify({ chest_id: chestId }),
+            body: new URLSearchParams({
+                chest_id: chestId,
+                child_id: document.querySelector(".child-view").dataset.childId
+            }),
         });
 
         const data = await res.json();

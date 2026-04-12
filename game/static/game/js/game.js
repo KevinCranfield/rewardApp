@@ -1138,6 +1138,13 @@ function openChest(chestId){
     const el = document.querySelector(`[data-chest-id='${chestId}']`);
     if(!el) return;
 
+    const childId = el.dataset.childId;
+    if(!childId){
+        console.error("Missing childId on chest element");
+        showToast("⚠️ Invalid chest");
+        return;
+    }
+
     // add animation
     el.classList.add("chest-opening");
 
@@ -1153,7 +1160,8 @@ function openChest(chestId){
                 "Content-Type": "application/x-www-form-urlencoded"
             },
             body: new URLSearchParams({
-                chest_id: chestId
+                chest_id: chestId,
+                child_id: childId
             })
         })
         .then(async res => {
