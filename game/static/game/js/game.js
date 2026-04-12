@@ -1184,6 +1184,12 @@ function openChest(chestId){
                 // Safe cleanup only (do NOT touch global overlays)
                 document.body.style.overflow = "";
                 document.body.classList.remove("modal-open");
+                // 🔧 Ensure overlay is fully disabled before removal
+                const overlay = document.getElementById("chest-overlay");
+                if(overlay){
+                    overlay.style.pointerEvents = "none";
+                    overlay.style.display = "none";
+                }
                 // 🔧 Force-kill any stuck overlay (THIS is your bug)
                 killChestOverlay();
 
@@ -1316,7 +1322,11 @@ function openChest(chestId){
 function killChestOverlay(){
     // Remove by ID
     const overlay = document.getElementById("chest-overlay");
-    if(overlay) overlay.remove();
+    if(overlay){
+        overlay.style.pointerEvents = "none";
+        overlay.style.display = "none";
+        overlay.remove();
+    }
 
     // Remove any leftover overlay elements by class
     document.querySelectorAll(".chest-overlay").forEach(el => el.remove());
@@ -1326,7 +1336,7 @@ function killChestOverlay(){
         const style = window.getComputedStyle(el);
         if(
             (style.position === "fixed" || style.position === "absolute") &&
-            parseInt(style.zIndex || "0") > 9999 &&
+            parseInt(style.zIndex || "0") > 500 &&
             !el.classList.contains("chest-popup") &&
             el.id !== "dice-popup"
         ){
