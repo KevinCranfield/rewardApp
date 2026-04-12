@@ -255,6 +255,7 @@ def open_chest(request):
 
     return JsonResponse({
         "success": True,
+        "tier": chest.tier,
         "rolls_awarded": chest.rolls_awarded,
         "total_rolls": total_rolls
     })
