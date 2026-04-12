@@ -106,14 +106,6 @@
 
 </div>
 
-<!-- ✨ CHEST REVEAL OVERLAY -->
-<div id="chest-overlay" class="chest-overlay hidden">
-    <div class="chest-reveal-card">
-        <div class="chest-reveal-icon" id="reveal-icon">🎁</div>
-        <div class="chest-reveal-title" id="reveal-title">Opening...</div>
-        <div class="chest-reveal-rolls" id="reveal-rolls"></div>
-    </div>
-</div>
 
 <script>
 const CSRF = "{{ csrf_token }}";
@@ -165,10 +157,27 @@ async function openChest(btn) {
 }
 
 function showChestReveal(tier, rollsAwarded, rollsRemaining) {
-    const overlay = document.getElementById("chest-overlay");
-    const icon = document.getElementById("reveal-icon");
-    const title = document.getElementById("reveal-title");
-    const rolls = document.getElementById("reveal-rolls");
+    // Create overlay fresh every time (prevents ghost overlay bug)
+    let overlay = document.getElementById("chest-overlay");
+    if (overlay) overlay.remove();
+
+    overlay = document.createElement("div");
+    overlay.id = "chest-overlay";
+    overlay.className = "chest-overlay";
+
+    overlay.innerHTML = `
+        <div class="chest-reveal-card">
+            <div class="chest-reveal-icon" id="reveal-icon">🎁</div>
+            <div class="chest-reveal-title" id="reveal-title">Opening...</div>
+            <div class="chest-reveal-rolls" id="reveal-rolls"></div>
+        </div>
+    `;
+
+    document.body.appendChild(overlay);
+
+    const icon = overlay.querySelector("#reveal-icon");
+    const title = overlay.querySelector("#reveal-title");
+    const rolls = overlay.querySelector("#reveal-rolls");
 
     const tierData = {
         bronze: { emoji: "🟤", label: "Bronze Chest", colour: "#b45309" },
@@ -195,7 +204,11 @@ function showChestReveal(tier, rollsAwarded, rollsRemaining) {
     // auto close after short delay
     setTimeout(() => {
         overlay.classList.remove("chest-overlay-show");
-        overlay.classList.add("hidden");
+
+        // Fully remove from DOM so it can NEVER block clicks
+        setTimeout(() => {
+            overlay.remove();
+        }, 200);
     }, 1400);
 
     // Update roll button + status
@@ -257,6 +270,7 @@ function closeChestOverlay() {
 
 .hidden {
     display: none;
+    pointer-events: none;
 }
 
 .chest-reveal-card {
