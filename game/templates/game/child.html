@@ -10,7 +10,7 @@
 </h2>
 
 <!-- 📦 CHESTS -->
-{% if child.chests.all %}
+{% if child.chests.all|length > 0 %}
 <div class="chests-row" id="chests-row">
     {% for chest in child.chests.all %}
         {% if not chest.is_opened %}
