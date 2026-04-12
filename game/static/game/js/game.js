@@ -13,15 +13,6 @@
 
 const BOARD_SIZE = 64;
 
-// 🔥 HARD KILL chest overlay if anything tries to recreate it
-const observer = new MutationObserver(() => {
-    const overlay = document.getElementById("chest-overlay");
-    if(overlay){
-        overlay.remove();
-    }
-});
-
-observer.observe(document.body, { childList: true, subtree: true });
 
 function triggerWinOverlay(childId){
     const meta = document.getElementById("game-meta");
@@ -1194,7 +1185,9 @@ function openChest(chestId){
                 // 🔧 Force-kill any stuck overlay (THIS is your bug)
                 const overlay = document.getElementById("chest-overlay");
                 if(overlay){
-                    overlay.remove(); // 🔥 completely remove it (prevents it coming back with display:flex)
+                    overlay.classList.add("hidden");
+                    overlay.style.display = "none";
+                    overlay.style.pointerEvents = "none";
                 }
 
                 // show reward
@@ -1220,6 +1213,7 @@ function openChest(chestId){
                 popup.style.pointerEvents = "none";
 
                 document.body.appendChild(popup);
+                document.body.classList.remove("modal-open");
 
                 setTimeout(() => {
                     popup.style.transform = "translate(-50%, -50%) scale(1)";
@@ -1238,7 +1232,15 @@ function openChest(chestId){
                     document.body.classList.remove("modal-open");
                     const overlay = document.getElementById("chest-overlay");
                     if(overlay){
-                        overlay.remove(); // 🔥 completely remove it (prevents it coming back with display:flex)
+                        overlay.classList.add("hidden");
+                        overlay.style.display = "none";
+                        overlay.style.pointerEvents = "none";
+                    }
+
+                    // Ensure board is visible again
+                    const board = document.querySelector(".board");
+                    if(board){
+                        board.style.opacity = "1";
                     }
 
                     // Ensure board redraw (fixes disappearing board)
