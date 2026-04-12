@@ -2750,3 +2750,26 @@ body {
     60% { opacity: 1; transform: translateY(-6px) scale(1.1); }
     100% { transform: translateY(0) scale(1); }
 }
+/* =========================
+   CHEST OVERLAY FIX
+========================= */
+
+#chest-overlay {
+    position: fixed;
+    inset: 0;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    pointer-events: none; /* critical: don't block clicks by default */
+}
+
+#chest-overlay.show {
+    display: flex;
+    pointer-events: auto; /* only clickable when visible */
+}
+
+#chest-overlay.hidden {
+    display: none !important;
+    pointer-events: none !important;
+}

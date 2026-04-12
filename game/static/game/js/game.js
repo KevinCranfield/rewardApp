@@ -1294,8 +1294,12 @@ function killChestOverlay(){
     const overlay = document.getElementById("chest-overlay");
     if(!overlay) return;
 
-    // 🚨 HARD REMOVE from DOM (not just hide)
-    overlay.remove();
+    // Instead of removing (which can trigger re-injection), fully neutralise it
+    overlay.classList.add("hidden");
+    overlay.style.setProperty("display", "none", "important");
+    overlay.style.setProperty("pointer-events", "none", "important");
+    overlay.style.setProperty("opacity", "0", "important");
+    overlay.style.setProperty("visibility", "hidden", "important");
 }
 
 // Run after DOMContentLoaded with a short delay
@@ -1303,9 +1307,25 @@ window.addEventListener("DOMContentLoaded", () => {
     setTimeout(killChestOverlay, 100);
 });
 
+// Extra safety: periodically ensure overlay stays dead
+setInterval(() => {
+    const overlay = document.getElementById("chest-overlay");
+    if(overlay && overlay.style.display !== "none"){
+        killChestOverlay();
+    }
+}, 500);
+
 // Watch for ANY changes trying to re-show it and kill immediately
+let overlayLock = false;
 const overlayObserver = new MutationObserver(() => {
+    if(overlayLock) return;
+    overlayLock = true;
+
     killChestOverlay();
+
+    setTimeout(() => {
+        overlayLock = false;
+    }, 50);
 });
 
 window.addEventListener("DOMContentLoaded", () => {
