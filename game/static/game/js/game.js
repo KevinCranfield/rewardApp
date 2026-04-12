@@ -1186,7 +1186,7 @@ function openChest(chestId){
                 const overlay = document.getElementById("chest-overlay");
                 if(overlay){
                     overlay.classList.add("hidden");
-                    overlay.style.display = "none";
+                    overlay.style.setProperty("display", "none", "important");
                     overlay.style.pointerEvents = "none";
                 }
 
@@ -1233,7 +1233,7 @@ function openChest(chestId){
                     const overlay = document.getElementById("chest-overlay");
                     if(overlay){
                         overlay.classList.add("hidden");
-                        overlay.style.display = "none";
+                        overlay.style.setProperty("display", "none", "important");
                         overlay.style.pointerEvents = "none";
                     }
 
