@@ -1146,7 +1146,6 @@ function openChest(chestId){
     }
 
     // add animation
-    el.classList.add("chest-opening");
 
     playSound("click");
 
@@ -1178,7 +1177,6 @@ function openChest(chestId){
                 // remove chest visually
                 el.classList.add("chest-opened");
                 // ensure no blocking overlay remains
-                el.classList.remove("chest-opening");
                 // 🧹 force remove any leftover blocking overlays
                 document.querySelectorAll('.modal').forEach(m => m.classList.add('hidden'));
                 document.body.classList.remove('modal-open','no-scroll','overlay-active');
@@ -1227,7 +1225,7 @@ function openChest(chestId){
                 }, 600);
             } else {
                 showToast("Error opening chest");
-                el.classList.remove("chest-opening");
+                
                 // 🧹 force remove any leftover blocking overlays
                 document.querySelectorAll('.modal').forEach(m => m.classList.add('hidden'));
                 document.body.classList.remove('modal-open','no-scroll','overlay-active');
@@ -1238,7 +1236,7 @@ function openChest(chestId){
         .catch((err) => {
             console.error(err);
             showToast("⚠️ Network/server error");
-            el.classList.remove("chest-opening");
+            
             document.querySelectorAll('.modal').forEach(m => m.classList.add('hidden'));
             document.body.classList.remove('modal-open','no-scroll','overlay-active');
             document.body.style.overflow = "";
