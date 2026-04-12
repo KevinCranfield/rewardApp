@@ -1095,3 +1095,56 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
 });
+
+/* =========================
+   CHEST OPEN SYSTEM
+========================= */
+
+function openChest(chestId){
+    const el = document.querySelector(`[data-chest-id='${chestId}']`);
+    if(!el) return;
+
+    // add animation
+    el.classList.add("chest-opening");
+
+    playSound("click");
+
+    setTimeout(() => {
+        fetch("/open-chest/", {
+            method: "POST",
+            headers: {
+                "X-CSRFToken": getCSRFToken(),
+                "Content-Type": "application/x-www-form-urlencoded"
+            },
+            body: "chest_id=" + chestId
+        })
+        .then(res => res.json())
+        .then(data => {
+            if(data.success){
+                // remove chest visually
+                el.classList.add("chest-opened");
+
+                // show reward
+                showToast(`🎲 +${data.rolls} rolls!`);
+
+                burstConfetti(25);
+
+                if(navigator.vibrate){
+                    navigator.vibrate([50,30,50]);
+                }
+
+                // remove from DOM after animation
+                setTimeout(() => {
+                    el.remove();
+                }, 600);
+            } else {
+                showToast("Error opening chest");
+                el.classList.remove("chest-opening");
+            }
+        })
+        .catch(() => {
+            showToast("⚠️ Network error");
+            el.classList.remove("chest-opening");
+        });
+    }, 400);
+}
