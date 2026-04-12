@@ -232,3 +232,10 @@ def enter_pin(request):
         return render(request, "game/enter_pin.html", {"error": "Invalid PIN"})
 
     return render(request, "game/enter_pin.html")
+
+@login_required
+def remove_child(request, child_id):
+    family = get_family(request.user)
+    child = get_object_or_404(Child, id=child_id, family=family)
+    child.delete()
+    return redirect("dashboard")
