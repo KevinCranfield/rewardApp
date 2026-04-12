@@ -1144,6 +1144,13 @@ function openChest(chestId){
 
     const childId = el.dataset.childId;
     let chestType = el.dataset.chestType || el.getAttribute("data-chest-type");
+
+    // 🔥 Fallback: detect from class if dataset missing (fix for always bronze bug)
+    if(!chestType){
+        if(el.classList.contains("gold")) chestType = "gold";
+        else if(el.classList.contains("silver")) chestType = "silver";
+        else if(el.classList.contains("bronze")) chestType = "bronze";
+    }
     console.log("CHEST CLICKED TYPE:", chestType);
     if(!childId){
         console.error("Missing childId on chest element");
@@ -1167,7 +1174,7 @@ function openChest(chestId){
             body: new URLSearchParams({
                 chest_id: chestId,
                 child_id: childId,
-                chest_type: (chestType || "").toLowerCase()
+                chest_type: chestType ? chestType.toLowerCase() : ""
             })
         })
         .then(async res => {
