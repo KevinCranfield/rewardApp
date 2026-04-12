@@ -306,3 +306,19 @@ def signup(request):
             return redirect("dashboard")
 
     return render(request, "game/signup.html")
+
+
+# New function to change the parent's PIN
+@login_required
+def change_pin(request):
+    family = get_family(request.user)
+
+    if request.method == "POST":
+        new_pin = request.POST.get("pin")
+
+        if new_pin:
+            family.parent_pin = new_pin
+            family.save()
+            return redirect("dashboard")
+
+    return render(request, "game/change_pin.html")
