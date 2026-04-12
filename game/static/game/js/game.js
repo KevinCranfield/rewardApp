@@ -1145,8 +1145,11 @@ function openChest(chestId){
             },
             body: "chest_id=" + chestId
         })
-        .then(res => {
+        .then(async res => {
             if(!res.ok){
+                const text = await res.text();
+                console.error("OPEN CHEST ERROR:", res.status, text);
+                showToast("⚠️ Server error (" + res.status + ")");
                 throw new Error("Server error");
             }
             return res.json();
