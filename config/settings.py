@@ -46,6 +46,12 @@ INSTALLED_APPS = [
     'axes',
 ]
 
+# Authentication backends (required for django-axes)
+AUTHENTICATION_BACKENDS = [
+    'axes.backends.AxesStandaloneBackend',
+    'django.contrib.auth.backends.ModelBackend',
+]
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'axes.middleware.AxesMiddleware',
