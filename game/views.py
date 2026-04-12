@@ -274,26 +274,37 @@ def enter_pin(request):
     return render(request, "game/pin.html")
 
 @login_required
+@require_POST
 def remove_child(request, child_id):
     family = get_family(request.user)
     child = get_object_or_404(Child, id=child_id, family=family)
+
+    Chest.objects.filter(child=child).delete()
+    Reward.objects.filter(child=child).delete()
+    Roll.objects.filter(child=child).delete()
+
     child.delete()
-    return redirect("dashboard")
+
+    return JsonResponse({"success": True})
 
 
 # New function to reset the board for all children in the family
 @login_required
+@require_POST
 def reset_board(request):
     family = get_family(request.user)
 
     children = Child.objects.filter(family=family)
+
     for child in children:
         child.position = 0
         child.save()
 
-    Reward.objects.filter(child__family=family).update(is_used=True)
+    # 🔥 THIS was your bug
+    Chest.objects.filter(child__family=family).delete()
+    Reward.objects.filter(child__family=family).delete()
 
-    return redirect("dashboard")
+    return JsonResponse({"success": True})
 
 def signup(request):
     if request.method == "POST":
