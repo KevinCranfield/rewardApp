@@ -112,7 +112,7 @@ const CSRF = "{{ csrf_token }}";
 
 async function openChest(btn) {
     const chestId = btn.dataset.chestId;
-    const tier = btn.dataset.tier;
+    let tier = btn.dataset.tier;
 
     btn.disabled = true;
     btn.classList.add("chest-opening");
@@ -134,6 +134,10 @@ async function openChest(btn) {
         const data = await res.json();
 
         if (data.success) {
+            // Use server truth if provided (fixes bronze bug)
+            if (data.tier) {
+                tier = data.tier;
+            }
             // Remove chest button
             btn.remove();
 

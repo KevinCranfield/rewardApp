@@ -1143,6 +1143,7 @@ function openChest(chestId){
     if(!el) return;
 
     const childId = el.dataset.childId;
+    const chestType = el.dataset.chestType;
     if(!childId){
         console.error("Missing childId on chest element");
         showToast("⚠️ Invalid chest");
@@ -1164,7 +1165,8 @@ function openChest(chestId){
             },
             body: new URLSearchParams({
                 chest_id: chestId,
-                child_id: childId
+                child_id: childId,
+                chest_type: chestType
             })
         })
         .then(async res => {
