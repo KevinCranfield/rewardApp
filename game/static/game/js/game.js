@@ -1294,21 +1294,27 @@ function killChestOverlay(){
     const overlay = document.getElementById("chest-overlay");
     if(!overlay) return;
 
-    // Remove any inline styles forcing it visible
-    overlay.removeAttribute("style");
-
-    // Force hidden state
-    overlay.classList.add("hidden");
+    // 🚫 Completely disable it visually AND functionally
     overlay.style.setProperty("display", "none", "important");
-    overlay.style.pointerEvents = "none";
+    overlay.style.setProperty("visibility", "hidden", "important");
+    overlay.style.setProperty("opacity", "0", "important");
+    overlay.style.setProperty("pointer-events", "none", "important");
+
+    // Remove any classes that might re-show it
+    overlay.classList.remove("active", "show");
+    overlay.classList.add("hidden");
 }
 
 // Run immediately after load
 window.addEventListener("DOMContentLoaded", killChestOverlay);
 
-// Watch for ANY changes trying to re-show it
+// Watch for ANY changes trying to re-show it, debounce to prevent flicker loops
+let overlayTimeout;
 const overlayObserver = new MutationObserver(() => {
-    killChestOverlay();
+    clearTimeout(overlayTimeout);
+    overlayTimeout = setTimeout(() => {
+        killChestOverlay();
+    }, 50);
 });
 
 window.addEventListener("DOMContentLoaded", () => {
