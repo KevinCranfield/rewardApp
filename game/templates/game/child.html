@@ -176,7 +176,7 @@ function showChestReveal(tier, rollsAwarded, rollsRemaining) {
     };
 
     console.log("CHEST DATA:", tier, rollsAwarded, rollsRemaining);
-    const t = tierData[tier];
+    const t = tierData[tier] || tierData["bronze"];
     icon.textContent = t.emoji;
     title.textContent = t.label;
     title.style.color = t.colour;
@@ -188,6 +188,7 @@ function showChestReveal(tier, rollsAwarded, rollsRemaining) {
     `;
 
     overlay.classList.remove("hidden");
+    overlay.style.display = "flex";  // force visible
     overlay.classList.add("chest-overlay-show");
 
     // Update roll button + status
