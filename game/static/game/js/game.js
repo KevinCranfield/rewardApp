@@ -11,7 +11,13 @@
 // =============================================
 
 
+
 const BOARD_SIZE = 64;
+
+// Global safety: ensure chest overlay never blocks clicks
+document.addEventListener("click", () => {
+    killChestOverlay();
+});
 
 
 function triggerWinOverlay(childId){
@@ -1183,10 +1189,7 @@ function openChest(chestId){
                 document.body.style.overflow = "";
                 document.body.classList.remove("modal-open");
                 // 🔧 Force-kill any stuck overlay (THIS is your bug)
-                const overlay = document.getElementById("chest-overlay");
-                if(overlay){
-                    overlay.remove();
-                }
+                killChestOverlay();
 
                 // show reward
                 const added = data.rolls || 0;
@@ -1237,10 +1240,7 @@ function openChest(chestId){
                     // Final cleanup (hard remove overlay)
                     document.body.style.overflow = "";
                     document.body.classList.remove("modal-open");
-                    const overlay = document.getElementById("chest-overlay");
-                    if(overlay){
-                        overlay.remove();
-                    }
+                    killChestOverlay();
 
                     // Ensure board is visible again
                     const board = document.querySelector(".board");
@@ -1294,39 +1294,17 @@ function openChest(chestId){
         });
     }, 400);
 }
-// 🔒 HARD FIX: prevent chest overlay from ever re-appearing
+
 function killChestOverlay(){
     const overlay = document.getElementById("chest-overlay");
     if(!overlay) return;
-    overlay.remove(); // hard remove (proven fix)
+
+    overlay.style.display = "none";
+    overlay.style.pointerEvents = "none";
+    overlay.classList.add("hidden");
 }
 
 // Run after DOMContentLoaded with a short delay (one-time cleanup)
 window.addEventListener("DOMContentLoaded", () => {
     setTimeout(killChestOverlay, 100);
 });
-
-
-// 🧨 DEBUG + HARD FIX: kill ANY invisible click-blocking overlay
-setInterval(() => {
-    const el = document.elementFromPoint(window.innerWidth/2, window.innerHeight/2);
-    if(!el) return;
-
-    // If it's not part of the board and sits on top, remove it
-    if(
-        el.id !== "dice-popup" &&
-        !el.classList.contains("token") &&
-        !el.closest(".board")
-    ){
-        console.warn("Removing blocking element:", el);
-
-        // If it's clearly an overlay-style element
-        if(
-            el.style.position === "fixed" ||
-            el.style.position === "absolute" ||
-            el.style.zIndex > 1000
-        ){
-            el.remove();
-        }
-    }
-}, 1500);
