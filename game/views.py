@@ -16,6 +16,20 @@ from .models import Family, Child, Roll, Reward, Chest
 PARENT_AUTH_TIMEOUT = 300
 
 
+def build_board():
+    squares = []
+    num = 1
+    for row in range(8):
+        current_row = []
+        for col in range(8):
+            current_row.append(num)
+            num += 1
+        if row % 2 == 1:
+            current_row.reverse()
+        squares.append(current_row)
+    return squares
+
+
 def get_family(user):
     family, _ = Family.objects.get_or_create(owner=user)
     return family
@@ -94,8 +108,10 @@ def child_view(request, child_id):
 
     return render(request, "game/child.html", {
         "child": child,
+        "children": [child],
         "chests": chests,
         "rolls_available": rolls_available,
+        "squares": build_board(),
     })
 
 
