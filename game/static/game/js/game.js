@@ -15,8 +15,8 @@
 const BOARD_SIZE = 64;
 
 // Global safety: ensure chest overlay never blocks clicks
-document.addEventListener("click", () => {
-    killChestOverlay();
+["click","touchstart","pointerdown"].forEach(evt => {
+    document.addEventListener(evt, killChestOverlay, true);
 });
 
 
@@ -1191,6 +1191,24 @@ function openChest(chestId){
                 // 🔧 Force-kill any stuck overlay (THIS is your bug)
                 killChestOverlay();
 
+                // 🔥 HARD FIX: remove ANY full-screen blocking overlays
+                setTimeout(() => {
+                    document.querySelectorAll("body *").forEach(el => {
+                        const style = window.getComputedStyle(el);
+
+                        if(
+                            (style.position === "fixed" || style.position === "absolute") &&
+                            parseInt(style.zIndex || "0") > 999 &&
+                            el.id !== "dice-popup" &&
+                            !el.classList.contains("chest-popup") &&
+                            !el.classList.contains("token")
+                        ){
+                            console.warn("Removing blocking element:", el);
+                            el.remove();
+                        }
+                    });
+                }, 100);
+
                 // show reward
                 const added = data.rolls || 0;
                 const total = data.rolls_remaining;
@@ -1232,6 +1250,10 @@ function openChest(chestId){
                 setTimeout(() => {
                     const el = document.elementFromPoint(window.innerWidth/2, window.innerHeight/2);
                     console.log("TOP ELEMENT AFTER CHEST:", el);
+                    console.log("ALL FIXED ELEMENTS:", Array.from(document.querySelectorAll("body *")).filter(e => {
+                        const s = window.getComputedStyle(e);
+                        return s.position === "fixed" && parseInt(s.zIndex || "0") > 500;
+                    }));
                 }, 1800);
 
                 setTimeout(() => {
@@ -1299,12 +1321,24 @@ function killChestOverlay(){
     const overlay = document.getElementById("chest-overlay");
     if(!overlay) return;
 
-    overlay.style.display = "none";
-    overlay.style.pointerEvents = "none";
-    overlay.classList.add("hidden");
+    // Hard remove (fixes reappearing / inline style overrides)
+    overlay.remove();
 }
 
-// Run after DOMContentLoaded with a short delay (one-time cleanup)
+// 🔥 Force-remove overlay if anything recreates it
+const observer = new MutationObserver(() => {
+    const overlay = document.getElementById("chest-overlay");
+    if(overlay){
+        console.warn("Overlay recreated → removing");
+        overlay.remove();
+    }
+});
+
+observer.observe(document.body, { childList: true, subtree: true });
+
+// Run after DOMContentLoaded with staggered short delays (one-time cleanup)
 window.addEventListener("DOMContentLoaded", () => {
-    setTimeout(killChestOverlay, 100);
+    setTimeout(killChestOverlay, 50);
+    setTimeout(killChestOverlay, 500);
+    setTimeout(killChestOverlay, 1500);
 });
