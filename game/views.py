@@ -129,11 +129,20 @@ def add_reward(request):
         tier_map = {"1": "bronze", "2": "silver", "3": "gold"}
         tier_name = tier_map.get(tier, "bronze")
 
+        # Determine rolls based on tier
+        if tier == "3":
+            rolls = 3
+        elif tier == "2":
+            rolls = 2
+        else:
+            rolls = 1
+
         if reason:
             Chest.objects.create(
                 child=child,
-                tier=tier_name,
-                reason=reason,
+                chest_type=tier_name,
+                rolls=rolls,
+                is_opened=False
             )
 
     return redirect("dashboard")
