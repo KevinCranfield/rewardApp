@@ -29,7 +29,7 @@ SECRET_KEY = os.environ.get('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ["rewardapp.live", "www.rewardapp.live"]
+ALLOWED_HOSTS = ["rewardapp.live", "www.rewardapp.live", "134.209.18.202"]
 CSRF_TRUSTED_ORIGINS = ["https://rewardapp.live", "https://www.rewardapp.live"]
 
 
