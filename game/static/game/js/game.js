@@ -1349,16 +1349,7 @@ function killChestOverlay(){
     document.body.classList.remove("modal-open");
 }
 
-// Watch for ANY overlay being added and remove it
-const observer = new MutationObserver(() => {
-    document.querySelectorAll(".chest-overlay").forEach(el => el.remove());
-});
-
-observer.observe(document.body, { childList: true, subtree: true });
-
-// Run after DOMContentLoaded with staggered short delays (one-time cleanup)
+// Run once after load to ensure no stuck overlays
 window.addEventListener("DOMContentLoaded", () => {
-    setTimeout(killChestOverlay, 50);
-    setTimeout(killChestOverlay, 500);
-    setTimeout(killChestOverlay, 1500);
+    killChestOverlay();
 });
