@@ -1176,18 +1176,10 @@ function openChest(chestId){
             if(data.success){
                 // remove chest visually
                 el.classList.add("chest-opened");
-                // DO NOT aggressively remove overlays (this was breaking UI)
-                // Just ensure scroll is restored safely
+
+                // Safe cleanup only (do NOT touch global overlays)
                 document.body.style.overflow = "";
-
-                // 🧹 Clean up ANY stuck overlays/backdrops safely
-                document.querySelectorAll(".modal, .overlay, .backdrop, .modal-backdrop").forEach(el => {
-                    el.style.display = "none";
-                });
-
-                // Also ensure body is not stuck in dark state
                 document.body.classList.remove("modal-open");
-                document.body.style.background = "";
 
                 // show reward
                 const added = data.rolls || 0;
@@ -1195,6 +1187,7 @@ function openChest(chestId){
 
                 // 🎉 Floating popup (non-blocking, no overlay)
                 let popup = document.createElement("div");
+                popup.className = "chest-popup";
                 popup.innerText = `🎁 +${added} roll${added === 1 ? "" : "s"}` + (total !== undefined ? ` | Total: ${total}` : "");
 
                 popup.style.position = "fixed";
@@ -1224,9 +1217,14 @@ function openChest(chestId){
                 setTimeout(() => {
                     popup.remove();
 
-                    // Final safety cleanup (prevents stuck dark screen)
+                    // Final cleanup (light touch only)
                     document.body.style.overflow = "";
                     document.body.classList.remove("modal-open");
+
+                    // Ensure board redraw (fixes disappearing board)
+                    if(typeof drawConnections === "function"){
+                        setTimeout(drawConnections, 50);
+                    }
                 }, 2000);
 
                 burstConfetti(25);
