@@ -107,7 +107,46 @@ def add_child(request):
         if name and colour:
             Child.objects.create(family=family, name=name, colour=colour)
 
+
     return redirect("dashboard")
+
+
+# New function to give a chest directly to a child
+@login_required
+@require_POST
+def give_chest(request):
+    family = get_family(request.user)
+
+    child = Child.objects.filter(
+        id=request.POST.get("child_id"),
+        family=family
+    ).first()
+
+    if not child:
+        return JsonResponse({"success": False}, status=400)
+
+    tier = request.POST.get("tier", "1")
+
+    tier_map = {
+        "1": ("bronze", 1),
+        "2": ("silver", 2),
+        "3": ("gold", 3),
+    }
+
+    chest_type, rolls = tier_map.get(tier, ("bronze", 1))
+
+    chest = Chest.objects.create(
+        child=child,
+        chest_type=chest_type,
+        rolls=rolls,
+        is_opened=False
+    )
+
+    return JsonResponse({
+        "success": True,
+        "chest_type": chest_type,
+        "rolls": rolls
+    })
 
 
 @login_required
