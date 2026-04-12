@@ -10,7 +10,18 @@
 // 8. burstConfetti capped at 60
 // =============================================
 
+
 const BOARD_SIZE = 64;
+
+// 🔥 HARD KILL chest overlay if anything tries to recreate it
+const observer = new MutationObserver(() => {
+    const overlay = document.getElementById("chest-overlay");
+    if(overlay){
+        overlay.remove();
+    }
+});
+
+observer.observe(document.body, { childList: true, subtree: true });
 
 function triggerWinOverlay(childId){
     const meta = document.getElementById("game-meta");
