@@ -99,13 +99,6 @@
                     </div>
                 {% endfor %}
             {% endfor %}
-        {% else %}
-            {% for num in 1|to:64 %}
-                <div class="square" data-square="{{ num }}">
-                    <span class="square-number">{{ num }}</span>
-                    <div class="token-container"></div>
-                </div>
-            {% endfor %}
         {% endif %}
     </div>
     <svg class="board-overlay"></svg>
