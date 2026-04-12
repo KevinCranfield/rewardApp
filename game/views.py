@@ -169,15 +169,16 @@ def open_chest(request):
         chest.save()
 
         rewards = [
-            Reward(child=chest.child, reason=chest.reason)
-            for _ in range(chest.rolls_awarded)
+            Reward(child=chest.child)
+            for _ in range(chest.rolls)
         ]
 
         Reward.objects.bulk_create(rewards)
 
     return JsonResponse({
         "success": True,
-        "rolls": chest.rolls_awarded
+        "rolls_awarded": chest.rolls,
+        "rolls_remaining": Reward.objects.filter(child=chest.child, is_used=False).count()
     })
 
 
