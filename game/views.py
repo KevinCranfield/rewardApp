@@ -270,9 +270,9 @@ def enter_pin(request):
             request.session["parent_auth_time"] = timezone.now().timestamp()
             return redirect("dashboard")
 
-        return render(request, "game/enter_pin.html", {"error": "Invalid PIN"})
+        return render(request, "game/pin.html", {"error": "Invalid PIN"})
 
-    return render(request, "game/enter_pin.html")
+    return render(request, "game/pin.html")
 
 @login_required
 def remove_child(request, child_id):
