@@ -2757,19 +2757,27 @@ body {
 #chest-overlay {
     position: fixed;
     inset: 0;
-    display: none;
+    display: none !important;
     justify-content: center;
     align-items: center;
-    z-index: 9999;
-    pointer-events: none; /* critical: don't block clicks by default */
+    z-index: -1 !important;
+    pointer-events: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
 }
 
 #chest-overlay.show {
-    display: flex;
-    pointer-events: auto; /* only clickable when visible */
+    display: flex !important;
+    pointer-events: auto !important;
+    z-index: 9999 !important;
+    visibility: visible !important;
+    opacity: 1 !important;
 }
 
 #chest-overlay.hidden {
     display: none !important;
     pointer-events: none !important;
+    z-index: -1 !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
 }
