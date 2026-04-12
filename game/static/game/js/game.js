@@ -1286,20 +1286,12 @@ function openChest(chestId){
 
                 // Ensure no overlays block refresh
                 document.body.style.pointerEvents = "auto";
-                // 🔄 HARD REFRESH AFTER CHEST (force reload, bypass cache)
+                // Ensure nothing blocks navigation
+                document.body.style.opacity = "1";
+                // 🔄 FORCE HARD REFRESH (reliable)
                 setTimeout(() => {
-                    try {
-                        // Primary reload
-                        window.location.reload();
-
-                        // Fallback in case reload is blocked
-                        setTimeout(() => {
-                            window.location.href = window.location.href;
-                        }, 500);
-                    } catch(e){
-                        window.location.href = window.location.href;
-                    }
-                }, 2200);
+                    window.location.href = window.location.pathname + "?t=" + Date.now();
+                }, 1800);
 
                 // remove from DOM after animation
                 setTimeout(() => {
