@@ -308,17 +308,10 @@ def signup(request):
     return render(request, "game/signup.html")
 
 
-# New function to change the parent's PIN
+
+# New function to check parent authentication via AJAX
 @login_required
-def change_pin(request):
-    family = get_family(request.user)
-
-    if request.method == "POST":
-        new_pin = request.POST.get("pin")
-
-        if new_pin:
-            family.parent_pin = new_pin
-            family.save()
-            return redirect("dashboard")
-
-    return render(request, "game/change_pin.html")
+def ping_auth(request):
+    if is_parent_authenticated(request):
+        return JsonResponse({"authenticated": True})
+    return JsonResponse({"authenticated": False}, status=401)
