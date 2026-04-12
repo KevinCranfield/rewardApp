@@ -14,10 +14,6 @@
 
 const BOARD_SIZE = 64;
 
-// Global safety: ensure chest overlay never blocks clicks
-["click","touchstart","pointerdown"].forEach(evt => {
-    document.addEventListener(evt, killChestOverlay, true);
-});
 
 
 function triggerWinOverlay(childId){
@@ -1318,20 +1314,34 @@ function openChest(chestId){
 }
 
 function killChestOverlay(){
+    // Remove by ID
     const overlay = document.getElementById("chest-overlay");
-    if(!overlay) return;
+    if(overlay) overlay.remove();
 
-    // Hard remove (fixes reappearing / inline style overrides)
-    overlay.remove();
+    // Remove any leftover overlay elements by class
+    document.querySelectorAll(".chest-overlay").forEach(el => el.remove());
+
+    // Remove any full-screen blockers
+    document.querySelectorAll("body *").forEach(el => {
+        const style = window.getComputedStyle(el);
+        if(
+            (style.position === "fixed" || style.position === "absolute") &&
+            parseInt(style.zIndex || "0") > 9999 &&
+            !el.classList.contains("chest-popup") &&
+            el.id !== "dice-popup"
+        ){
+            el.remove();
+        }
+    });
+
+    // Reset body lock just in case
+    document.body.style.overflow = "";
+    document.body.classList.remove("modal-open");
 }
 
-// 🔥 Force-remove overlay if anything recreates it
+// Watch for ANY overlay being added and remove it
 const observer = new MutationObserver(() => {
-    const overlay = document.getElementById("chest-overlay");
-    if(overlay){
-        console.warn("Overlay recreated → removing");
-        overlay.remove();
-    }
+    document.querySelectorAll(".chest-overlay").forEach(el => el.remove());
 });
 
 observer.observe(document.body, { childList: true, subtree: true });
