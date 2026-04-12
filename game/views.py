@@ -293,3 +293,16 @@ def reset_board(request):
     Reward.objects.filter(child__family=family).update(is_used=True)
 
     return redirect("dashboard")
+
+def signup(request):
+    if request.method == "POST":
+        username = request.POST.get("username")
+        password = request.POST.get("password")
+
+        if username and password:
+            from django.contrib.auth.models import User
+            user = User.objects.create_user(username=username, password=password)
+            login(request, user)
+            return redirect("dashboard")
+
+    return render(request, "game/signup.html")
