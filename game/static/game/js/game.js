@@ -1000,6 +1000,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
             button.disabled = true;
 
+            // Insert check for missing form.action before fetch
+            if(!form.action){
+                showToast("⚠️ Invalid form action");
+                button.disabled = false;
+                return;
+            }
+
             try {
                 const formData = new FormData(form);
                 const submitter = e.submitter;
@@ -1016,7 +1023,15 @@ document.addEventListener("DOMContentLoaded", () => {
                     }
                 });
 
-                const data = await res.json();
+                let data;
+                try {
+                    data = await res.json();
+                } catch (err) {
+                    console.error("Invalid JSON response", err);
+                    showToast("⚠️ Server error");
+                    button.disabled = false;
+                    return;
+                }
 
                 if(data.success){
                     const count = data.count || 1;
@@ -1118,7 +1133,12 @@ function openChest(chestId){
             },
             body: "chest_id=" + chestId
         })
-        .then(res => res.json())
+        .then(res => {
+            if(!res.ok){
+                throw new Error("Server error");
+            }
+            return res.json();
+        })
         .then(data => {
             if(data.success){
                 // remove chest visually
@@ -1142,8 +1162,9 @@ function openChest(chestId){
                 el.classList.remove("chest-opening");
             }
         })
-        .catch(() => {
-            showToast("⚠️ Network error");
+        .catch((err) => {
+            console.error(err);
+            showToast("⚠️ Network/server error");
             el.classList.remove("chest-opening");
         });
     }, 400);
