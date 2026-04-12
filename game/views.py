@@ -151,7 +151,13 @@ def give_chest(request):
     if not child:
         return JsonResponse({"success": False}, status=400)
 
-    tier = request.POST.get("tier", "bronze")
+    # Accept multiple possible field names from frontend
+    tier = (
+        request.POST.get("tier")
+        or request.POST.get("chest_type")
+        or request.POST.get("rolls")
+        or "bronze"
+    )
 
     tier_map = {
         "1": "bronze",
@@ -196,7 +202,13 @@ def add_reward(request):
     if not reason:
         return JsonResponse({"success": False, "error": "Missing reason"}, status=400)
 
-    tier = request.POST.get("tier", "bronze")
+    # Accept multiple possible field names from frontend
+    tier = (
+        request.POST.get("tier")
+        or request.POST.get("chest_type")
+        or request.POST.get("rolls")
+        or "bronze"
+    )
 
     tier_map = {
         "1": "bronze",
