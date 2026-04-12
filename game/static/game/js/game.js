@@ -1246,7 +1246,7 @@ function openChest(chestId){
                     if(board){
                         board.style.opacity = "1";
                     }
-                }, 2000);
+                }, 1500);
 
                 burstConfetti(25);
 
@@ -1284,10 +1284,11 @@ function openChest(chestId){
                     }
                 }
 
-                // 🔄 HARD REFRESH AFTER CHEST (ensures rolls persist visually)
+                // 🔄 HARD REFRESH AFTER CHEST (force reload, bypass cache)
                 setTimeout(() => {
-                    window.location.reload();
-                }, 2200);
+                    const url = window.location.href.split("?")[0];
+                    window.location.href = url + "?refresh=" + Date.now();
+                }, 1800);
 
                 // remove from DOM after animation
                 setTimeout(() => {
