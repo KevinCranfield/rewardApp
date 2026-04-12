@@ -1182,6 +1182,9 @@ function openChest(chestId){
                 // 🧹 force remove any leftover blocking overlays
                 document.querySelectorAll('.modal').forEach(m => m.classList.add('hidden'));
                 document.body.classList.remove('modal-open','no-scroll','overlay-active');
+                // 🔧 EXTRA FIX: force remove any stuck dark overlays or blockers
+                document.body.style.overflow = "";
+                document.querySelectorAll('.overlay, .backdrop, .screen-blocker').forEach(el => el.remove());
 
                 // show reward
                 const added = data.rolls || 0;
@@ -1228,6 +1231,8 @@ function openChest(chestId){
                 // 🧹 force remove any leftover blocking overlays
                 document.querySelectorAll('.modal').forEach(m => m.classList.add('hidden'));
                 document.body.classList.remove('modal-open','no-scroll','overlay-active');
+                document.body.style.overflow = "";
+                document.querySelectorAll('.overlay, .backdrop, .screen-blocker').forEach(el => el.remove());
             }
         })
         .catch((err) => {
@@ -1236,6 +1241,8 @@ function openChest(chestId){
             el.classList.remove("chest-opening");
             document.querySelectorAll('.modal').forEach(m => m.classList.add('hidden'));
             document.body.classList.remove('modal-open','no-scroll','overlay-active');
+            document.body.style.overflow = "";
+            document.querySelectorAll('.overlay, .backdrop, .screen-blocker').forEach(el => el.remove());
         });
     }, 400);
 }
