@@ -61,7 +61,7 @@ class Chest(models.Model):
     tier = models.CharField(max_length=10, choices=TIER_CHOICES)
     reason = models.CharField(max_length=200, blank=True)
 
-    is_opened = models.BooleanField(default=False)
+    is_opened = models.BooleanField(default=False, db_index=True)
     opened_at = models.DateTimeField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
