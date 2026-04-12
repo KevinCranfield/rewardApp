@@ -1180,6 +1180,15 @@ function openChest(chestId){
                 // Just ensure scroll is restored safely
                 document.body.style.overflow = "";
 
+                // 🧹 Clean up ANY stuck overlays/backdrops safely
+                document.querySelectorAll(".modal, .overlay, .backdrop, .modal-backdrop").forEach(el => {
+                    el.style.display = "none";
+                });
+
+                // Also ensure body is not stuck in dark state
+                document.body.classList.remove("modal-open");
+                document.body.style.background = "";
+
                 // show reward
                 const added = data.rolls || 0;
                 const total = data.rolls_remaining;
@@ -1197,7 +1206,7 @@ function openChest(chestId){
                 popup.style.padding = "16px 22px";
                 popup.style.borderRadius = "14px";
                 popup.style.fontSize = "18px";
-                popup.style.zIndex = "9999";
+                popup.style.zIndex = "10000";
                 popup.style.transition = "all .25s ease";
                 popup.style.pointerEvents = "none";
 
@@ -1212,7 +1221,13 @@ function openChest(chestId){
                     popup.style.transform = "translate(-50%, -60%) scale(0.9)";
                 }, 1500);
 
-                setTimeout(() => popup.remove(), 2000);
+                setTimeout(() => {
+                    popup.remove();
+
+                    // Final safety cleanup (prevents stuck dark screen)
+                    document.body.style.overflow = "";
+                    document.body.classList.remove("modal-open");
+                }, 2000);
 
                 burstConfetti(25);
 
