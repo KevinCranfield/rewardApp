@@ -1176,23 +1176,43 @@ function openChest(chestId){
             if(data.success){
                 // remove chest visually
                 el.classList.add("chest-opened");
-                // ensure no blocking overlay remains
-                // 🧹 force remove any leftover blocking overlays
-                document.querySelectorAll('.modal').forEach(m => m.classList.add('hidden'));
-                document.body.classList.remove('modal-open','no-scroll','overlay-active');
-                // 🔧 EXTRA FIX: force remove any stuck dark overlays or blockers
+                // DO NOT aggressively remove overlays (this was breaking UI)
+                // Just ensure scroll is restored safely
                 document.body.style.overflow = "";
-                document.querySelectorAll('.overlay, .backdrop, .screen-blocker').forEach(el => el.remove());
 
                 // show reward
                 const added = data.rolls || 0;
                 const total = data.rolls_remaining;
 
-                if(total !== undefined){
-                    showToast(`🎲 +${added} roll${added === 1 ? "" : "s"} | Total: ${total}`, 2500);
-                } else {
-                    showToast(`🎲 +${added} roll${added === 1 ? "" : "s"}!`, 2000);
-                }
+                // 🎉 Floating popup (non-blocking, no overlay)
+                let popup = document.createElement("div");
+                popup.innerText = `🎁 +${added} roll${added === 1 ? "" : "s"}` + (total !== undefined ? ` | Total: ${total}` : "");
+
+                popup.style.position = "fixed";
+                popup.style.top = "30%";
+                popup.style.left = "50%";
+                popup.style.transform = "translate(-50%, -50%) scale(0.8)";
+                popup.style.background = "rgba(0,0,0,0.85)";
+                popup.style.color = "white";
+                popup.style.padding = "16px 22px";
+                popup.style.borderRadius = "14px";
+                popup.style.fontSize = "18px";
+                popup.style.zIndex = "9999";
+                popup.style.transition = "all .25s ease";
+                popup.style.pointerEvents = "none";
+
+                document.body.appendChild(popup);
+
+                setTimeout(() => {
+                    popup.style.transform = "translate(-50%, -50%) scale(1)";
+                }, 20);
+
+                setTimeout(() => {
+                    popup.style.opacity = "0";
+                    popup.style.transform = "translate(-50%, -60%) scale(0.9)";
+                }, 1500);
+
+                setTimeout(() => popup.remove(), 2000);
 
                 burstConfetti(25);
 
@@ -1218,29 +1238,19 @@ function openChest(chestId){
                     });
                 }
 
-
                 // remove from DOM after animation
                 setTimeout(() => {
                     el.remove();
                 }, 600);
             } else {
                 showToast("Error opening chest");
-                
-                // 🧹 force remove any leftover blocking overlays
-                document.querySelectorAll('.modal').forEach(m => m.classList.add('hidden'));
-                document.body.classList.remove('modal-open','no-scroll','overlay-active');
                 document.body.style.overflow = "";
-                document.querySelectorAll('.overlay, .backdrop, .screen-blocker').forEach(el => el.remove());
             }
         })
         .catch((err) => {
             console.error(err);
             showToast("⚠️ Network/server error");
-            
-            document.querySelectorAll('.modal').forEach(m => m.classList.add('hidden'));
-            document.body.classList.remove('modal-open','no-scroll','overlay-active');
             document.body.style.overflow = "";
-            document.querySelectorAll('.overlay, .backdrop, .screen-blocker').forEach(el => el.remove());
         });
     }, 400);
 }
