@@ -68,6 +68,12 @@ class Chest(models.Model):
     class Meta:
         ordering = ["-created_at"]
 
+    def save(self, *args, **kwargs):
+        if self.is_opened and self.opened_at is None:
+            from django.utils import timezone
+            self.opened_at = timezone.now()
+        super().save(*args, **kwargs)
+
     @property
     def rolls_awarded(self):
         return self.ROLLS_BY_TIER.get(self.tier, 1)

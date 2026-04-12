@@ -152,41 +152,40 @@ def give_chest(request):
 
 
 @login_required
+@require_POST
 def add_reward(request):
-    if request.method == "POST":
-        family = get_family(request.user)
+    family = get_family(request.user)
 
-        child = Child.objects.filter(
-            id=request.POST.get("child_id"),
-            family=family
-        ).first()
+    child = Child.objects.filter(
+        id=request.POST.get("child_id"),
+        family=family
+    ).first()
 
-        if not child:
-            return redirect("dashboard")
+    if not child:
+        return JsonResponse({"success": False, "error": "Invalid child"}, status=400)
 
-        reason = request.POST.get("reason")
+    reason = request.POST.get("reason")
 
-        tier = request.POST.get("tier", "1")
-        tier_map = {"1": "bronze", "2": "silver", "3": "gold"}
-        tier_name = tier_map.get(tier, "bronze")
+    if not reason:
+        return JsonResponse({"success": False, "error": "Missing reason"}, status=400)
 
-        # Determine rolls based on tier
-        if tier == "3":
-            rolls = 3
-        elif tier == "2":
-            rolls = 2
-        else:
-            rolls = 1
+    tier = request.POST.get("tier", "1")
+    tier_map = {"1": "bronze", "2": "silver", "3": "gold"}
+    tier_name = tier_map.get(tier, "bronze")
 
-        if reason:
-            Chest.objects.create(
-                child=child,
-                tier=tier_name,
-                reason=reason,
-                is_opened=False
-            )
+    chest = Chest.objects.create(
+        child=child,
+        tier=tier_name,
+        reason=reason,
+        is_opened=False
+    )
 
-    return redirect("dashboard")
+    return JsonResponse({
+        "success": True,
+        "tier": chest.tier,
+        "rolls": chest.rolls_awarded
+    })
+    
 
 
 @login_required
