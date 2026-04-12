@@ -775,10 +775,17 @@ function showDice(value, onComplete){
 }
 
 function getCSRFToken(){
-    return document.cookie
-        .split('; ')
-        .find(row => row.startsWith('csrftoken'))
-        ?.split('=')[1];
+    const name = "csrftoken=";
+    const decoded = decodeURIComponent(document.cookie);
+    const cookies = decoded.split(";");
+
+    for(let i = 0; i < cookies.length; i++){
+        let c = cookies[i].trim();
+        if(c.startsWith(name)){
+            return c.substring(name.length);
+        }
+    }
+    return null;
 }
 
 function toggleAddChild(){
@@ -1139,11 +1146,15 @@ function openChest(chestId){
     setTimeout(() => {
         fetch("/open-chest/", {
             method: "POST",
+            credentials: "same-origin",
             headers: {
                 "X-CSRFToken": getCSRFToken(),
+                "X-Requested-With": "XMLHttpRequest",
                 "Content-Type": "application/x-www-form-urlencoded"
             },
-            body: "chest_id=" + chestId
+            body: new URLSearchParams({
+                chest_id: chestId
+            })
         })
         .then(async res => {
             if(!res.ok){
