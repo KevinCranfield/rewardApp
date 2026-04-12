@@ -151,7 +151,7 @@ async function openChest(btn) {
             }
 
             // Show reveal overlay
-            showChestReveal(tier, data.rolls_awarded, data.rolls_remaining);
+            showChestReveal(tier, data.rolls_awarded, data.total_rolls);
 
         } else {
             btn.disabled = false;
@@ -179,7 +179,12 @@ function showChestReveal(tier, rollsAwarded, rollsRemaining) {
     icon.textContent = t.emoji;
     title.textContent = t.label;
     title.style.color = t.colour;
-    rolls.textContent = `+${rollsAwarded} roll${rollsAwarded > 1 ? "s" : ""} added! 🎲`;
+    rolls.innerHTML = `
+        <div>+${rollsAwarded} roll${rollsAwarded > 1 ? "s" : ""} 🎲</div>
+        <div style="margin-top:8px; font-weight:bold;">
+            Total: ${rollsRemaining} roll${rollsRemaining !== 1 ? "s" : ""}
+        </div>
+    `;
 
     overlay.classList.add("hidden");
     overlay.classList.remove("hidden");

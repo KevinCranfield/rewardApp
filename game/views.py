@@ -215,10 +215,12 @@ def open_chest(request):
 
         Reward.objects.bulk_create(rewards)
 
+    total_rolls = Reward.objects.filter(child=chest.child, is_used=False).count()
+
     return JsonResponse({
         "success": True,
         "rolls_awarded": chest.rolls_awarded,
-        "rolls_remaining": Reward.objects.filter(child=chest.child, is_used=False).count()
+        "total_rolls": total_rolls
     })
 
 
@@ -252,9 +254,13 @@ def roll(request):
         position_after=child.position
     )
 
+    remaining = Reward.objects.filter(child=child, is_used=False).count()
+
     return JsonResponse({
         "success": True,
-        "roll": roll_value
+        "roll": roll_value,
+        "position": child.position,
+        "rolls_remaining": remaining
     })
 
 
