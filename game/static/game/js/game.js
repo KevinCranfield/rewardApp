@@ -1288,10 +1288,6 @@ function openChest(chestId){
                 document.body.style.pointerEvents = "auto";
                 // Ensure nothing blocks navigation
                 document.body.style.opacity = "1";
-                // 🔄 FORCE HARD REFRESH (reliable)
-                setTimeout(() => {
-                    window.location.href = window.location.pathname + "?t=" + Date.now();
-                }, 1800);
 
                 // remove from DOM after animation
                 setTimeout(() => {
