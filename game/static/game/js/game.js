@@ -1179,6 +1179,9 @@ function openChest(chestId){
                 el.classList.add("chest-opened");
                 // ensure no blocking overlay remains
                 el.classList.remove("chest-opening");
+                // 🧹 force remove any leftover blocking overlays
+                document.querySelectorAll('.modal').forEach(m => m.classList.add('hidden'));
+                document.body.classList.remove('modal-open','no-scroll','overlay-active');
 
                 // show reward
                 const added = data.rolls || 0;
@@ -1222,12 +1225,17 @@ function openChest(chestId){
             } else {
                 showToast("Error opening chest");
                 el.classList.remove("chest-opening");
+                // 🧹 force remove any leftover blocking overlays
+                document.querySelectorAll('.modal').forEach(m => m.classList.add('hidden'));
+                document.body.classList.remove('modal-open','no-scroll','overlay-active');
             }
         })
         .catch((err) => {
             console.error(err);
             showToast("⚠️ Network/server error");
             el.classList.remove("chest-opening");
+            document.querySelectorAll('.modal').forEach(m => m.classList.add('hidden'));
+            document.body.classList.remove('modal-open','no-scroll','overlay-active');
         });
     }, 400);
 }

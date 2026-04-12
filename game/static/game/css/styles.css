@@ -858,6 +858,10 @@ button, a {
     z-index:9999;
 }
 
+.modal.hidden{
+    display:none !important;
+}
+
 .modal-content{
     background:white;
     padding:20px;
@@ -868,6 +872,7 @@ button, a {
     flex-direction:column;
     gap:12px;
     animation:fadeSlide .2s ease;
+    pointer-events:auto;
 }
 
 .modal-content input{
