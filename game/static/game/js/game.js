@@ -1177,13 +1177,15 @@ function openChest(chestId){
             if(data.success){
                 // remove chest visually
                 el.classList.add("chest-opened");
+                // ensure no blocking overlay remains
+                el.classList.remove("chest-opening");
 
                 // show reward
                 const added = data.rolls || 0;
                 const total = data.rolls_remaining;
 
                 if(total !== undefined){
-                    showToast(`🎲 +${added} roll${added === 1 ? "" : "s"}\nTotal rolls: ${total}`, 2500);
+                    showToast(`🎲 +${added} roll${added === 1 ? "" : "s"} | Total: ${total}`, 2500);
                 } else {
                     showToast(`🎲 +${added} roll${added === 1 ? "" : "s"}!`, 2000);
                 }
