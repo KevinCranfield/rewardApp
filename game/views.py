@@ -239,3 +239,18 @@ def remove_child(request, child_id):
     child = get_object_or_404(Child, id=child_id, family=family)
     child.delete()
     return redirect("dashboard")
+
+
+# New function to reset the board for all children in the family
+@login_required
+def reset_board(request):
+    family = get_family(request.user)
+
+    children = Child.objects.filter(family=family)
+    for child in children:
+        child.position = 0
+        child.save()
+
+    Reward.objects.filter(child__family=family).update(is_used=True)
+
+    return redirect("dashboard")
