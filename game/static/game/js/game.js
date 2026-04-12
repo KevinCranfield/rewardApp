@@ -1180,6 +1180,12 @@ function openChest(chestId){
                 // Safe cleanup only (do NOT touch global overlays)
                 document.body.style.overflow = "";
                 document.body.classList.remove("modal-open");
+                // 🔧 Force-kill any stuck overlay (THIS is your bug)
+                const overlay = document.getElementById("chest-overlay");
+                if(overlay){
+                    overlay.style.display = "none";
+                    overlay.classList.add("hidden");
+                }
 
                 // show reward
                 const added = data.rolls || 0;
@@ -1220,6 +1226,11 @@ function openChest(chestId){
                     // Final cleanup (light touch only)
                     document.body.style.overflow = "";
                     document.body.classList.remove("modal-open");
+                    const overlay = document.getElementById("chest-overlay");
+                    if(overlay){
+                        overlay.style.display = "none";
+                        overlay.classList.add("hidden");
+                    }
 
                     // Ensure board redraw (fixes disappearing board)
                     if(typeof drawConnections === "function"){
