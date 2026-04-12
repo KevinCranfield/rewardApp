@@ -110,7 +110,6 @@
         <div class="chest-reveal-icon" id="reveal-icon">🎁</div>
         <div class="chest-reveal-title" id="reveal-title">Opening...</div>
         <div class="chest-reveal-rolls" id="reveal-rolls"></div>
-        <button class="chest-reveal-close" onclick="closeChestOverlay()">Let's roll! 🎲</button>
     </div>
 </div>
 
@@ -190,6 +189,12 @@ function showChestReveal(tier, rollsAwarded, rollsRemaining) {
     overlay.classList.remove("hidden");
     overlay.style.display = "flex";  // force visible
     overlay.classList.add("chest-overlay-show");
+
+    // auto close after short delay
+    setTimeout(() => {
+        overlay.classList.remove("chest-overlay-show");
+        overlay.classList.add("hidden");
+    }, 1400);
 
     // Update roll button + status
     const childId = document.querySelector(".child-view").dataset.childId;

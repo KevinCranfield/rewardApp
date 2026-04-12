@@ -1183,7 +1183,7 @@ function openChest(chestId){
                 const total = data.rolls_remaining;
 
                 if(total !== undefined){
-                    showToast(`🎲 +${added} roll${added === 1 ? "" : "s"} | Total: ${total}`, 2000);
+                    showToast(`🎲 +${added} roll${added === 1 ? "" : "s"}\nTotal rolls: ${total}`, 2500);
                 } else {
                     showToast(`🎲 +${added} roll${added === 1 ? "" : "s"}!`, 2000);
                 }
@@ -1212,10 +1212,6 @@ function openChest(chestId){
                     });
                 }
 
-                // 🧠 Ensure board/state stays correct
-                setTimeout(() => {
-                    location.reload();
-                }, 900);
 
                 // remove from DOM after animation
                 setTimeout(() => {
