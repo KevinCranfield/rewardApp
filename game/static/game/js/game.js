@@ -1178,38 +1178,13 @@ function openChest(chestId){
         })
         .then(data => {
             if(data.success){
+                // 🔥 Immediate hard remove of overlay FIRST (before anything else)
+                killChestOverlay();
+
                 // remove chest visually
                 el.classList.add("chest-opened");
 
-                // Safe cleanup only (do NOT touch global overlays)
-                document.body.style.overflow = "";
-                document.body.classList.remove("modal-open");
-                // 🔧 Ensure overlay is fully disabled before removal
-                const overlay = document.getElementById("chest-overlay");
-                if(overlay){
-                    overlay.style.pointerEvents = "none";
-                    overlay.style.display = "none";
-                }
-                // 🔧 Force-kill any stuck overlay (THIS is your bug)
-                killChestOverlay();
-
-                // 🔥 HARD FIX: remove ANY full-screen blocking overlays
-                setTimeout(() => {
-                    document.querySelectorAll("body *").forEach(el => {
-                        const style = window.getComputedStyle(el);
-
-                        if(
-                            (style.position === "fixed" || style.position === "absolute") &&
-                            parseInt(style.zIndex || "0") > 999 &&
-                            el.id !== "dice-popup" &&
-                            !el.classList.contains("chest-popup") &&
-                            !el.classList.contains("token")
-                        ){
-                            console.warn("Removing blocking element:", el);
-                            el.remove();
-                        }
-                    });
-                }, 100);
+                // Overlay already handled by killChestOverlay()
 
                 // show reward
                 const added = data.rolls || 0;
@@ -1331,20 +1306,7 @@ function killChestOverlay(){
     // Remove any leftover overlay elements by class
     document.querySelectorAll(".chest-overlay").forEach(el => el.remove());
 
-    // Remove any full-screen blockers
-    document.querySelectorAll("body *").forEach(el => {
-        const style = window.getComputedStyle(el);
-        if(
-            (style.position === "fixed" || style.position === "absolute") &&
-            parseInt(style.zIndex || "0") > 500 &&
-            !el.classList.contains("chest-popup") &&
-            el.id !== "dice-popup"
-        ){
-            el.remove();
-        }
-    });
-
-    // Reset body lock just in case
+    // Reset body lock only
     document.body.style.overflow = "";
     document.body.classList.remove("modal-open");
 }
