@@ -1143,7 +1143,8 @@ function openChest(chestId){
     if(!el) return;
 
     const childId = el.dataset.childId;
-    const chestType = el.dataset.chestType;
+    let chestType = el.dataset.chestType || el.getAttribute("data-chest-type");
+    console.log("CHEST CLICKED TYPE:", chestType);
     if(!childId){
         console.error("Missing childId on chest element");
         showToast("⚠️ Invalid chest");
@@ -1166,7 +1167,7 @@ function openChest(chestId){
             body: new URLSearchParams({
                 chest_id: chestId,
                 child_id: childId,
-                chest_type: chestType
+                chest_type: (chestType || "").toLowerCase()
             })
         })
         .then(async res => {
@@ -1179,6 +1180,7 @@ function openChest(chestId){
             return res.json();
         })
         .then(data => {
+            console.log("SERVER RESPONSE CHEST:", data);
             if(data.success){
                 // 🔥 Immediate hard remove of overlay FIRST (before anything else)
                 killChestOverlay();
