@@ -1289,3 +1289,34 @@ function openChest(chestId){
         });
     }, 400);
 }
+// 🔒 HARD FIX: prevent chest overlay from ever re-appearing
+function killChestOverlay(){
+    const overlay = document.getElementById("chest-overlay");
+    if(!overlay) return;
+
+    // Remove any inline styles forcing it visible
+    overlay.removeAttribute("style");
+
+    // Force hidden state
+    overlay.classList.add("hidden");
+    overlay.style.setProperty("display", "none", "important");
+    overlay.style.pointerEvents = "none";
+}
+
+// Run immediately after load
+window.addEventListener("DOMContentLoaded", killChestOverlay);
+
+// Watch for ANY changes trying to re-show it
+const overlayObserver = new MutationObserver(() => {
+    killChestOverlay();
+});
+
+window.addEventListener("DOMContentLoaded", () => {
+    const overlay = document.getElementById("chest-overlay");
+    if(overlay){
+        overlayObserver.observe(overlay, {
+            attributes: true,
+            attributeFilter: ["style", "class"]
+        });
+    }
+});
