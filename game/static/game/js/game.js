@@ -1225,6 +1225,12 @@ function openChest(chestId){
                 // (Optional safety) One-shot cleanup after chest opens
                 setTimeout(killChestOverlay, 1500);
 
+                // 🐞 DEBUG: Log the top element after chest popup (identify overlays)
+                setTimeout(() => {
+                    const el = document.elementFromPoint(window.innerWidth/2, window.innerHeight/2);
+                    console.log("TOP ELEMENT AFTER CHEST:", el);
+                }, 1800);
+
                 setTimeout(() => {
                     popup.remove();
 
@@ -1299,3 +1305,28 @@ function killChestOverlay(){
 window.addEventListener("DOMContentLoaded", () => {
     setTimeout(killChestOverlay, 100);
 });
+
+
+// 🧨 DEBUG + HARD FIX: kill ANY invisible click-blocking overlay
+setInterval(() => {
+    const el = document.elementFromPoint(window.innerWidth/2, window.innerHeight/2);
+    if(!el) return;
+
+    // If it's not part of the board and sits on top, remove it
+    if(
+        el.id !== "dice-popup" &&
+        !el.classList.contains("token") &&
+        !el.closest(".board")
+    ){
+        console.warn("Removing blocking element:", el);
+
+        // If it's clearly an overlay-style element
+        if(
+            el.style.position === "fixed" ||
+            el.style.position === "absolute" ||
+            el.style.zIndex > 1000
+        ){
+            el.remove();
+        }
+    }
+}, 1500);
