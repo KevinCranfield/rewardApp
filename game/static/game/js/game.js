@@ -1185,9 +1185,7 @@ function openChest(chestId){
                 // 🔧 Force-kill any stuck overlay (THIS is your bug)
                 const overlay = document.getElementById("chest-overlay");
                 if(overlay){
-                    overlay.classList.add("hidden");
-                    overlay.style.setProperty("display", "none", "important");
-                    overlay.style.pointerEvents = "none";
+                    overlay.remove();
                 }
 
                 // show reward
@@ -1224,17 +1222,18 @@ function openChest(chestId){
                     popup.style.transform = "translate(-50%, -60%) scale(0.9)";
                 }, 1500);
 
+                // (Optional safety) One-shot cleanup after chest opens
+                setTimeout(killChestOverlay, 1500);
+
                 setTimeout(() => {
                     popup.remove();
 
-                    // Final cleanup (light touch only)
+                    // Final cleanup (hard remove overlay)
                     document.body.style.overflow = "";
                     document.body.classList.remove("modal-open");
                     const overlay = document.getElementById("chest-overlay");
                     if(overlay){
-                        overlay.classList.add("hidden");
-                        overlay.style.setProperty("display", "none", "important");
-                        overlay.style.pointerEvents = "none";
+                        overlay.remove();
                     }
 
                     // Ensure board is visible again
@@ -1293,44 +1292,10 @@ function openChest(chestId){
 function killChestOverlay(){
     const overlay = document.getElementById("chest-overlay");
     if(!overlay) return;
-
-    // Instead of removing (which can trigger re-injection), fully neutralise it
-    overlay.classList.add("hidden");
-    overlay.style.setProperty("display", "none", "important");
-    overlay.style.setProperty("pointer-events", "none", "important");
-    overlay.style.setProperty("opacity", "0", "important");
-    overlay.style.setProperty("visibility", "hidden", "important");
+    overlay.remove(); // hard remove (proven fix)
 }
 
-// Run after DOMContentLoaded with a short delay
+// Run after DOMContentLoaded with a short delay (one-time cleanup)
 window.addEventListener("DOMContentLoaded", () => {
     setTimeout(killChestOverlay, 100);
-});
-
-// Extra safety: periodically ensure overlay stays dead
-setInterval(() => {
-    const overlay = document.getElementById("chest-overlay");
-    if(overlay && overlay.style.display !== "none"){
-        killChestOverlay();
-    }
-}, 500);
-
-// Watch for ANY changes trying to re-show it and kill immediately
-let overlayLock = false;
-const overlayObserver = new MutationObserver(() => {
-    if(overlayLock) return;
-    overlayLock = true;
-
-    killChestOverlay();
-
-    setTimeout(() => {
-        overlayLock = false;
-    }, 50);
-});
-
-window.addEventListener("DOMContentLoaded", () => {
-    overlayObserver.observe(document.body, {
-        childList: true,
-        subtree: true
-    });
 });
