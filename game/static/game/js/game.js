@@ -1022,13 +1022,25 @@ document.addEventListener("DOMContentLoaded", () => {
                         "X-Requested-With": "XMLHttpRequest"
                     }
                 });
+                if(!res.ok){
+                    console.error("Server returned non-OK:", res.status);
+                    showToast("⚠️ Server error (" + res.status + ")");
+                    button.disabled = false;
+                    return;
+                }
 
                 let data;
                 try {
-                    data = await res.json();
+                    const text = await res.text();
+                    try {
+                        data = JSON.parse(text);
+                    } catch(parseErr){
+                        console.error("Raw response:", text);
+                        throw parseErr;
+                    }
                 } catch (err) {
                     console.error("Invalid JSON response", err);
-                    showToast("⚠️ Server error");
+                    showToast("⚠️ Server returned HTML error");
                     button.disabled = false;
                     return;
                 }
