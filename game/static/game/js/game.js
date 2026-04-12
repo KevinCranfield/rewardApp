@@ -1183,8 +1183,7 @@ function openChest(chestId){
                 // 🔧 Force-kill any stuck overlay (THIS is your bug)
                 const overlay = document.getElementById("chest-overlay");
                 if(overlay){
-                    overlay.style.display = "none";
-                    overlay.classList.add("hidden");
+                    overlay.remove(); // 🔥 completely remove it (prevents it coming back with display:flex)
                 }
 
                 // show reward
@@ -1228,8 +1227,7 @@ function openChest(chestId){
                     document.body.classList.remove("modal-open");
                     const overlay = document.getElementById("chest-overlay");
                     if(overlay){
-                        overlay.style.display = "none";
-                        overlay.classList.add("hidden");
+                        overlay.remove(); // 🔥 completely remove it (prevents it coming back with display:flex)
                     }
 
                     // Ensure board redraw (fixes disappearing board)
