@@ -175,6 +175,7 @@ function showChestReveal(tier, rollsAwarded, rollsRemaining) {
         gold:   { emoji: "🟡", label: "Gold Chest!",  colour: "#ca8a04" },
     };
 
+    console.log("CHEST DATA:", tier, rollsAwarded, rollsRemaining);
     const t = tierData[tier];
     icon.textContent = t.emoji;
     title.textContent = t.label;
@@ -186,7 +187,6 @@ function showChestReveal(tier, rollsAwarded, rollsRemaining) {
         </div>
     `;
 
-    overlay.classList.add("hidden");
     overlay.classList.remove("hidden");
     overlay.classList.add("chest-overlay-show");
 
