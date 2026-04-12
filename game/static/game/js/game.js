@@ -1294,35 +1294,23 @@ function killChestOverlay(){
     const overlay = document.getElementById("chest-overlay");
     if(!overlay) return;
 
-    // 🚫 Completely disable it visually AND functionally
-    overlay.style.setProperty("display", "none", "important");
-    overlay.style.setProperty("visibility", "hidden", "important");
-    overlay.style.setProperty("opacity", "0", "important");
-    overlay.style.setProperty("pointer-events", "none", "important");
-
-    // Remove any classes that might re-show it
-    overlay.classList.remove("active", "show");
-    overlay.classList.add("hidden");
+    // 🚨 HARD REMOVE from DOM (not just hide)
+    overlay.remove();
 }
 
-// Run immediately after load
-window.addEventListener("DOMContentLoaded", killChestOverlay);
+// Run after DOMContentLoaded with a short delay
+window.addEventListener("DOMContentLoaded", () => {
+    setTimeout(killChestOverlay, 100);
+});
 
-// Watch for ANY changes trying to re-show it, debounce to prevent flicker loops
-let overlayTimeout;
+// Watch for ANY changes trying to re-show it and kill immediately
 const overlayObserver = new MutationObserver(() => {
-    clearTimeout(overlayTimeout);
-    overlayTimeout = setTimeout(() => {
-        killChestOverlay();
-    }, 50);
+    killChestOverlay();
 });
 
 window.addEventListener("DOMContentLoaded", () => {
-    const overlay = document.getElementById("chest-overlay");
-    if(overlay){
-        overlayObserver.observe(overlay, {
-            attributes: true,
-            attributeFilter: ["style", "class"]
-        });
-    }
+    overlayObserver.observe(document.body, {
+        childList: true,
+        subtree: true
+    });
 });
