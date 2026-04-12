@@ -260,9 +260,24 @@ def open_chest(request):
         chest.is_opened = True
         chest.save()
 
+        # 🔥 DEBUG: ensure rolls_awarded matches tier
+        print("DEBUG open_chest tier:", chest.tier)
+        print("DEBUG open_chest rolls_awarded:", chest.rolls_awarded)
+
+        # Safety fallback (in case model logic failed)
+        if chest.tier == "gold":
+            rolls_to_award = 3
+        elif chest.tier == "silver":
+            rolls_to_award = 2
+        else:
+            rolls_to_award = 1
+
+        # 🔥 DEBUG final rolls used
+        print("DEBUG open_chest final rolls_to_award:", rolls_to_award)
+
         rewards = [
             Reward(child=chest.child)
-            for _ in range(chest.rolls_awarded)
+            for _ in range(rolls_to_award)
         ]
 
         Reward.objects.bulk_create(rewards)
@@ -272,7 +287,7 @@ def open_chest(request):
     return JsonResponse({
         "success": True,
         "tier": chest.tier,
-        "rolls_awarded": chest.rolls_awarded,
+        "rolls_awarded": rolls_to_award,
         "total_rolls": total_rolls
     })
 

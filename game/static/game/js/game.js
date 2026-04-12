@@ -1021,8 +1021,15 @@ document.addEventListener("DOMContentLoaded", () => {
             try {
                 const formData = new FormData(form);
                 const submitter = e.submitter;
-                if(submitter && submitter.name === "rolls"){
-                    formData.set("rolls", submitter.value);
+
+                // Capture which button was clicked (rolls or chest type)
+                if(submitter){
+                    if(submitter.name === "rolls"){
+                        formData.set("rolls", submitter.value);
+                    }
+                    if(submitter.name === "chest_type"){
+                        formData.set("chest_type", submitter.value);
+                    }
                 }
 
                 const res = await fetch(form.action, {
