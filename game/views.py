@@ -19,14 +19,22 @@ PARENT_AUTH_TIMEOUT = 300
 def build_board():
     squares = []
     num = 1
+
     for row in range(8):
         current_row = []
         for col in range(8):
             current_row.append(num)
             num += 1
+
+        # Reverse every other row for snake pattern
         if row % 2 == 1:
             current_row.reverse()
+
         squares.append(current_row)
+
+    # 🔥 Flip vertically so row 1 is at the bottom
+    squares.reverse()
+
     return squares
 
 
