@@ -1179,13 +1179,43 @@ function openChest(chestId){
                 el.classList.add("chest-opened");
 
                 // show reward
-                showToast(`🎲 +${data.rolls} rolls!`);
+                const added = data.rolls || 0;
+                const total = data.rolls_remaining;
+
+                if(total !== undefined){
+                    showToast(`🎲 +${added} roll${added === 1 ? "" : "s"} | Total: ${total}`, 2000);
+                } else {
+                    showToast(`🎲 +${added} roll${added === 1 ? "" : "s"}!`, 2000);
+                }
 
                 burstConfetti(25);
 
                 if(navigator.vibrate){
                     navigator.vibrate([50,30,50]);
                 }
+
+                // 🔄 Update roll badges immediately
+                if(total !== undefined){
+                    const rollEls = document.querySelectorAll(
+                        `.rewards-available[data-child="${childId}"], .rolls-available[data-child="${childId}"], .roll-badge[data-child="${childId}"]`
+                    );
+                    rollEls.forEach(el => {
+                        const n = total;
+                        el.innerText = n === 1
+                            ? "🎯 1 roll available"
+                            : `🎯 ${n} rolls available`;
+                        if(n === 0){
+                            el.classList.add("empty");
+                        } else {
+                            el.classList.remove("empty");
+                        }
+                    });
+                }
+
+                // 🧠 Ensure board/state stays correct
+                setTimeout(() => {
+                    location.reload();
+                }, 900);
 
                 // remove from DOM after animation
                 setTimeout(() => {
