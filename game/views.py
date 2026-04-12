@@ -130,24 +130,24 @@ def give_chest(request):
     tier = request.POST.get("tier", "1")
 
     tier_map = {
-        "1": ("bronze", 1),
-        "2": ("silver", 2),
-        "3": ("gold", 3),
+        "1": "bronze",
+        "2": "silver",
+        "3": "gold",
     }
 
-    chest_type, rolls = tier_map.get(tier, ("bronze", 1))
+    tier_name = tier_map.get(tier, "bronze")
 
     chest = Chest.objects.create(
         child=child,
-        chest_type=chest_type,
-        rolls=rolls,
+        tier=tier_name,
+        reason="manual",
         is_opened=False
     )
 
     return JsonResponse({
         "success": True,
-        "chest_type": chest_type,
-        "rolls": rolls
+        "tier": chest.tier,
+        "rolls": chest.rolls_awarded
     })
 
 
@@ -181,8 +181,8 @@ def add_reward(request):
         if reason:
             Chest.objects.create(
                 child=child,
-                chest_type=tier_name,
-                rolls=rolls,
+                tier=tier_name,
+                reason=reason,
                 is_opened=False
             )
 
@@ -211,14 +211,14 @@ def open_chest(request):
 
         rewards = [
             Reward(child=chest.child)
-            for _ in range(chest.rolls)
+            for _ in range(chest.rolls_awarded)
         ]
 
         Reward.objects.bulk_create(rewards)
 
     return JsonResponse({
         "success": True,
-        "rolls_awarded": chest.rolls,
+        "rolls_awarded": chest.rolls_awarded,
         "rolls_remaining": Reward.objects.filter(child=chest.child, is_used=False).count()
     })
 
