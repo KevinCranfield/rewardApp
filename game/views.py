@@ -158,6 +158,7 @@ def give_chest(request):
         or request.POST.get("rolls")
         or "bronze"
     )
+    print("DEBUG add_reward raw tier:", tier)
 
     tier_map = {
         "1": "bronze",
@@ -169,6 +170,7 @@ def give_chest(request):
     }
 
     tier_name = tier_map.get(str(tier).lower(), "bronze")
+    print("DEBUG add_reward mapped tier_name:", tier_name)
 
     chest = Chest.objects.create(
         child=child,
@@ -209,6 +211,7 @@ def add_reward(request):
         or request.POST.get("rolls")
         or "bronze"
     )
+    print("DEBUG give_chest raw tier:", tier)
 
     tier_map = {
         "1": "bronze",
@@ -220,6 +223,7 @@ def add_reward(request):
     }
 
     tier_name = tier_map.get(str(tier).lower(), "bronze")
+    print("DEBUG give_chest mapped tier_name:", tier_name)
 
     chest = Chest.objects.create(
         child=child,
