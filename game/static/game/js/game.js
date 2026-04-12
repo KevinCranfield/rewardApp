@@ -1246,11 +1246,6 @@ function openChest(chestId){
                     if(board){
                         board.style.opacity = "1";
                     }
-
-                    // Ensure board redraw (fixes disappearing board)
-                    if(typeof drawConnections === "function"){
-                        setTimeout(drawConnections, 50);
-                    }
                 }, 2000);
 
                 burstConfetti(25);
@@ -1276,6 +1271,23 @@ function openChest(chestId){
                         }
                     });
                 }
+
+                // Ensure roll UI stays visible immediately (before refresh)
+                const status = document.querySelector(`.roll-status[data-child="${childId}"]`);
+                if(status){
+                    if(total === 0){
+                        status.classList.add("empty");
+                        status.innerText = "⚠️ No more rolls — go earn another reward 🙂";
+                    } else {
+                        status.classList.remove("empty");
+                        status.innerText = "🎲 Tap roll to play";
+                    }
+                }
+
+                // 🔄 HARD REFRESH AFTER CHEST (ensures rolls persist visually)
+                setTimeout(() => {
+                    window.location.reload();
+                }, 2200);
 
                 // remove from DOM after animation
                 setTimeout(() => {
