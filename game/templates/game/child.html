@@ -78,28 +78,37 @@
 <!-- 🎮 BOARD -->
 <div class="board-wrapper">
     <div class="board" id="game-board">
-        <svg class="board-overlay"></svg>
-        {% for row in squares %}
-            {% for num in row %}
+        {% if squares %}
+            {% for row in squares %}
+                {% for num in row %}
+                    <div class="square" data-square="{{ num }}">
+                        <span class="square-number">{{ num }}</span>
+                        <div class="token-container">
+                            {% for c in children %}
+                                {% if c.position == num %}
+                                    <div
+                                        class="token"
+                                        id="token-{{ c.id }}"
+                                        style="background: {{ c.colour }}"
+                                    >
+                                        {{ c.name|slice:":1" }}
+                                    </div>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endfor %}
+        {% else %}
+            {% for num in 1|to:64 %}
                 <div class="square" data-square="{{ num }}">
                     <span class="square-number">{{ num }}</span>
-                    <div class="token-container">
-                        {% for c in children %}
-                            {% if c.position == num %}
-                                <div
-                                    class="token"
-                                    id="token-{{ c.id }}"
-                                    style="background: {{ c.colour }}"
-                                >
-                                    {{ c.name|slice:":1" }}
-                                </div>
-                            {% endif %}
-                        {% endfor %}
-                    </div>
+                    <div class="token-container"></div>
                 </div>
             {% endfor %}
-        {% endfor %}
+        {% endif %}
     </div>
+    <svg class="board-overlay"></svg>
 </div>
 
 </div>
