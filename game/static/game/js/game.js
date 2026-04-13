@@ -998,6 +998,15 @@ document.addEventListener("DOMContentLoaded", () => {
             updateState();
         });
 
+        // Track last clicked chest button (fix missing chest_type)
+        let lastChestType = null;
+        form.querySelectorAll("button[name='chest_type']").forEach(btn => {
+            btn.addEventListener("click", () => {
+                lastChestType = btn.value;
+                console.log("CLICKED CHEST BUTTON:", lastChestType);
+            });
+        });
+
         form.addEventListener("submit", async (e) => {
             e.preventDefault();
 
@@ -1025,26 +1034,19 @@ document.addEventListener("DOMContentLoaded", () => {
                 // 🔥 DEBUG: log which button triggered submit
                 console.log("SUBMITTER:", submitter);
 
-                // Capture which button was clicked (rolls or chest type)
-                if(submitter){
-                    if(submitter.name === "rolls"){
-                        formData.set("rolls", submitter.value);
-                    }
-                    if(submitter.name === "chest_type"){
-                        formData.set("chest_type", submitter.value);
-                    }
+                // Always prefer explicitly clicked chest button
+                if(lastChestType){
+                    formData.set("chest_type", lastChestType);
+                } else if(submitter && submitter.name === "chest_type"){
+                    formData.set("chest_type", submitter.value);
                 }
 
-                // 🚨 HARD FIX: if chest_type missing, try to detect from buttons
+                // 🚨 STRICT: if chest_type missing, block submit
                 if(!formData.get("chest_type")){
-                    const activeBtn = form.querySelector("button[name='chest_type']:focus, button[name='chest_type'].active");
-                    if(activeBtn){
-                        console.log("FALLBACK CHEST TYPE:", activeBtn.value);
-                        formData.set("chest_type", activeBtn.value);
-                    } else {
-                        console.warn("NO CHEST TYPE FOUND → defaulting bronze");
-                        formData.set("chest_type", "bronze");
-                    }
+                    console.error("NO CHEST TYPE FOUND — BLOCKING SUBMIT");
+                    showToast("⚠️ Please select a chest");
+                    button.disabled = false;
+                    return;
                 }
 
                 // 🐞 DEBUG: dump all form data being sent
