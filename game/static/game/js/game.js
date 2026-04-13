@@ -1150,13 +1150,19 @@ function openChest(chestId){
     if(!el) return;
 
     const childId = el.dataset.childId;
-    let chestType = el.dataset.chestType || el.getAttribute("data-chest-type") || el.dataset.tier || el.getAttribute("data-tier");
+    // ✅ STRICT: only trust explicit data attributes (fixes always-bronze bug)
+    let chestType = (
+        el.getAttribute("data-chest-type") ||
+        el.dataset.chestType ||
+        el.getAttribute("data-tier") ||
+        el.dataset.tier
+    );
 
-    // 🔥 Fallback: detect from class if dataset missing (fix for always bronze bug)
+    // 🚨 Do NOT fallback to class (classes include base styles like "bronze")
     if(!chestType){
-        if(el.classList.contains("gold")) chestType = "gold";
-        else if(el.classList.contains("silver")) chestType = "silver";
-        else if(el.classList.contains("bronze")) chestType = "bronze";
+        console.error("Missing chest type on element", el);
+        showToast("⚠️ Chest error — missing type");
+        return;
     }
     console.log("CHEST DATA DEBUG:", { dataset: el.dataset, classList: [...el.classList] });
     console.log("CHEST CLICKED TYPE:", chestType);
@@ -1171,8 +1177,8 @@ function openChest(chestId){
     playSound("click");
 
     setTimeout(() => {
-        const finalType = (chestType || "").toLowerCase();
-        console.log("SENDING CHEST TYPE:", finalType);
+        const finalType = String(chestType).toLowerCase().trim();
+        console.log("FINAL CHEST TYPE SENT:", finalType);
         fetch("/open-chest/", {
             method: "POST",
             credentials: "same-origin",
