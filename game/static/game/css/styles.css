@@ -2781,3 +2781,38 @@ body {
     visibility: hidden !important;
     opacity: 0 !important;
 }
+
+/* =========================
+   CHEST CLICK FIX (FORCE)
+========================= */
+
+/* Bring chests above EVERYTHING */
+.chests-row {
+    position: relative !important;
+    z-index: 9999 !important;
+}
+
+/* Ensure buttons are always clickable */
+.chest-btn {
+    position: relative !important;
+    z-index: 10000 !important;
+    pointer-events: auto !important;
+}
+
+/* Force all children clickable */
+.chests-row * {
+    pointer-events: auto !important;
+}
+
+/* Kill ANY overlay blocking clicks */
+.board-overlay,
+#chest-overlay,
+.modal:not(.show) {
+    pointer-events: none !important;
+}
+
+/* Only allow overlay interaction when visible */
+#chest-overlay.show {
+    pointer-events: auto !important;
+    z-index: 99999 !important;
+}
