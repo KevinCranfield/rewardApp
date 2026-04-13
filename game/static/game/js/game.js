@@ -1022,6 +1022,9 @@ document.addEventListener("DOMContentLoaded", () => {
                 const formData = new FormData(form);
                 const submitter = e.submitter;
 
+                // 🔥 DEBUG: log which button triggered submit
+                console.log("SUBMITTER:", submitter);
+
                 // Capture which button was clicked (rolls or chest type)
                 if(submitter){
                     if(submitter.name === "rolls"){
@@ -1030,6 +1033,23 @@ document.addEventListener("DOMContentLoaded", () => {
                     if(submitter.name === "chest_type"){
                         formData.set("chest_type", submitter.value);
                     }
+                }
+
+                // 🚨 HARD FIX: if chest_type missing, try to detect from buttons
+                if(!formData.get("chest_type")){
+                    const activeBtn = form.querySelector("button[name='chest_type']:focus, button[name='chest_type'].active");
+                    if(activeBtn){
+                        console.log("FALLBACK CHEST TYPE:", activeBtn.value);
+                        formData.set("chest_type", activeBtn.value);
+                    } else {
+                        console.warn("NO CHEST TYPE FOUND → defaulting bronze");
+                        formData.set("chest_type", "bronze");
+                    }
+                }
+
+                // 🐞 DEBUG: dump all form data being sent
+                for (let pair of formData.entries()) {
+                    console.log("FORM DATA:", pair[0], pair[1]);
                 }
 
                 const res = await fetch(form.action, {
