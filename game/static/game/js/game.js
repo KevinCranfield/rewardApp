@@ -1401,3 +1401,65 @@ document.addEventListener("DOMContentLoaded", () => {
         openChest(chestId);
     });
 });
+
+// ============================
+// CHEST CLICK HANDLER FIX
+// ============================
+
+document.addEventListener("DOMContentLoaded", () => {
+    console.log("Chest handler loaded"); // debug
+
+    document.querySelectorAll(".chest-btn").forEach(btn => {
+        btn.addEventListener("click", async (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+
+            console.log("CHEST CLICKED", btn);
+
+            const childId = btn.dataset.child;
+            const tier = btn.dataset.tier;
+
+            if(!childId || !tier){
+                console.warn("Missing childId or tier");
+                return;
+            }
+
+            // visual feedback
+            btn.classList.add("chest-opening");
+
+            try {
+                const res = await fetch("/open-chest/", {
+                    method: "POST",
+                    headers: {
+                        "X-CSRFToken": getCSRFToken(),
+                        "Content-Type": "application/x-www-form-urlencoded"
+                    },
+                    body: `child_id=${childId}&tier=${tier}`
+                });
+
+                const data = await res.json();
+
+                console.log("CHEST RESPONSE:", data);
+
+                if(data.success){
+                    btn.classList.add("chest-opened");
+
+                    showToast(`🎉 +${data.rolls} rolls!`);
+
+                    setTimeout(() => {
+                        btn.remove(); // remove chest
+                    }, 400);
+
+                } else {
+                    showToast(data.error || "Error opening chest");
+                    btn.classList.remove("chest-opening");
+                }
+
+            } catch(err){
+                console.error(err);
+                showToast("⚠️ Network error");
+                btn.classList.remove("chest-opening");
+            }
+        });
+    });
+});
