@@ -252,21 +252,28 @@ def open_chest(request):
         chest = Chest.objects.select_for_update().filter(
             id=chest_id,
             child_id=child_id,
-            child__family=family,
-            is_opened=False
+            child__family=family
         ).first()
 
+        # ❌ Chest not found
         if not chest:
-            return JsonResponse({"success": False, "error": "Chest not found or already opened"}, status=400)
+            return JsonResponse({
+                "success": False,
+                "error": "Chest not found"
+            }, status=400)
 
+        # ✅ Already opened (prevent double-click issues)
+        if chest.is_opened:
+            return JsonResponse({
+                "success": True,
+                "already_opened": True
+            })
+
+        # ✅ Mark as opened
         chest.is_opened = True
         chest.save()
 
-        # 🔥 DEBUG: ensure rolls_awarded matches tier
-        print("DEBUG open_chest tier:", chest.tier)
-        print("DEBUG open_chest rolls_awarded:", chest.rolls_awarded)
-
-        # Safety fallback (in case model logic failed)
+        # 🎯 Determine rolls from tier
         if chest.tier == "gold":
             rolls_to_award = 3
         elif chest.tier == "silver":
@@ -274,17 +281,18 @@ def open_chest(request):
         else:
             rolls_to_award = 1
 
-        # 🔥 DEBUG final rolls used
-        print("DEBUG open_chest final rolls_to_award:", rolls_to_award)
-
+        # 🎁 Create rewards
         rewards = [
             Reward(child=chest.child)
             for _ in range(rolls_to_award)
         ]
-
         Reward.objects.bulk_create(rewards)
 
-    total_rolls = Reward.objects.filter(child=chest.child, is_used=False).count()
+    # 🔢 Count remaining rolls
+    total_rolls = Reward.objects.filter(
+        child=chest.child,
+        is_used=False
+    ).count()
 
     return JsonResponse({
         "success": True,
@@ -292,6 +300,7 @@ def open_chest(request):
         "rolls_awarded": rolls_to_award,
         "total_rolls": total_rolls
     })
+    
 
 
 @login_required
