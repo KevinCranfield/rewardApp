@@ -40,6 +40,7 @@
                     <form method="POST" action="{% url 'add_reward' %}" class="reward-form">
                         {% csrf_token %}
                         <input type="hidden" name="child_id" value="{{ child.id }}">
+                        <input type="hidden" name="chest_type" value="">
 
                         <select name="reason" class="reward-select">
                             <option value="">👉 Select reason to add reward</option>
@@ -53,13 +54,13 @@
                         <input type="text" name="custom_text" class="reward-input" placeholder="Or type your own reason (e.g. Brushed teeth)">
 
                         <div class="reward-buttons">
-                            <button type="submit" name="tier" value="1" class="reward-btn bronze-btn">
+                            <button type="submit" name="tier" value="1" class="reward-btn bronze-btn" onclick="this.form.chest_type.value='bronze'">
                                 🟤 Bronze Chest (+1 Roll)
                             </button>
-                            <button type="submit" name="tier" value="2" class="reward-btn silver-btn">
+                            <button type="submit" name="tier" value="2" class="reward-btn silver-btn" onclick="this.form.chest_type.value='silver'">
                                 ⚪ Silver Chest (+2 Rolls)
                             </button>
-                            <button type="submit" name="tier" value="3" class="reward-btn gold-btn">
+                            <button type="submit" name="tier" value="3" class="reward-btn gold-btn" onclick="this.form.chest_type.value='gold'">
                                 🟡 Gold Chest (+3 Rolls)
                             </button>
                         </div>
