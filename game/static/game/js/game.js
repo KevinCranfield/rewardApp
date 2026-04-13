@@ -1463,3 +1463,11 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
 });
+
+document.addEventListener("DOMContentLoaded", () => {
+    console.log("Chest handler loaded");
+
+    document.querySelectorAll(".chest-btn").forEach(btn => {
+        btn.addEventListener("click", () => openChest(btn));
+    });
+});

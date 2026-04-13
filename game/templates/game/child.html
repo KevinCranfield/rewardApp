@@ -17,8 +17,8 @@
     <button
         class="chest-btn chest-{{ chest.chest_type }}"
         data-chest-id="{{ chest.id }}"
+        data-child="{{ child.id }}"
         data-tier="{{ chest.chest_type }}"
-        onclick="openChest(this)"
     >
         <span class="chest-icon">
             {% if chest.chest_type == "gold" %}🟡
