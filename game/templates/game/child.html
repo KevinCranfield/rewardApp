@@ -114,11 +114,17 @@ async function openChest(btn) {
     const chestId = btn.dataset.chestId;
     let tier = btn.dataset.tier;
 
+    console.log("OPEN CHEST CLICKED", btn, btn.dataset);
     btn.disabled = true;
     btn.classList.add("chest-opening");
     await new Promise(resolve => setTimeout(resolve, 500));
 
     try {
+        console.log("SENDING REQUEST", {
+            chestId,
+            tier,
+            childId: document.querySelector(".child-view").dataset.childId
+        });
         const res = await fetch("/open-chest/", {
             method: "POST",
             headers: {
@@ -132,6 +138,7 @@ async function openChest(btn) {
         });
 
         const data = await res.json();
+        console.log("SERVER RESPONSE", data);
 
         if (data.success) {
             // Use server truth if provided (fixes bronze bug)

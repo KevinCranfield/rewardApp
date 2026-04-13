@@ -1376,3 +1376,28 @@ function killChestOverlay(){
 window.addEventListener("DOMContentLoaded", () => {
     killChestOverlay();
 });
+
+/* =========================
+   CHEST CLICK BINDING (FIX)
+========================= */
+
+document.addEventListener("DOMContentLoaded", () => {
+    // Use event delegation so dynamically loaded chests always work
+    document.addEventListener("click", (e) => {
+        const chest = e.target.closest(".chest");
+        if(!chest) return;
+
+        // Prevent double triggers
+        if(chest.classList.contains("chest-opened")) return;
+
+        const chestId = chest.dataset.chestId;
+        if(!chestId){
+            console.error("Clicked chest missing ID", chest);
+            return;
+        }
+
+        console.log("CHEST CLICK DETECTED:", chestId);
+
+        openChest(chestId);
+    });
+});
