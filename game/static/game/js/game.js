@@ -274,17 +274,25 @@ function roll(childId){
                 } else {
                     status.classList.remove("empty");
                     status.innerText = `🎯 ${data.rolls_remaining} roll${data.rolls_remaining === 1 ? '' : 's'} available`;
+
+                    // 🔥 Force remove any lingering red banner styles
+                    status.style.background = "transparent";
+                    status.style.color = "#16a34a";
                 }
             }
         }
 
         if(button){
-            if(data.rolls_remaining === 0){
-                button.disabled = true;
-            } else {
-                setTimeout(() => {
-                    button.disabled = false;
-                }, 1200);
+            button.disabled = data.rolls_remaining === 0;
+        }
+
+        // 🔥 Final UI sync safeguard
+        if(data.rolls_remaining > 0){
+            const status = document.querySelector(`.roll-status[data-child="${childId}"]`) 
+                || document.querySelector(".roll-status");
+            if(status){
+                status.classList.remove("empty");
+                status.innerText = `🎯 ${data.rolls_remaining} roll${data.rolls_remaining === 1 ? '' : 's'} available`;
             }
         }
 
