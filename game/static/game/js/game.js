@@ -1175,7 +1175,8 @@ window.addEventListener("DOMContentLoaded", () => {
             console.log("CLICK CHEST:", chestId);
 
             if(typeof openChest === "function" && chestId){
-                openChest(chestId);
+                // Pass full button so child_id + tier are available
+                openChest(btn);
             } else {
                 console.error("openChest missing or chestId not found");
             }
