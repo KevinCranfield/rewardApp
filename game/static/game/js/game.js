@@ -160,6 +160,14 @@ function roll(childId){
     const button = document.querySelector(`.roll-btn[data-child="${childId}"]`);
 
     if(button && button.disabled) return;
+
+    // 🔒 Extra safety: prevent roll if UI shows 0 rolls
+    const statusCheck = document.querySelector(`.roll-status[data-child="${childId}"]`);
+    if(statusCheck && statusCheck.classList.contains("empty")){
+        console.warn("Blocked roll — no rolls available");
+        return;
+    }
+
     if(button) button.disabled = true;
     playSound('click');
     if(navigator.vibrate){
@@ -965,6 +973,21 @@ document.getElementById("resetBoardBtn")?.addEventListener("click", () => {
 
             document.querySelectorAll(".reward-history").forEach(el => {
                 el.innerHTML = "";
+            });
+
+            // 🔥 Reset roll UI properly
+            document.querySelectorAll(".roll-status").forEach(status => {
+                status.classList.add("empty");
+                status.innerText = "⚠️ No more rolls — go earn another reward 🙂";
+                status.style.background = "";
+                status.style.color = "";
+                status.dataset.locked = "false";
+            });
+
+            // 🔥 Disable all roll buttons
+            document.querySelectorAll(".roll-btn").forEach(btn => {
+                btn.disabled = true;
+                btn.classList.add("disabled");
             });
         }
     });
