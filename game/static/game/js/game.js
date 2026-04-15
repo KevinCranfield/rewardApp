@@ -252,14 +252,28 @@ function roll(childId){
                 }
             });
 
-            const status = document.querySelector(`.roll-status[data-child="${childId}"]`);
+            let status = document.querySelector(`.roll-status[data-child="${childId}"]`);
+
+            // Fallback: create status element if it doesn't exist
+            if(!status){
+                const rollBtn = document.querySelector(`.roll-btn[data-child="${childId}"]`);
+                if(rollBtn){
+                    status = document.createElement("div");
+                    status.className = "roll-status";
+                    status.style.marginTop = "10px";
+                    status.style.textAlign = "center";
+                    status.style.fontWeight = "600";
+                    rollBtn.parentNode.insertBefore(status, rollBtn.nextSibling);
+                }
+            }
+
             if(status){
                 if(data.rolls_remaining === 0){
                     status.classList.add("empty");
                     status.innerText = "⚠️ No more rolls — go earn another reward 🙂";
                 } else {
                     status.classList.remove("empty");
-                    status.innerText = "🎲 Tap roll to play";
+                    status.innerText = `🎯 ${data.rolls_remaining} roll${data.rolls_remaining === 1 ? '' : 's'} available`;
                 }
             }
         }
