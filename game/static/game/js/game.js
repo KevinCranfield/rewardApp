@@ -1172,13 +1172,29 @@ window.addEventListener("DOMContentLoaded", () => {
             e.stopPropagation();
 
             const chestId = btn.dataset.chestId || btn.getAttribute("data-chest-id");
+
+            // Prevent double click spam
+            if(btn.classList.contains("chest-opening")){
+                console.warn("Chest already opening, ignoring click");
+                return;
+            }
+            btn.classList.add("chest-opening");
+            btn.disabled = true;
+
             console.log("CLICK CHEST:", chestId);
 
             if(typeof openChest === "function" && chestId){
-                // Pass full button so child_id + tier are available
-                openChest(btn);
+                try {
+                    openChest(btn);
+                } catch(err){
+                    console.error(err);
+                    btn.classList.remove("chest-opening");
+                    btn.disabled = false;
+                }
             } else {
                 console.error("openChest missing or chestId not found");
+                btn.classList.remove("chest-opening");
+                btn.disabled = false;
             }
         });
     });
