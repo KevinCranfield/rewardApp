@@ -173,12 +173,14 @@ function roll(childId){
 
     let current = 0;
 
+    // Prefer backend truth over DOM (fixes stuck token bug)
     if(token){
         const square = token.closest(".square");
         if(square){
-            current = parseInt(square.dataset.square);
+            current = parseInt(square.dataset.square) || 0;
         }
     }
+    // Will be overridden by data.from if available
 
     fetch("/roll/", {
         method: "POST",
@@ -200,6 +202,11 @@ function roll(childId){
 
         console.log("ROLL:", data);
         console.log("Rolls remaining:", data.rolls_remaining);
+
+        // FIX: ensure correct start position from backend
+        if(data.from !== undefined){
+            current = data.from;
+        }
 
         showDice(data.dice, () => {
             if(data.jump){
