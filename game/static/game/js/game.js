@@ -203,10 +203,6 @@ function roll(childId){
         console.log("ROLL:", data);
         console.log("Rolls remaining:", data.rolls_remaining);
 
-        // FIX: ensure correct start position from backend
-        if(data.from !== undefined){
-            current = data.from;
-        }
 
         showDice(data.dice, () => {
             if(data.jump){

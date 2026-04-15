@@ -324,7 +324,42 @@ def roll(request):
 
     roll_value = random.randint(1, 6)
 
-    child.position += roll_value
+    start_position = child.position
+    new_position = child.position + roll_value
+
+    # Snakes & ladders mapping
+    snakes = {
+        62: 44,
+        55: 41,
+        27: 10,
+        33: 18,
+    }
+
+    ladders = {
+        3: 22,
+        8: 26,
+        19: 38,
+        35: 49,
+    }
+
+    jump_from = None
+    jump_to = None
+
+    # Apply movement first
+    child.position = new_position
+
+    # Check ladder
+    if new_position in ladders:
+        jump_from = new_position
+        jump_to = ladders[new_position]
+        child.position = jump_to
+
+    # Check snake
+    elif new_position in snakes:
+        jump_from = new_position
+        jump_to = snakes[new_position]
+        child.position = jump_to
+
     child.save()
 
     Roll.objects.create(
@@ -340,7 +375,9 @@ def roll(request):
         "dice": roll_value,
         "roll": roll_value,
         "position": child.position,
-        "rolls_remaining": remaining
+        "rolls_remaining": remaining,
+        "jump": jump_to is not None,
+        "from": jump_from,
     })
 
 
