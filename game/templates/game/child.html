@@ -90,7 +90,17 @@
                                     <div
                                         class="token"
                                         id="token-{{ c.id }}"
-                                        style="background: {{ c.colour }}"
+                                        style="
+                                            background: {{ c.colour }};
+                                            width: 28px;
+                                            height: 28px;
+                                            border-radius: 50%;
+                                            display: flex;
+                                            align-items: center;
+                                            justify-content: center;
+                                            color: white;
+                                            font-weight: bold;
+                                        "
                                     >
                                         {{ c.name|slice:":1" }}
                                     </div>
