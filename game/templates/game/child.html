@@ -253,12 +253,20 @@ function showChestReveal(tier, rollsAwarded, rollsRemaining) {
     }
     if (statusEl) {
         if (rollsRemaining > 0) {
-            statusEl.className = "roll-status available";
+            statusEl.classList.remove("empty");
+            statusEl.classList.add("available");
             statusEl.textContent = `🎯 ${rollsRemaining} roll${rollsRemaining !== 1 ? "s" : ""} available`;
         } else {
-            statusEl.className = "roll-status empty";
+            statusEl.classList.remove("available");
+            statusEl.classList.add("empty");
             statusEl.textContent = "No more rolls — go earn another reward 🙂";
         }
+    }
+
+    // 🔥 FORCE remove any leftover red banner styling
+    if (statusEl && rollsRemaining > 0) {
+        statusEl.style.background = "";
+        statusEl.style.color = "";
     }
 
     // 🧠 Extra safety: force re-check after UI settles
