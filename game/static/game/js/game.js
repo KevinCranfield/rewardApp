@@ -366,12 +366,18 @@ function updateTokensUI(children){
         const token = document.createElement("div");
         token.className = "token";
         token.id = "token-" + child.id;
-        token.textContent = "•";
+        token.textContent = child.name ? child.name[0].toUpperCase() : "•";
         token._rollButton = document.querySelector(`.roll-btn[data-child="${child.id}"]`);
 
         if(child.colour){
             token.style.background = child.colour;
         }
+        // Ensure visible styling (fix token not turning coloured properly)
+        token.style.color = "white";
+        token.style.display = "flex";
+        token.style.alignItems = "center";
+        token.style.justifyContent = "center";
+        token.style.fontWeight = "bold";
 
         container.appendChild(token);
     });
