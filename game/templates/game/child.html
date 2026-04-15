@@ -19,6 +19,7 @@
         data-chest-id="{{ chest.id }}"
         data-child="{{ child.id }}"
         data-tier="{{ chest.tier }}"
+        onclick="openChest(this)"
     >
         <span class="chest-icon">
             {% if chest.tier == "gold" %}🟡
@@ -110,6 +111,7 @@
 <script>
 const CSRF = "{{ csrf_token }}";
 
+// ✅ openChest — receives the button element directly via onclick="openChest(this)"
 async function openChest(btn) {
     const chestId = btn.dataset.chestId;
     let tier = btn.dataset.tier;
@@ -120,11 +122,9 @@ async function openChest(btn) {
     await new Promise(resolve => setTimeout(resolve, 500));
 
     try {
-        console.log("SENDING REQUEST", {
-            chestId,
-            tier,
-            childId: document.querySelector(".child-view").dataset.childId
-        });
+        const childId = document.querySelector(".child-view").dataset.childId;
+        console.log("SENDING REQUEST", { chestId, tier, childId });
+
         const res = await fetch("/open-chest/", {
             method: "POST",
             headers: {
@@ -133,7 +133,8 @@ async function openChest(btn) {
             },
             body: new URLSearchParams({
                 chest_id: chestId,
-                child_id: document.querySelector(".child-view").dataset.childId
+                child_id: childId,
+                chest_type: tier   // ✅ also send tier so backend logs are clean
             }),
         });
 
@@ -141,34 +142,43 @@ async function openChest(btn) {
         console.log("SERVER RESPONSE", data);
 
         if (data.success) {
-            // Use server truth if provided (fixes bronze bug)
+            // Use server's tier value if provided (guards against wrong client-side tier)
             if (data.tier) {
                 tier = data.tier;
             }
+
             // Remove chest button
             btn.remove();
 
-            // Hide row if no more chests
+            // Hide row if no more chests remain
             const row = document.getElementById("chests-row");
-            if (row && row.querySelectorAll(".chest-btn").length === 0) {
+            if (row && row.querySelectorAll(".chest-btn:not([disabled])").length === 0) {
                 row.remove();
             }
 
-            // Show reveal overlay
             showChestReveal(tier, data.rolls_awarded, data.total_rolls);
 
         } else {
+            console.error("Chest open failed:", data.error);
             btn.disabled = false;
             btn.classList.remove("chest-opening");
+            // Show error toast if available from game.js
+            if (typeof showToast === "function") {
+                showToast("⚠️ " + (data.error || "Error opening chest"));
+            }
         }
     } catch (e) {
+        console.error("openChest error:", e);
         btn.disabled = false;
         btn.classList.remove("chest-opening");
+        if (typeof showToast === "function") {
+            showToast("⚠️ Network error");
+        }
     }
 }
 
 function showChestReveal(tier, rollsAwarded, rollsRemaining) {
-    // Create overlay fresh every time (prevents ghost overlay bug)
+    // Remove any existing overlay first (prevent ghost overlay)
     let overlay = document.getElementById("chest-overlay");
     if (overlay) overlay.remove();
 
@@ -196,7 +206,6 @@ function showChestReveal(tier, rollsAwarded, rollsRemaining) {
         gold:   { emoji: "🟡", label: "Gold Chest!",  colour: "#ca8a04" },
     };
 
-    console.log("CHEST DATA:", tier, rollsAwarded, rollsRemaining);
     const t = tierData[tier] || tierData["bronze"];
     icon.textContent = t.emoji;
     title.textContent = t.label;
@@ -208,39 +217,49 @@ function showChestReveal(tier, rollsAwarded, rollsRemaining) {
         </div>
     `;
 
-    overlay.classList.remove("hidden");
-    overlay.style.display = "flex";  // force visible
+    overlay.style.display = "flex";
     overlay.classList.add("chest-overlay-show");
 
-    // auto close after short delay
+    // Confetti burst
+    if (typeof burstConfetti === "function") burstConfetti(25);
+    if (navigator.vibrate) navigator.vibrate([50, 30, 50]);
+
+    // Auto-close after 1.4s
     setTimeout(() => {
         overlay.classList.remove("chest-overlay-show");
-
-        // Fully remove from DOM so it can NEVER block clicks
-        setTimeout(() => {
-            overlay.remove();
-        }, 200);
+        setTimeout(() => overlay.remove(), 200);
     }, 1400);
 
-    // Update roll button + status
+    // Update roll button + status immediately
     const childId = document.querySelector(".child-view").dataset.childId;
     const rollBtn = document.querySelector(`.roll-btn[data-child="${childId}"]`);
     const statusEl = document.querySelector(`.roll-status[data-child="${childId}"]`);
 
-    if (rollBtn && rollsRemaining > 0) {
-        rollBtn.disabled = false;
-        rollBtn.classList.remove("disabled");
+    if (rollBtn) {
+        if (rollsRemaining > 0) {
+            rollBtn.disabled = false;
+            rollBtn.classList.remove("disabled");
+        } else {
+            rollBtn.disabled = true;
+            rollBtn.classList.add("disabled");
+        }
     }
     if (statusEl) {
-        statusEl.className = "roll-status available";
-        statusEl.textContent = `🎯 ${rollsRemaining} roll${rollsRemaining !== 1 ? "s" : ""} available`;
+        if (rollsRemaining > 0) {
+            statusEl.className = "roll-status available";
+            statusEl.textContent = `🎯 ${rollsRemaining} roll${rollsRemaining !== 1 ? "s" : ""} available`;
+        } else {
+            statusEl.className = "roll-status empty";
+            statusEl.textContent = "No more rolls — go earn another reward 🙂";
+        }
     }
 }
 
 function closeChestOverlay() {
     const overlay = document.getElementById("chest-overlay");
+    if (!overlay) return;
     overlay.classList.remove("chest-overlay-show");
-    overlay.classList.add("hidden");
+    setTimeout(() => overlay.remove(), 200);
 }
 </script>
 
