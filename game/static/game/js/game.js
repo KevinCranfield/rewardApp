@@ -202,9 +202,25 @@ function roll(childId){
     .then(res => res.json())
     .then(data => {
 
-        if(data.error){
-            showToast("⚠️ " + data.error);
-            if(button) button.disabled = false;
+        // 🔥 Handle no rolls / backend rejection cleanly
+        if(data.error || data.success === false){
+            console.warn("ROLL BLOCKED:", data);
+
+            const status = document.querySelector(`.roll-status[data-child="${childId}"]`) 
+                || document.querySelector(".roll-status");
+
+            if(status){
+                status.classList.add("empty");
+                status.innerText = "⚠️ No more rolls — go earn another reward 🙂";
+                status.style.background = "";
+                status.style.color = "";
+            }
+
+            if(button){
+                button.disabled = true;
+            }
+
+            showToast("⚠️ No rolls available");
             return;
         }
 
@@ -306,12 +322,14 @@ function roll(childId){
                 status.style.color = "#16a34a";
             }
         }
+        // 🔥 If backend returns no movement (e.g. rolls = 0), do NOT animate
         if(!data.position){
-            console.warn("No movement data");
-            if(button) button.disabled = false;
-            setTimeout(() => {
-                if(button) button.disabled = false;
-            }, 2500);
+            console.warn("No movement data — likely 0 rolls");
+
+            if(button){
+                button.disabled = true;
+            }
+
             return;
         }
 
