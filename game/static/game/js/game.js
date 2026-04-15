@@ -260,6 +260,7 @@ function roll(childId){
                 if(rollBtn){
                     status = document.createElement("div");
                     status.className = "roll-status";
+                    status.dataset.child = childId;
                     status.style.marginTop = "10px";
                     status.style.textAlign = "center";
                     status.style.fontWeight = "600";
@@ -293,9 +294,10 @@ function roll(childId){
             if(status){
                 status.classList.remove("empty");
                 status.innerText = `🎯 ${data.rolls_remaining} roll${data.rolls_remaining === 1 ? '' : 's'} available`;
+                status.style.background = "transparent";
+                status.style.color = "#16a34a";
             }
         }
-
         if(!data.position){
             console.warn("No movement data");
             if(button) button.disabled = false;
