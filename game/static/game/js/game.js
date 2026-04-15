@@ -165,6 +165,15 @@ function roll(childId){
     const statusCheck = document.querySelector(`.roll-status[data-child="${childId}"]`);
     if(statusCheck && statusCheck.classList.contains("empty")){
         console.warn("Blocked roll — no rolls available");
+
+        // 🔥 VISUAL FIX: ensure button is greyed out when blocked
+        if(button){
+            button.disabled = true;
+            button.classList.add("disabled");
+            button.style.opacity = "0.5";
+            button.style.cursor = "not-allowed";
+        }
+
         return;
     }
 
@@ -308,7 +317,19 @@ function roll(childId){
         }
 
         if(button){
-            button.disabled = data.rolls_remaining === 0;
+            const noRolls = data.rolls_remaining === 0;
+
+            button.disabled = noRolls;
+
+            if(noRolls){
+                button.classList.add("disabled");
+                button.style.opacity = "0.5";
+                button.style.cursor = "not-allowed";
+            } else {
+                button.classList.remove("disabled");
+                button.style.opacity = "1";
+                button.style.cursor = "pointer";
+            }
         }
 
         // 🔥 Final UI sync safeguard
@@ -321,6 +342,13 @@ function roll(childId){
                 status.style.background = "transparent";
                 status.style.color = "#16a34a";
             }
+        }
+        // 🔥 Ensure button styling matches state (fix grey-out consistency)
+        if(button && data.rolls_remaining > 0){
+            button.disabled = false;
+            button.classList.remove("disabled");
+            button.style.opacity = "1";
+            button.style.cursor = "pointer";
         }
         // 🔥 If backend returns no movement (e.g. rolls = 0), do NOT animate
         if(!data.position){
