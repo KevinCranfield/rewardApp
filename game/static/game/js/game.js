@@ -1183,6 +1183,23 @@ window.addEventListener("DOMContentLoaded", () => {
 
             console.log("CLICK CHEST:", chestId);
 
+            // Safety: re-enable roll button after chest opens (UI sync fix)
+            setTimeout(() => {
+                const childId = document.querySelector(".child-view")?.dataset.childId;
+                if(childId){
+                    const rollBtn = document.querySelector(`.roll-btn[data-child="${childId}"]`);
+                    if(rollBtn){
+                        rollBtn.disabled = false;
+                    }
+
+                    const status = document.querySelector(`.roll-status[data-child="${childId}"]`);
+                    if(status){
+                        status.classList.remove("empty");
+                        status.innerText = "🎲 Tap roll to play";
+                    }
+                }
+            }, 1200);
+
             if(typeof openChest === "function" && chestId){
                 try {
                     openChest(btn);
