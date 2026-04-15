@@ -178,6 +178,10 @@ async function openChest(btn) {
 }
 
 function showChestReveal(tier, rollsAwarded, rollsRemaining) {
+    // 🔧 Ensure rollsRemaining is a proper number
+    rollsRemaining = parseInt(rollsRemaining);
+    if (isNaN(rollsRemaining)) rollsRemaining = 0;
+
     // Remove any existing overlay first (prevent ghost overlay)
     let overlay = document.getElementById("chest-overlay");
     if (overlay) overlay.remove();
@@ -236,9 +240,12 @@ function showChestReveal(tier, rollsAwarded, rollsRemaining) {
     const statusEl = document.querySelector(`.roll-status[data-child="${childId}"]`);
 
     if (rollBtn) {
+        // 🔥 FORCE enable if rolls exist
         if (rollsRemaining > 0) {
             rollBtn.disabled = false;
             rollBtn.classList.remove("disabled");
+            rollBtn.style.pointerEvents = "auto";
+            rollBtn.style.opacity = "1";
         } else {
             rollBtn.disabled = true;
             rollBtn.classList.add("disabled");
@@ -253,6 +260,14 @@ function showChestReveal(tier, rollsAwarded, rollsRemaining) {
             statusEl.textContent = "No more rolls — go earn another reward 🙂";
         }
     }
+
+    // 🧠 Extra safety: force re-check after UI settles
+    setTimeout(() => {
+        if (rollBtn && rollsRemaining > 0) {
+            rollBtn.disabled = false;
+            rollBtn.classList.remove("disabled");
+        }
+    }, 300);
 }
 
 function closeChestOverlay() {
