@@ -1164,6 +1164,25 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 });
 
+// Ensure chest buttons are clickable and trigger open
+window.addEventListener("DOMContentLoaded", () => {
+    document.querySelectorAll(".chest-btn").forEach(btn => {
+        btn.addEventListener("click", (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+
+            const chestId = btn.dataset.chestId || btn.getAttribute("data-chest-id");
+            console.log("CLICK CHEST:", chestId);
+
+            if(typeof openChest === "function" && chestId){
+                openChest(chestId);
+            } else {
+                console.error("openChest missing or chestId not found");
+            }
+        });
+    });
+});
+
 /* =========================
    CHEST OPEN SYSTEM
    NOTE: openChest() is defined in child.html (inline script) because
