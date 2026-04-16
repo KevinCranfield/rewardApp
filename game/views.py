@@ -437,7 +437,7 @@ def signup(request):
         if username and password:
             from django.contrib.auth.models import User
             user = User.objects.create_user(username=username, password=password)
-            login(request, user)
+            login(request, user, backend='django.contrib.auth.backends.ModelBackend')
             return redirect("dashboard")
 
     return render(request, "game/signup.html")
