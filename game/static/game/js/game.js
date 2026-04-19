@@ -11,7 +11,7 @@
 // 9. Removed duplicate broken .chest-btn click handlers (chest opening handled in child.html)
 // =============================================
 
-console.log("GAME JS VERSION: PREMIUM_CHEST_V1");
+console.log("GAME JS VERSION: PREMIUM_CHEST_V2");
 
 
 const BOARD_SIZE = 64;
