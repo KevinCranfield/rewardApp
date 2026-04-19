@@ -118,23 +118,24 @@ body.loaded{visibility:visible;}
 <script src="{% static 'game/js/game.js' %}" defer></script>
 
 <script>
-let deferredPrompt;
+/* =========================
+   GLOBAL INSTALL BUTTON HANDLER
+   (Uses game.js deferredPrompt)
+========================= */
 
-window.addEventListener('beforeinstallprompt', (e) => {
-    e.preventDefault();
-    deferredPrompt = e;
+function installApp() {
+    if (typeof triggerInstallPrompt === "function") {
+        triggerInstallPrompt();
+    } else {
+        console.warn("Install prompt not ready yet");
+    }
+}
+
+// Show button when game.js sets readiness
+window.addEventListener("beforeinstallprompt", () => {
     const btn = document.getElementById("installBtn");
     if (btn) btn.style.display = "inline-block";
 });
-
-function installApp() {
-    if (deferredPrompt) {
-        deferredPrompt.prompt();
-        deferredPrompt.userChoice.then(() => {
-            deferredPrompt = null;
-        });
-    }
-}
 </script>
 
 <div id="iosInstallHint" class="ios-install-hint">

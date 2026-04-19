@@ -1325,6 +1325,12 @@ window.addEventListener("DOMContentLoaded", () => {
                     }, 200);
 
                     openChest(btn);
+                    // 🎯 Trigger install after exciting moment (only if available)
+                    if(document.body.dataset.pwaReady === "true"){
+                        setTimeout(() => {
+                            triggerInstallPrompt();
+                        }, 800);
+                    }
                     setTimeout(() => {
                         const overlay = document.getElementById("chest-overlay");
                         if(overlay){
@@ -1392,3 +1398,37 @@ function killChestOverlay(){
 window.addEventListener("DOMContentLoaded", () => {
     killChestOverlay();
 });
+
+/* =========================
+   PWA INSTALL PROMPT HANDLER
+========================= */
+
+let deferredPrompt = null;
+
+// Capture the install prompt
+window.addEventListener("beforeinstallprompt", (e) => {
+    console.log("PWA install prompt captured");
+
+    e.preventDefault(); // stop Chrome auto-banner
+    deferredPrompt = e;
+
+    // Optional: trigger install after reward/chest later
+    document.body.dataset.pwaReady = "true";
+});
+
+// Function to trigger install (can be called from anywhere)
+function triggerInstallPrompt(){
+    if(!deferredPrompt){
+        console.warn("No install prompt available");
+        return;
+    }
+
+    deferredPrompt.prompt();
+
+    deferredPrompt.userChoice.then(choice => {
+        console.log("Install choice:", choice.outcome);
+
+        deferredPrompt = null;
+        document.body.dataset.pwaReady = "false";
+    });
+}
