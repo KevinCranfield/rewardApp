@@ -11,6 +11,7 @@
 // 9. Removed duplicate broken .chest-btn click handlers (chest opening handled in child.html)
 // =============================================
 
+console.log("GAME JS VERSION: PREMIUM_CHEST_V1");
 
 
 const BOARD_SIZE = 64;
@@ -1284,6 +1285,7 @@ window.addEventListener("DOMContentLoaded", () => {
             btn.disabled = true;
 
             console.log("CLICK CHEST:", chestId);
+            console.log("CHEST HANDLER ACTIVE - PREMIUM");
 
             // Let backend response control roll status — do NOT override UI here
             setTimeout(() => {
@@ -1321,6 +1323,24 @@ window.addEventListener("DOMContentLoaded", () => {
                     }, 200);
 
                     openChest(btn);
+                    setTimeout(() => {
+                        const overlay = document.getElementById("chest-overlay");
+                        if(overlay){
+                            overlay.classList.remove("show");
+                        }
+
+                        btn.classList.remove(
+                            "chest-opening",
+                            "chest-focus",
+                            "chest-gold-glow",
+                            "chest-silver-glow",
+                            "chest-bronze-glow",
+                            "chest-lid-open",
+                            "chest-burst"
+                        );
+
+                        btn.disabled = false;
+                    }, 1500);
                 } catch(err){
                     console.error(err);
                     btn.classList.remove(
