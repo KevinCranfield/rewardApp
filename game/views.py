@@ -381,7 +381,6 @@ def roll(request):
     })
 
 
-@login_required
 def enter_pin(request):
     if request.method == "POST":
         family = get_family(request.user)
