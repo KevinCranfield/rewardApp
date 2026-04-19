@@ -974,8 +974,10 @@ window.addEventListener("load", () => {
 function pingActivity(){
     fetch("/ping-auth/", {
         method: "POST",
+        credentials: "same-origin",
         headers: {
-            "X-CSRFToken": getCSRFToken()
+            "X-CSRFToken": getCSRFToken(),
+            "Content-Type": "application/x-www-form-urlencoded"
         }
     }).catch(()=>{});
 }

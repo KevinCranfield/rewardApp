@@ -30,7 +30,10 @@ SECRET_KEY = os.environ.get('SECRET_KEY')
 DEBUG = False
 
 ALLOWED_HOSTS = ["rewardapp.live", "www.rewardapp.live", "134.209.18.202"]
-CSRF_TRUSTED_ORIGINS = ["https://rewardapp.live", "https://www.rewardapp.live"]
+CSRF_TRUSTED_ORIGINS = [
+    "https://rewardapp.live",
+    "https://www.rewardapp.live",
+]
 
 
 # Application definition
@@ -132,7 +135,11 @@ USE_TZ = True
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 SECURE_SSL_REDIRECT = True
 SESSION_COOKIE_SECURE = True
+SESSION_COOKIE_SAMESITE = "Lax"
 CSRF_COOKIE_SECURE = True
+CSRF_COOKIE_SAMESITE = "Lax"
+CSRF_COOKIE_HTTPONLY = False
+SESSION_COOKIE_HTTPONLY = True
 
 # Additional security settings
 SECURE_HSTS_SECONDS = 31536000
