@@ -90,7 +90,7 @@ WSGI_APPLICATION = 'config.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
-LOGIN_URL = "/enter-pin/"
+LOGIN_URL = "/login/"
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
