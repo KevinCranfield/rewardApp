@@ -214,29 +214,44 @@ function showChestReveal(tier, rollsAwarded, rollsRemaining) {
     const title = overlay.querySelector("#reveal-title");
     const rolls = overlay.querySelector("#reveal-rolls");
 
-    const tierData = {
-        bronze: { emoji: "🟤", label: "Bronze Chest", colour: "#b45309" },
-        silver: { emoji: "⚪", label: "Silver Chest", colour: "#6b7280" },
-        gold:   { emoji: "🟡", label: "Gold Chest!",  colour: "#ca8a04" },
-    };
+    // 🎬 Start closed state
+    icon.textContent = "🎁";
+    title.textContent = "Opening...";
+    rolls.innerHTML = "";
 
-    const t = tierData[tier] || tierData["bronze"];
-    icon.textContent = t.emoji;
-    title.textContent = t.label;
-    title.style.color = t.colour;
-    rolls.innerHTML = `
-        <div>+${rollsAwarded} roll${rollsAwarded > 1 ? "s" : ""} 🎲</div>
-        <div style="margin-top:8px; font-weight:bold;">
-            Total: ${rollsRemaining} roll${rollsRemaining !== 1 ? "s" : ""}
-        </div>
-    `;
+    setTimeout(() => {
+        overlay.classList.add("shake");
+
+        setTimeout(() => {
+            overlay.classList.remove("shake");
+
+            const tierData = {
+                bronze: { emoji: "🟤", label: "Bronze Chest", colour: "#b45309" },
+                silver: { emoji: "⚪", label: "Silver Chest", colour: "#6b7280" },
+                gold:   { emoji: "🟡", label: "Gold Chest!",  colour: "#ca8a04" },
+            };
+
+            const t = tierData[tier] || tierData["bronze"];
+
+            icon.textContent = t.emoji;
+            title.textContent = t.label;
+            title.style.color = t.colour;
+
+            rolls.innerHTML = `
+                <div>+${rollsAwarded} roll${rollsAwarded > 1 ? "s" : ""} 🎲</div>
+                <div style="margin-top:8px; font-weight:bold;">
+                    Total: ${rollsRemaining} roll${rollsRemaining !== 1 ? "s" : ""}
+                </div>
+            `;
+
+            if (typeof burstConfetti === "function") burstConfetti(25);
+            if (navigator.vibrate) navigator.vibrate([50,30,50]);
+
+        }, 500);
+    }, 200);
 
     overlay.style.display = "flex";
     overlay.classList.add("chest-overlay-show");
-
-    // Confetti burst
-    if (typeof burstConfetti === "function") burstConfetti(25);
-    if (navigator.vibrate) navigator.vibrate([50, 30, 50]);
 
     // Auto-close after 1.4s
     setTimeout(() => {
@@ -349,6 +364,10 @@ function closeChestOverlay() {
 .chest-overlay-show .chest-reveal-card {
     transform: scale(1);
     opacity: 1;
+}
+
+.shake {
+    animation: chestShake 0.4s ease;
 }
 </style>
 

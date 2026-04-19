@@ -2751,35 +2751,80 @@ body {
     100% { transform: translateY(0) scale(1); }
 }
 /* =========================
-   CHEST OVERLAY FIX
+   CHEST OVERLAY (CLEAN)
 ========================= */
 
 #chest-overlay {
     position: fixed;
     inset: 0;
-    display: none !important;
+    display: none;
     justify-content: center;
     align-items: center;
-    z-index: -1 !important;
-    pointer-events: none !important;
-    visibility: hidden !important;
-    opacity: 0 !important;
+    background: rgba(0,0,0,0.85);
+    z-index: 9999;
+    transition: opacity .3s ease;
 }
 
 #chest-overlay.show {
-    display: flex !important;
-    pointer-events: auto !important;
-    z-index: 9999 !important;
-    visibility: visible !important;
-    opacity: 1 !important;
+    display: flex;
+    pointer-events: auto;
 }
 
 #chest-overlay.hidden {
-    display: none !important;
-    pointer-events: none !important;
-    z-index: -1 !important;
-    visibility: hidden !important;
-    opacity: 0 !important;
+    display: none;
+    pointer-events: none;
+}
+
+/* =========================
+   PREMIUM CHEST ANIMATION
+========================= */
+
+.chest-focus {
+    animation: chestFocus .4s ease;
+}
+
+@keyframes chestFocus {
+    0% { transform: scale(0.6); opacity: 0; }
+    60% { transform: scale(1.15); opacity: 1; }
+    100% { transform: scale(1); }
+}
+
+.chest-lid-open {
+    animation: lidOpen .5s ease forwards;
+    transform-origin: top;
+}
+
+@keyframes lidOpen {
+    0% { transform: rotateX(0deg); }
+    100% { transform: rotateX(-120deg); }
+}
+
+.chest-gold-glow {
+    box-shadow:
+        0 0 20px rgba(250,204,21,0.9),
+        0 0 40px rgba(250,204,21,0.6);
+}
+
+.chest-silver-glow {
+    box-shadow:
+        0 0 20px rgba(156,163,175,0.9),
+        0 0 40px rgba(156,163,175,0.6);
+}
+
+.chest-bronze-glow {
+    box-shadow:
+        0 0 20px rgba(180,83,9,0.9),
+        0 0 40px rgba(180,83,9,0.6);
+}
+
+.chest-burst {
+    animation: chestBurst .4s ease forwards;
+}
+
+@keyframes chestBurst {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.4); }
+    100% { transform: scale(0); opacity: 0; }
 }
 
 /* =========================
@@ -2804,9 +2849,8 @@ body {
     pointer-events: auto !important;
 }
 
-/* Kill ANY overlay blocking clicks */
+/* Kill hidden overlays blocking clicks */
 .board-overlay,
-#chest-overlay,
 .modal:not(.show) {
     pointer-events: none !important;
 }

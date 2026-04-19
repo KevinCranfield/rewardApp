@@ -1043,7 +1043,7 @@ let activityTimeout;
 
 function resetActivityTimer(){
     clearTimeout(activityTimeout);
-    activityTimeout = setTimeout(pingActivity, 2000);
+    activityTimeout = setTimeout(pingActivity, 20000);
 }
 
 ["click", "keydown", "touchstart"].forEach(evt => {
@@ -1298,10 +1298,39 @@ window.addEventListener("DOMContentLoaded", () => {
 
             if(typeof openChest === "function" && chestId){
                 try {
+                    // 🔥 PREMIUM CHEST UI TRIGGER
+                    const overlay = document.getElementById("chest-overlay");
+                    if(overlay){
+                        overlay.classList.add("show");
+                    }
+
+                    // Add focus + glow before open
+                    btn.classList.add("chest-focus");
+
+                    const tier = btn.dataset.tier || btn.classList.contains("chest-gold") ? "gold"
+                                : btn.classList.contains("chest-silver") ? "silver"
+                                : "bronze";
+
+                    if(tier === "gold") btn.classList.add("chest-gold-glow");
+                    if(tier === "silver") btn.classList.add("chest-silver-glow");
+                    if(tier === "bronze") btn.classList.add("chest-bronze-glow");
+
+                    // Lid open effect
+                    setTimeout(() => {
+                        btn.classList.add("chest-lid-open");
+                    }, 200);
+
                     openChest(btn);
                 } catch(err){
                     console.error(err);
-                    btn.classList.remove("chest-opening");
+                    btn.classList.remove(
+                        "chest-opening",
+                        "chest-focus",
+                        "chest-gold-glow",
+                        "chest-silver-glow",
+                        "chest-bronze-glow",
+                        "chest-lid-open"
+                    );
                     btn.disabled = false;
                 }
             } else {
