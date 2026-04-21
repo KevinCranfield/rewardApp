@@ -29,6 +29,7 @@ urlpatterns = [
     path("enter-pin/", views.enter_pin, name="enter_pin"),
     path("change-pin/", views.change_pin, name="change_pin"),
     path("ping-auth/", views.ping_auth, name="ping_auth"),
+    path("get-child-state/", views.get_child_state, name="get_child_state"),
 
     # 🔑 PASSWORD RESET
     path("forgot-password/", views.CustomPasswordResetView.as_view(

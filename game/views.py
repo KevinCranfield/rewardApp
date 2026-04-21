@@ -506,12 +506,34 @@ def sentry_test(request):
     return JsonResponse({"status": "ok"})
 
 
+
 # New function to check parent authentication via AJAX
 @login_required
 def ping_auth(request):
     if is_parent_authenticated(request):
         return JsonResponse({"authenticated": True})
     return JsonResponse({"authenticated": False}, status=401)
+
+
+# 🔥 New endpoint: return current roll state for a child
+@login_required
+def get_child_state(request):
+    family = get_family(request.user)
+    child_id = request.GET.get("child_id")
+
+    child = Child.objects.filter(id=child_id, family=family).first()
+
+    if not child:
+        return JsonResponse({"error": "Child not found"}, status=404)
+
+    rolls_remaining = Reward.objects.filter(
+        child=child,
+        is_used=False
+    ).count()
+
+    return JsonResponse({
+        "rolls_remaining": rolls_remaining
+    })
 
 
 # Custom password reset view

@@ -1378,16 +1378,6 @@ window.addEventListener("DOMContentLoaded", () => {
             console.log("CLICK CHEST:", chestId);
             console.log("CHEST HANDLER ACTIVE - PREMIUM");
 
-            // Let backend response control roll status — do NOT override UI here
-            setTimeout(() => {
-                const childId = document.querySelector(".child-view")?.dataset.childId;
-                if(childId){
-                    const rollBtn = document.querySelector(`.roll-btn[data-child="${childId}"]`);
-                    if(rollBtn){
-                        rollBtn.disabled = false;
-                    }
-                }
-            }, 1200);
 
             if(typeof openChest === "function" && chestId){
                 try {
@@ -1417,6 +1407,51 @@ window.addEventListener("DOMContentLoaded", () => {
                     }, 200);
 
                     openChest(btn);
+                    // 🔥 HARD SYNC: fetch latest roll state from backend after chest open
+                    setTimeout(() => {
+                        const childId = document.querySelector(".child-view")?.dataset.childId;
+                        if(!childId) return;
+
+                        fetch(`/get-child-state/?child_id=${childId}`, {
+                            credentials: "same-origin"
+                        })
+                        .then(res => res.json())
+                        .then(data => {
+                            if(data.rolls_remaining === undefined) return;
+
+                            const rollBtn = document.querySelector(`.roll-btn[data-child="${childId}"]`);
+                            const status = document.querySelector(`.roll-status[data-child="${childId}"]`) 
+                                           || document.querySelector(".roll-status");
+
+                            if(status){
+                                if(data.rolls_remaining > 0){
+                                    status.classList.remove("empty");
+                                    status.innerText = `🎯 ${data.rolls_remaining} roll${data.rolls_remaining === 1 ? '' : 's'} available`;
+                                    status.style.background = "transparent";
+                                    status.style.color = "#16a34a";
+                                } else {
+                                    status.classList.add("empty");
+                                    status.innerText = "⚠️ No more rolls — go earn another reward 🙂";
+                                }
+                            }
+
+                            if(rollBtn){
+                                const hasRolls = data.rolls_remaining > 0;
+                                rollBtn.disabled = !hasRolls;
+
+                                if(hasRolls){
+                                    rollBtn.classList.remove("disabled");
+                                    rollBtn.style.opacity = "1";
+                                    rollBtn.style.cursor = "pointer";
+                                } else {
+                                    rollBtn.classList.add("disabled");
+                                    rollBtn.style.opacity = "0.5";
+                                    rollBtn.style.cursor = "not-allowed";
+                                }
+                            }
+                        })
+                        .catch(err => console.error("Roll sync failed:", err));
+                    }, 700);
                     // 🎯 Trigger install after exciting moment (only if available)
                     if(document.body.dataset.pwaReady === "true"){
                         setTimeout(() => {
