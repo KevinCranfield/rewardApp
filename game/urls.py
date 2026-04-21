@@ -15,6 +15,7 @@ urlpatterns = [
     path("remove-child/<int:child_id>/", views.remove_child, name="remove_child"),
     path("add-reward/", views.add_reward, name="add_reward"),
     path("add-reward-type/", views.add_reward_type, name="add_reward_type"),
+    path("set-main-reward/", views.set_main_reward, name="set_main_reward"),
     path("roll/", views.roll, name="roll"),
     path("reset-board/", views.reset_board, name="reset_board"),
 
