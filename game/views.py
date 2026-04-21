@@ -67,8 +67,8 @@ def home(request):
     # add rolls_available for badge usage
     children_list = list(children)
     for c in children_list:
-        c.rolls_available = Reward.objects.filter(child=c, is_used=False).count()
-        c.unopened_chests_count = c.chests.filter(is_opened=False).count()
+        # properties handled on model; no manual assignment needed
+        pass
 
     return render(request, "game/home.html", {
         "children": children_list
@@ -111,8 +111,7 @@ def dashboard(request):
 
     for c in children:
         c.unopened_chests = c.chests.filter(is_opened=False)
-        c.unopened_chests_count = c.unopened_chests.count()
-        c.rolls_available = Reward.objects.filter(child=c, is_used=False).count()
+        # do NOT assign to c.unopened_chests_count or c.rolls_available (they are @property on the model)
 
     return render(request, "game/parentDashboard.html", {
         "children": children
@@ -132,10 +131,7 @@ def child_view(request, child_id):
 
     return render(request, "game/child.html", {
         "child": child,
-        "children": [
-            (lambda x: (setattr(x, 'rolls_available', Reward.objects.filter(child=x, is_used=False).count()) or setattr(x, 'unopened_chests_count', x.chests.filter(is_opened=False).count()) or x))(c)
-            for c in Child.objects.filter(family=family)
-        ],
+        "children": list(Child.objects.filter(family=family)),
         "chests": chests,
         "rolls_available": rolls_available,
         "squares": build_board(),
@@ -602,8 +598,8 @@ def setup_page(request):
 
     # add rolls_available for badge usage
     for c in children:
-        c.rolls_available = Reward.objects.filter(child=c, is_used=False).count()
-        c.unopened_chests_count = c.chests.filter(is_opened=False).count()
+        # properties handled on model; no manual assignment needed
+        pass
 
     # 🔥 Show rewards per child + defaults
     rewards = RewardType.objects.filter(
