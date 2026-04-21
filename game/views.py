@@ -90,12 +90,17 @@ def logout_view(request):
 
 @login_required
 def dashboard(request):
+    family = get_family(request.user)
+
+    # If no children yet → onboarding flow
+    if not family.children.exists():
+        return redirect("setup_page")
+
     if not is_parent_authenticated(request):
         return redirect("enter_pin")
 
     request.session["parent_auth_time"] = timezone.now().timestamp()
 
-    family = get_family(request.user)
     children = list(family.children.all())
 
     for c in children:
@@ -144,7 +149,15 @@ def add_child(request):
         colour = request.POST.get("colour")
 
         if name and colour:
-            Child.objects.create(family=family, name=name, colour=colour)
+            child = Child.objects.create(family=family, name=name, colour=colour)
+
+            # 🎁 Give first chest automatically (onboarding)
+            Chest.objects.create(
+                child=child,
+                tier="bronze",
+                reason="First reward 🎉",
+                is_opened=False
+            )
 
         # If AJAX request, return JSON
         if request.headers.get("x-requested-with") == "XMLHttpRequest":
@@ -510,7 +523,7 @@ def signup(request):
             from django.contrib.auth.models import User
             user = User.objects.create_user(username=username, password=password)
             login(request, user, backend='django.contrib.auth.backends.ModelBackend')
-            return redirect("dashboard")
+            return redirect("setup_page")
 
     return render(request, "game/signup.html")
 
