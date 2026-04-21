@@ -62,7 +62,7 @@
             + Add Reward
           </button>
 
-          <form method="POST" action="/remove-child/{{ child.id }}/" style="display:inline;">
+          <form method="POST" action="/remove-child/{{ child.id }}/" class="remove-child-form" data-child-id="{{ child.id }}" style="display:inline;">
             {% csrf_token %}
             <button type="submit" class="remove-child">Remove</button>
           </form>
@@ -294,6 +294,37 @@ function openRewardModal(childId, childName){
 function closeRewardModal(){
   document.getElementById('reward-modal').style.display = 'none';
 }
+
+// ⚡ Instant remove child (no reload)
+document.querySelectorAll(".remove-child-form").forEach(form => {
+  form.addEventListener("submit", function(e){
+    e.preventDefault();
+
+    const childCard = form.closest(".child-card");
+
+    fetch(form.action, {
+      method: "POST",
+      headers: {
+        "X-CSRFToken": form.querySelector("[name=csrfmiddlewaretoken]").value,
+        "X-Requested-With": "XMLHttpRequest"
+      }
+    })
+    .then(res => {
+      if(!res.ok) throw new Error("Failed");
+      return res.json().catch(() => ({}));
+    })
+    .then(() => {
+      if(childCard){
+        childCard.style.transition = "opacity 0.2s ease";
+        childCard.style.opacity = "0";
+        setTimeout(() => childCard.remove(), 200);
+      }
+    })
+    .catch(() => {
+      alert("Failed to remove child");
+    });
+  });
+});
 </script>
 
 {% endblock %}
