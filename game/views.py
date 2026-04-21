@@ -609,6 +609,29 @@ def add_reward_type(request):
 
     return redirect("setup_page")
 
+ 
+# 🎯 Set main reward (goal) for a child
+@login_required
+def set_main_reward(request):
+    if request.method == "POST":
+        family = get_family(request.user)
+
+        child_id = request.POST.get("child_id")
+        reward_id = request.POST.get("reward_id")
+
+        # prevent empty selection crash
+        if not child_id or not reward_id:
+            return redirect("setup_page")
+
+        child = Child.objects.filter(id=child_id, family=family).first()
+        reward = RewardType.objects.filter(id=reward_id).first()
+
+        if child and reward:
+            child.main_reward = reward
+            child.save()
+
+    return redirect("setup_page")
+
 # Custom password reset view
 class CustomPasswordResetView(PasswordResetView):
     template_name = "registration/password_reset_form.html"
