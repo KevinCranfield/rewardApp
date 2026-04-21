@@ -112,7 +112,7 @@ body.loaded{visibility:visible;}
 
         {% if children %}
             {% for c in children %}
-                <a href="/child/{{ c.id }}/" class="child-link">
+                <a href="/child/{{ c.id }}/" class="child-link nav-child" data-child-id="{{ c.id }}">
                     <span class="nav-dot" style="background: {{ c.colour }}"></span>
                     {{ c.name }}
                 </a>
