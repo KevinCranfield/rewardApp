@@ -9,6 +9,8 @@
 // 7. Dead animateLadder/animateSnake split + commented code removed
 // 8. burstConfetti capped at 60
 // 9. Removed duplicate broken .chest-btn click handlers (chest opening handled in child.html)
+// 10. FIX: pingActivity / resetActivityTimer now guarded by game-meta check
+//     — prevents 401 on unauthenticated pages (login, home, signup)
 // =============================================
 
 console.log("GAME JS VERSION: PREMIUM_CHEST_V2");
@@ -1042,6 +1044,14 @@ document.getElementById("resetBoardBtn")?.addEventListener("click", () => {
     });
 });
 
+// =============================================
+// PATCH 10: Activity timer guarded by game-meta
+// pingActivity / resetActivityTimer only start
+// when game-meta is present (i.e. authenticated
+// game page). Prevents spurious 401 on login,
+// signup, and home pages.
+// =============================================
+
 let activityTimeout;
 
 function resetActivityTimer(){
@@ -1049,11 +1059,14 @@ function resetActivityTimer(){
     activityTimeout = setTimeout(pingActivity, 20000);
 }
 
-["click", "keydown", "touchstart"].forEach(evt => {
-    document.addEventListener(evt, resetActivityTimer);
-});
+const gameMeta = document.getElementById("game-meta");
+if(gameMeta){
+    ["click", "keydown", "touchstart"].forEach(evt => {
+        document.addEventListener(evt, resetActivityTimer);
+    });
 
-resetActivityTimer();
+    resetActivityTimer();
+}
 
 document.addEventListener("DOMContentLoaded", () => {
     document.querySelectorAll("form.reward-form, form[action*='reward']").forEach(form => {
