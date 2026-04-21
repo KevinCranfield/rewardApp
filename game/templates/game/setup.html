@@ -19,9 +19,9 @@
 
     <form method="POST" action="/add-child/" class="child-form">
       {% csrf_token %}
-      <input type="text" name="name" placeholder="Child name" required>
-      <input type="color" name="colour" value="#3b82f6">
-      <button type="submit">+ Add Child</button>
+      <input class="child-input" type="text" name="name" placeholder="Child name" required>
+      <input class="child-colour" type="color" name="colour" value="#3b82f6">
+      <button class="child-btn" type="submit">+ Add Child</button>
     </form>
 
     <div class="children-grid">
@@ -105,6 +105,34 @@
   display: flex;
   gap: 10px;
   margin-bottom: 20px;
+  align-items: center;
+}
+
+.child-input {
+  padding: 8px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  flex: 1;
+}
+
+.child-colour {
+  width: 40px;
+  height: 40px;
+  border: none;
+  border-radius: 8px;
+}
+
+.child-btn {
+  background: #22c55e;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.child-btn:hover {
+  background: #16a34a;
 }
 
 .children-grid {
