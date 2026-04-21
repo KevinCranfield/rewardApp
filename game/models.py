@@ -37,6 +37,16 @@ class Child(models.Model):
         related_name="goal_for_children"
     )
 
+    # 🔢 Number of unopened chests (for UI badges)
+    @property
+    def unopened_chests_count(self):
+        return self.chests.filter(is_opened=False).count()
+
+    # 🎲 Total rolls available from unopened chests
+    @property
+    def rolls_available(self):
+        return sum(c.rolls_awarded for c in self.chests.filter(is_opened=False))
+
     def __str__(self):
         return self.name
 
