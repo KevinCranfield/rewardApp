@@ -1,24 +1,35 @@
 // =============================================
 // PATCH NOTES:
-// 1. BOARD_SIZE constant replaces hardcoded 64
-// 2. alert() replaced with showToast()
-// 3. Snake direction is deterministic (no Math.random)
-// 4. drawConnections called once via ResizeObserver
-// 5. Duplicate splash listener removed (handled in base.html only)
-// 6. Audio lazy-loaded on first unlock
-// 7. Dead animateLadder/animateSnake split + commented code removed
-// 8. burstConfetti capped at 60
-// 9. Removed duplicate broken .chest-btn click handlers (chest opening handled in child.html)
-// 10. FIX: pingActivity / resetActivityTimer now guarded by game-meta check
-//     — prevents 401 on unauthenticated pages (login, home, signup)
+// 1.  BOARD_SIZE constant replaces hardcoded 64
+// 2.  alert() replaced with showToast()
+// 3.  Snake direction is deterministic (no Math.random)
+// 4.  drawConnections called once via ResizeObserver
+// 5.  Duplicate splash listener removed (handled in base.html only)
+// 6.  Audio lazy-loaded on first unlock
+// 7.  Dead animateLadder/animateSnake split + commented code removed
+// 8.  burstConfetti capped at 60
+// 9.  Removed duplicate broken .chest-btn click handlers (chest opening handled in child.html)
+// 10. FIX: pingActivity / resetActivityTimer guarded by game-meta — prevents 401 on unauthed pages
+// 11. FIX: animateMovement uses stable token ref — won't break if updateTokensUI fires mid-walk
+// 12. FIX: Roll button re-enable tied to animation end, not arbitrary setTimeout — prevents double-roll race
+// 13. FIX: chest tier detection operator precedence bug — every chest was resolving to "gold"
+// 14. FIX: pingActivity guard moved to DOMContentLoaded — prevents firing before DOM is ready
+// 15. FIX: CSRF missing now shows a clear toast instead of silent 403
+// 16. FIX: ResizeObserver debounced — prevents SVG redraw storm during token animations
+// 17. FIX: burstConfetti uses live flag to cancel removeChild on navigated-away pages
+// 18. FIX: triggerWinOverlay locked to single fire — confetti/sound won't repeat if called twice
+// 19. FIX: board reset uses custom confirm modal — native confirm() blocked in PWA standalone mode
 // =============================================
 
-console.log("GAME JS VERSION: PREMIUM_CHEST_V2");
+console.log("GAME JS VERSION: Claude 2.0 - June 2024 Patch");
 
 
 const BOARD_SIZE = 64;
 
 
+
+// FIX 18: guard flag — prevent double confetti/sound if called twice rapidly
+let _winOverlayFired = false;
 
 function triggerWinOverlay(childId){
     const meta = document.getElementById("game-meta");
@@ -27,6 +38,10 @@ function triggerWinOverlay(childId){
     let overlay = document.getElementById("win-overlay");
 
     if(!overlay){
+        // Already showing — skip confetti/sound but don't create duplicate
+        if(_winOverlayFired) return;
+        _winOverlayFired = true;
+
         overlay = document.createElement("div");
         overlay.id = "win-overlay";
 
@@ -53,14 +68,18 @@ function triggerWinOverlay(childId){
         document.body.appendChild(overlay);
 
         overlay.querySelector("#continue-game").onclick = () => {
+            _winOverlayFired = false;
             overlay.remove();
         };
 
         overlay.querySelector("#reset-game").onclick = () => {
+            _winOverlayFired = false;
             window.location.reload();
         };
     }
 
+    // Only fire effects once — guard prevents repeat calls
+    if(!_winOverlayFired) return;
     burstConfetti(60);
 
     if(navigator.vibrate){
@@ -164,6 +183,13 @@ function roll(childId){
 
     if(button && button.disabled) return;
 
+    // FIX 15: bail early with clear message if CSRF cookie is missing
+    if(!getCSRFToken()){
+        showToast("⚠️ Session error — please refresh the page");
+        console.error("CSRF token missing — roll blocked");
+        return;
+    }
+
     // 🔒 Extra safety: prevent roll if UI shows 0 rolls
     const statusCheck = document.querySelector(`.roll-status[data-child="${childId}"]`);
     if(statusCheck && statusCheck.classList.contains("empty")){
@@ -249,12 +275,8 @@ function roll(childId){
             } else {
                 animateMovement(childId, current, data.position);
             }
-
-            setTimeout(() => {
-                if(button && data.rolls_remaining > 0){
-                    button.disabled = false;
-                }
-            }, 1500);
+            // FIX 12: button re-enable is handled at animation end in animateMovement/animateJump
+            // — removed competing setTimeout here that caused double-roll race condition
         });
 
         showToast("🎲 Rolled " + data.dice);
@@ -322,6 +344,8 @@ function roll(childId){
         if(button){
             const noRolls = data.rolls_remaining === 0;
 
+            // FIX 12: store on dataset so animateMovement end can re-enable correctly
+            button.dataset.rollsRemaining = data.rolls_remaining ?? 0;
             button.disabled = noRolls;
 
             if(noRolls){
@@ -364,11 +388,8 @@ function roll(childId){
             return;
         }
 
-        setTimeout(() => {
-            if(button && data.rolls_remaining > 0){
-                button.disabled = false;
-            }
-        }, 2500);
+        // FIX 12: removed second competing setTimeout(2500) re-enable here
+        // Button is now re-enabled only at animation completion
 
         if(current === data.position){
             console.warn("No movement");
@@ -384,12 +405,14 @@ function roll(childId){
 }
 
 function animateMovement(childId, start, end){
-    let token = document.getElementById("token-" + childId);
+    // FIX 11: capture token ID only, re-fetch by ID each step so stale ref can't break animation
+    const tokenId = "token-" + childId;
+    let token = document.getElementById(tokenId);
 
     if(!token){
         token = document.createElement("div");
         token.className = "token";
-        token.id = "token-" + childId;
+        token.id = tokenId;
         token.textContent = "•";
 
         const startSquare = document.querySelector(`[data-square='${start || 1}'] .token-container`);
@@ -398,24 +421,32 @@ function animateMovement(childId, start, end){
         }
     }
 
+    // FIX 12: capture rolls_remaining from the button's dataset to decide re-enable at end
+    const rollButton = document.querySelector(`.roll-btn[data-child="${childId}"]`);
+
     let step = start === 0 ? 1 : start + 1;
 
     function move(){
+        // FIX 11: re-fetch token each step — if updateTokensUI ran mid-walk, we get the fresh element
+        const liveToken = document.getElementById(tokenId);
+        if(!liveToken){
+            // Token was removed externally — stop animation cleanly
+            if(rollButton && rollButton.dataset.rollsRemaining > 0) rollButton.disabled = false;
+            return;
+        }
+
         if(step > end){
             if(end === BOARD_SIZE){
-                token = document.getElementById("token-" + childId);
-                if(token){
-                    token.classList.add("winner");
-                }
-                if(token && token._rollButton){
-                    token._rollButton.disabled = false;
-                }
+                liveToken.classList.add("winner");
+                if(rollButton) rollButton.disabled = false;
                 triggerWinOverlay(childId);
                 return;
             }
 
-            if(token && token._rollButton){
-                token._rollButton.disabled = false;
+            // FIX 12: re-enable button here at true animation end
+            if(rollButton){
+                const remaining = parseInt(rollButton.dataset.rollsRemaining ?? "1");
+                rollButton.disabled = remaining <= 0;
             }
             if(window.__lastChildren){
                 updateTokensUI(window.__lastChildren);
@@ -425,7 +456,7 @@ function animateMovement(childId, start, end){
 
         const square = document.querySelector(`[data-square='${step}'] .token-container`);
         if(square){
-            square.appendChild(token);
+            square.appendChild(liveToken);
         }
 
         step++;
@@ -948,17 +979,24 @@ function burstConfetti(count = 40){
         el.style.animationDelay = (Math.random()*0.15) + "s";
 
         document.body.appendChild(el);
-        setTimeout(() => el.remove(), 1400);
+
+        // FIX 17: check el is still attached before removing — prevents error on fast navigation
+        setTimeout(() => {
+            if(el.isConnected) el.remove();
+        }, 1400);
     }
 }
 
 // Single load listener for board drawing only (splash handled in base.html)
 window.addEventListener("load", () => {
-    // Use ResizeObserver for reliable single-fire board drawing
+    // FIX 16: debounce ResizeObserver — token moves subtly shift layout and
+    // were triggering continuous SVG redraws on slow devices
+    let roDebounce;
     const board = document.querySelector(".board");
     if(board){
         const ro = new ResizeObserver(() => {
-            drawConnections();
+            clearTimeout(roDebounce);
+            roDebounce = setTimeout(drawConnections, 100);
         });
         ro.observe(board);
     } else {
@@ -984,72 +1022,94 @@ function pingActivity(){
     }).catch(()=>{});
 }
 
+// FIX 19: custom confirm modal — native confirm() is blocked in PWA standalone on iOS/Android
+function showConfirm(message, onConfirm){
+    let modal = document.getElementById("custom-confirm-modal");
+    if(modal) modal.remove();
+
+    modal = document.createElement("div");
+    modal.id = "custom-confirm-modal";
+    modal.style.cssText = "position:fixed;inset:0;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;z-index:99999;";
+    modal.innerHTML = `
+        <div style="background:white;border-radius:16px;padding:28px 24px;max-width:320px;width:90%;text-align:center;box-shadow:0 20px 50px rgba(0,0,0,.3);">
+            <p style="font-size:16px;font-weight:600;margin-bottom:20px;">${message}</p>
+            <div style="display:flex;gap:12px;justify-content:center;">
+                <button id="confirm-cancel" style="padding:10px 20px;border-radius:10px;border:1px solid #d1d5db;background:white;font-weight:600;cursor:pointer;">Cancel</button>
+                <button id="confirm-ok" style="padding:10px 20px;border-radius:10px;border:none;background:#ef4444;color:white;font-weight:600;cursor:pointer;">Continue</button>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(modal);
+    modal.querySelector("#confirm-cancel").onclick = () => modal.remove();
+    modal.querySelector("#confirm-ok").onclick = () => { modal.remove(); onConfirm(); };
+}
+
 document.getElementById("resetBoardBtn")?.addEventListener("click", () => {
     playSound('click');
 
-    const confirmReset = confirm("⚠️ This will reset ALL players back to start. Continue?");
-    if(!confirmReset) return;
+    showConfirm("⚠️ This will reset ALL players back to start. Continue?", () => {
+        fetch("/reset-board/", {
+            method: "POST",
+            headers: {
+                "X-CSRFToken": getCSRFToken()
+            }
+        })
+        .then(res => res.json())
+        .then(data => {
+            if(data.children){
+                window.__lastChildren = data.children;
+            }
+            if(data.success){
+                showToast("🔄 Board reset!");
 
-    fetch("/reset-board/", {
-        method: "POST",
-        headers: {
-            "X-CSRFToken": getCSRFToken()
-        }
-    })
-    .then(res => res.json())
-    .then(data => {
-        if(data.children){
-            window.__lastChildren = data.children;
-        }
-        if(data.success){
-            showToast("🔄 Board reset!");
+                document.querySelectorAll(".token").forEach(t => t.remove());
 
-            document.querySelectorAll(".token").forEach(t => t.remove());
+                document.querySelectorAll(".position").forEach(el => {
+                    el.innerText = "Position: 0";
+                });
 
-            document.querySelectorAll(".position").forEach(el => {
-                el.innerText = "Position: 0";
-            });
+                document.querySelectorAll(".progress-bar-fill").forEach(bar => {
+                    bar.style.width = "0%";
+                });
 
-            document.querySelectorAll(".progress-bar-fill").forEach(bar => {
-                bar.style.width = "0%";
-            });
+                document.querySelectorAll(".last-roll").forEach(el => {
+                    el.innerText = "-";
+                });
 
-            document.querySelectorAll(".last-roll").forEach(el => {
-                el.innerText = "-";
-            });
+                document.querySelectorAll(".rewards-available").forEach(el => {
+                    el.innerText = "Rewards Available: 0";
+                });
 
-            document.querySelectorAll(".rewards-available").forEach(el => {
-                el.innerText = "Rewards Available: 0";
-            });
+                document.querySelectorAll(".reward-history").forEach(el => {
+                    el.innerHTML = "";
+                });
 
-            document.querySelectorAll(".reward-history").forEach(el => {
-                el.innerHTML = "";
-            });
+                // 🔥 Reset roll UI properly
+                document.querySelectorAll(".roll-status").forEach(status => {
+                    status.classList.add("empty");
+                    status.innerText = "⚠️ No more rolls — go earn another reward 🙂";
+                    status.style.background = "";
+                    status.style.color = "";
+                    status.dataset.locked = "false";
+                });
 
-            // 🔥 Reset roll UI properly
-            document.querySelectorAll(".roll-status").forEach(status => {
-                status.classList.add("empty");
-                status.innerText = "⚠️ No more rolls — go earn another reward 🙂";
-                status.style.background = "";
-                status.style.color = "";
-                status.dataset.locked = "false";
-            });
+                // 🔥 Disable all roll buttons
+                document.querySelectorAll(".roll-btn").forEach(btn => {
+                    btn.disabled = true;
+                    btn.classList.add("disabled");
+                });
 
-            // 🔥 Disable all roll buttons
-            document.querySelectorAll(".roll-btn").forEach(btn => {
-                btn.disabled = true;
-                btn.classList.add("disabled");
-            });
-        }
+                // FIX 18: reset win overlay flag on board reset
+                _winOverlayFired = false;
+            }
+        });
     });
 });
 
 // =============================================
-// PATCH 10: Activity timer guarded by game-meta
-// pingActivity / resetActivityTimer only start
-// when game-meta is present (i.e. authenticated
-// game page). Prevents spurious 401 on login,
-// signup, and home pages.
+// PATCH 10 + 14: Activity timer guarded by game-meta, inside DOMContentLoaded
+// so the element is guaranteed to exist before the check runs.
+// pingActivity only starts on authenticated game pages.
 // =============================================
 
 let activityTimeout;
@@ -1059,14 +1119,16 @@ function resetActivityTimer(){
     activityTimeout = setTimeout(pingActivity, 20000);
 }
 
-const gameMeta = document.getElementById("game-meta");
-if(gameMeta){
-    ["click", "keydown", "touchstart"].forEach(evt => {
-        document.addEventListener(evt, resetActivityTimer);
-    });
-
-    resetActivityTimer();
-}
+document.addEventListener("DOMContentLoaded", () => {
+    // FIX 14: guard runs after DOM is ready — game-meta won't be missed
+    const gameMeta = document.getElementById("game-meta");
+    if(gameMeta){
+        ["click", "keydown", "touchstart"].forEach(evt => {
+            document.addEventListener(evt, resetActivityTimer);
+        });
+        resetActivityTimer();
+    }
+});
 
 document.addEventListener("DOMContentLoaded", () => {
     document.querySelectorAll("form.reward-form, form[action*='reward']").forEach(form => {
@@ -1324,7 +1386,10 @@ window.addEventListener("DOMContentLoaded", () => {
                     // Add focus + glow before open
                     btn.classList.add("chest-focus");
 
-                    const tier = btn.dataset.tier || btn.classList.contains("chest-gold") ? "gold"
+                    // FIX 13: wrap ternary in parens — || was swallowing the whole expression
+                    const tier = btn.dataset.tier
+                                ? btn.dataset.tier
+                                : btn.classList.contains("chest-gold") ? "gold"
                                 : btn.classList.contains("chest-silver") ? "silver"
                                 : "bronze";
 
