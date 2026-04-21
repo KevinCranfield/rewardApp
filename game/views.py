@@ -10,7 +10,7 @@ import json
 
 from django.contrib.auth.views import PasswordResetView
 
-from .models import Family, Child, Roll, Reward, Chest
+from .models import Family, Child, Roll, Reward, Chest, RewardType
 
 
 PARENT_AUTH_TIMEOUT = 300
@@ -533,6 +533,23 @@ def get_child_state(request):
 
     return JsonResponse({
         "rolls_remaining": rolls_remaining
+    })
+
+
+
+
+# ⚙️ Setup page for parents
+@login_required
+def setup_page(request):
+    family = get_family(request.user)
+
+    children = family.children.all()
+
+    rewards = RewardType.objects.filter(user=request.user) | RewardType.objects.filter(is_default=True)
+
+    return render(request, "game/setup.html", {
+        "children": children,
+        "rewards": rewards,
     })
 
 
