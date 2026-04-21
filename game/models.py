@@ -104,6 +104,15 @@ class RewardType(models.Model):
     name = models.CharField(max_length=100)
     image = models.ImageField(upload_to="rewards/", blank=True, null=True)
 
+    # 🔥 NEW: tie reward to a specific child (optional for defaults)
+    child = models.ForeignKey(
+        'Child',
+        null=True,
+        blank=True,
+        on_delete=models.CASCADE,
+        related_name="reward_types"
+    )
+
     is_default = models.BooleanField(default=False)
     user = models.ForeignKey(User, null=True, blank=True, on_delete=models.CASCADE)
 
