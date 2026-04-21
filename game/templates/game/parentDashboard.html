@@ -27,7 +27,7 @@
                 </div>
 
                 <div class="child-info" data-rolls>
-                    Chests waiting: {{ child.unopened_chests|length }}
+                    Chests waiting: {{ child.unopened_chests.count }}
                 </div>
 
                 <div class="reward-section">
@@ -68,21 +68,24 @@
                 </div>
 
                 <div class="reward-history">
-                    {% for reward in child.all_rewards|slice:":5" %}
-                        <div class="reward-item">
-                            <span>
-                                🎁 {{ reward.reason }}
-                                {% if reward.custom_text %}
-                                    - {{ reward.custom_text }}
-                                {% endif %}
-                            </span>
-                            <span class="reward-date">
-                                {{ reward.created_at|date:"d M H:i" }}
-                            </span>
-                        </div>
-                    {% empty %}
+                    {% if child.unopened_chests.count > 0 %}
+                        {% for reward in child.all_rewards|slice:":5" %}
+                            <div class="reward-item">
+                                <span>
+                                    🎁 {{ reward.reason }}
+                                    {% if reward.custom_text %}
+                                        - {{ reward.custom_text }}
+                                    {% endif %}
+                                </span>
+                                <span class="reward-date">
+                                    {{ reward.created_at|date:"d M H:i" }}
+                                </span>
+                            </div>
+                        {% empty %}
+                        {% endfor %}
+                    {% else %}
                         <div class="no-rewards">⚠️ No chests yet — add one above to create a chest</div>
-                    {% endfor %}
+                    {% endif %}
                 </div>
 
                 <a href="/child/{{ child.id }}/" class="play-btn">🎮 Play</a>

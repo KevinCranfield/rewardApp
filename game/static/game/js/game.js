@@ -134,6 +134,9 @@ function unlockSounds(){
 }
 
 function showToast(message, duration){
+    if(message && message.includes("roll")){
+        return; // disable roll-related popups
+    }
     const toast = document.getElementById("toast");
     if(!toast) return;
 
@@ -1280,7 +1283,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 if(data.success){
                     const count = data.count || 1;
-                    showToast(`🎉 +${count} roll${count > 1 ? 's' : ''} added!`);
+                    
 
                     const card = form.closest('.card');
                     if(card){
