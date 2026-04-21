@@ -1607,7 +1607,7 @@ function triggerInstallPrompt(){
     });
 }
 // =========================
-// REMOVE CHILD (force reload fix)
+// REMOVE CHILD (dynamic no reload)
 // =========================
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -1616,6 +1616,8 @@ document.addEventListener("DOMContentLoaded", () => {
             e.preventDefault();
 
             const childId = btn.dataset.childId;
+            const childCard = btn.closest(".child-card");
+
             if(!childId) return;
 
             showConfirm("Remove this child?", () => {
@@ -1628,8 +1630,35 @@ document.addEventListener("DOMContentLoaded", () => {
                 .then(res => res.json())
                 .then(data => {
                     if(data.success){
-                        // 🔥 CRITICAL: reload ensures navbar + limits update
-                        window.location.reload();
+                        // ✅ Remove card from setup UI
+                        if(childCard){
+                            childCard.style.transition = "opacity .25s ease, transform .25s ease";
+                            childCard.style.opacity = "0";
+                            childCard.style.transform = "scale(0.95)";
+                            setTimeout(() => childCard.remove(), 250);
+                        }
+
+                        // ✅ Remove from navbar
+                        document.querySelectorAll(`[data-child-id="${childId}"]`).forEach(el => el.remove());
+
+                        // ✅ Re-enable Add Child button if it was disabled
+                        const addBtn = document.querySelector(".child-btn[disabled]");
+                        if(addBtn){
+                            addBtn.disabled = false;
+                            addBtn.textContent = "+ Add Child";
+                            addBtn.classList.remove("disabled");
+                            addBtn.style.opacity = "1";
+                            addBtn.style.cursor = "pointer";
+                        }
+
+                        // ✅ Empty state if no children remain
+                        const container = document.querySelector(".children-list");
+                        if(container && container.children.length === 0){
+                            container.innerHTML = "<p>No children added yet</p>";
+                        }
+
+                        showToast("Child removed");
+
                     } else {
                         showToast(data.error || "Error removing child");
                     }
