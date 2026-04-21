@@ -21,7 +21,7 @@
 // 19. FIX: board reset uses custom confirm modal — native confirm() blocked in PWA standalone mode
 // =============================================
 
-console.log("🔥 GAME JS VERSION: REMOVE CHILD + NAV FIX LIVE v2.1");
+console.log("🔥 GAME JS VERSION: REMOVE CHILD + NAV FIX LIVE v2.11");
 
 
 const BOARD_SIZE = 64;
