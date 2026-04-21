@@ -21,7 +21,7 @@
 // 19. FIX: board reset uses custom confirm modal — native confirm() blocked in PWA standalone mode
 // =============================================
 
-console.log("GAME JS VERSION: Claude 2.0 - June 2024 Patch");
+console.log("GAME JS VERSION: 2024-06-17.1 - Patch notes in comments of game.js");
 
 
 const BOARD_SIZE = 64;
@@ -413,7 +413,19 @@ function animateMovement(childId, start, end){
         token = document.createElement("div");
         token.className = "token";
         token.id = tokenId;
-        token.textContent = "•";
+
+        // FIX: pull colour + name from lastChildren cache so token
+        // renders correctly without needing a page refresh
+        const cached = (window.__lastChildren || []).find(c => String(c.id) === String(childId));
+        token.textContent = cached?.name ? cached.name[0].toUpperCase() : "•";
+        if(cached?.colour){
+            token.style.background = cached.colour;
+        }
+        token.style.color = "white";
+        token.style.display = "flex";
+        token.style.alignItems = "center";
+        token.style.justifyContent = "center";
+        token.style.fontWeight = "bold";
 
         const startSquare = document.querySelector(`[data-square='${start || 1}'] .token-container`);
         if(startSquare){

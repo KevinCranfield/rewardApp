@@ -114,6 +114,9 @@ def child_view(request, child_id):
     chests = child.chests.filter(is_opened=False)
     rolls_available = Reward.objects.filter(child=child, is_used=False).count()
 
+    # Pass child.rolls_available so the template can use it
+    child.rolls_available = rolls_available
+
     return render(request, "game/child.html", {
         "child": child,
         "children": [child],
@@ -132,7 +135,6 @@ def add_child(request):
 
         if name and colour:
             Child.objects.create(family=family, name=name, colour=colour)
-
 
     return redirect("dashboard")
 
@@ -237,7 +239,6 @@ def add_reward(request):
         "tier": chest.tier,
         "rolls": chest.rolls_awarded
     })
-    
 
 
 @login_required
@@ -300,9 +301,15 @@ def open_chest(request):
         "rolls_awarded": rolls_to_award,
         "total_rolls": total_rolls
     })
-    
 
 
+# =============================================================
+# FIX: roll() now returns a `children` array in the response.
+# This gives game.js the colour + name data it needs to render
+# the token correctly after each roll, without a page refresh.
+# Previously the token was created as a plain dot with no colour
+# because window.__lastChildren was never populated from /roll/.
+# =============================================================
 @login_required
 @require_POST
 def roll(request):
@@ -326,6 +333,10 @@ def roll(request):
 
     start_position = child.position
     new_position = child.position + roll_value
+
+    # Cap at board size — don't overshoot square 64
+    if new_position > 64:
+        new_position = 64
 
     # Snakes & ladders mapping
     snakes = {
@@ -370,6 +381,19 @@ def roll(request):
 
     remaining = Reward.objects.filter(child=child, is_used=False).count()
 
+    # FIX: build children array so JS can colour tokens correctly
+    # Include all children in the family so multi-child boards stay in sync
+    all_children = Child.objects.filter(family=family)
+    children_data = [
+        {
+            "id": c.id,
+            "name": c.name,
+            "colour": c.colour,
+            "position": c.position,
+        }
+        for c in all_children
+    ]
+
     return JsonResponse({
         "success": True,
         "dice": roll_value,
@@ -378,6 +402,7 @@ def roll(request):
         "rolls_remaining": remaining,
         "jump": jump_to is not None,
         "from": jump_from,
+        "children": children_data,   # FIX: token colour data for JS
     })
 
 
@@ -410,7 +435,10 @@ def remove_child(request, child_id):
     return JsonResponse({"success": True})
 
 
-# New function to reset the board for all children in the family
+# =============================================================
+# FIX: reset_board() now returns children array so JS can
+# re-render all tokens at position 0 without a page reload.
+# =============================================================
 @login_required
 @require_POST
 def reset_board(request):
@@ -422,11 +450,25 @@ def reset_board(request):
         child.position = 0
         child.save()
 
-    # 🔥 THIS was your bug
     Chest.objects.filter(child__family=family).delete()
     Reward.objects.filter(child__family=family).delete()
 
-    return JsonResponse({"success": True})
+    # FIX: return children so JS updateTokensUI can reset board visually
+    children_data = [
+        {
+            "id": c.id,
+            "name": c.name,
+            "colour": c.colour,
+            "position": c.position,
+        }
+        for c in children
+    ]
+
+    return JsonResponse({
+        "success": True,
+        "children": children_data,
+    })
+
 
 def signup(request):
     if request.method == "POST":
@@ -462,7 +504,6 @@ def change_pin(request):
 @login_required
 def sentry_test(request):
     return JsonResponse({"status": "ok"})
-
 
 
 # New function to check parent authentication via AJAX
