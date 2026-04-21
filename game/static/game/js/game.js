@@ -1508,12 +1508,6 @@ window.addEventListener("DOMContentLoaded", () => {
 
                     // Run after DOM updates (2 frames)
                     requestAnimationFrame(() => requestAnimationFrame(syncRollUI));
-                    // 🎯 Trigger install after exciting moment (only if available)
-                    if(document.body.dataset.pwaReady === "true"){
-                        setTimeout(() => {
-                            triggerInstallPrompt();
-                        }, 800);
-                    }
                     setTimeout(() => {
                         const overlay = document.getElementById("chest-overlay");
                         if(overlay){
