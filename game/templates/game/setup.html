@@ -35,7 +35,7 @@
             {% csrf_token %}
             <input type="hidden" name="child_id" value="{{ child.id }}">
 
-            <select name="reward_id">
+            <select name="reward_id" required>
               <option value="">Select goal</option>
               {% for reward in rewards %}
                 <option value="{{ reward.id }}"
@@ -118,7 +118,7 @@
   padding: 15px;
   border-radius: 12px;
   text-align: center;
-  width: 120px;
+  width: 160px;
   min-height: 220px;
 }
 
@@ -174,7 +174,10 @@
 
   .main-reward-form select {
     font-size: 12px;
-    padding: 3px;
+    padding: 6px;
+    width: 100%;
+    border-radius: 6px;
+    border: 1px solid #ccc;
   }
 
   .main-reward-form button {
@@ -183,8 +186,9 @@
     color: white;
     border: none;
     border-radius: 6px;
-    padding: 4px;
+    padding: 6px;
     cursor: pointer;
+    width: 100%;
   }
 
   .main-reward-form button:hover {
