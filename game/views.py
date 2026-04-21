@@ -131,7 +131,7 @@ def child_view(request, child_id):
     child = get_object_or_404(Child, id=child_id, family=family)
 
     chests = child.chests.filter(is_opened=False)
-    rolls_available = Reward.objects.filter(child=child, is_used=False).count()
+    rolls_available = None  # rolls only update after chest is opened (handled via open_chest API)
 
     # Pass child.rolls_available so the template can use it
     # child.rolls_available = rolls_available
@@ -140,7 +140,7 @@ def child_view(request, child_id):
         "child": child,
         "children": list(Child.objects.filter(family=family)),
         "chests": chests,
-        "rolls_available": rolls_available,
+        "rolls_available": Reward.objects.filter(child=child, is_used=False).count(),
         "squares": build_board(),
     })
 

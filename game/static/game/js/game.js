@@ -1553,12 +1553,65 @@ window.addEventListener("DOMContentLoaded", () => {
     });
 });
 
+
 /* =========================
    CHEST OPEN SYSTEM
    NOTE: openChest() is defined in child.html (inline script) because
    it needs access to showChestReveal(). game.js only provides
    killChestOverlay() as a utility for cleanup from other contexts.
 ========================= */
+
+// 🔧 PATCH: enforce correct open chest endpoint (fix 404)
+window.openChest = async function(chestId){
+    console.log("OPEN CHEST FUNCTION CALLED:", chestId);
+
+    try{
+        const res = await fetch(`/open-chest/${chestId}/`, {
+            method: "POST",
+            headers: {
+                "X-CSRFToken": getCSRFToken(),
+                "Content-Type": "application/json"
+            },
+            credentials: "same-origin"
+        });
+
+        if(!res.ok){
+            console.error("Open chest failed:", res.status);
+            showToast("⚠️ Failed to open chest");
+            return;
+        }
+
+        const data = await res.json();
+        console.log("CHEST RESPONSE:", data);
+
+        if(data.success){
+            // update rolls immediately from backend truth
+            if(data.rolls !== undefined){
+                const status = document.querySelector(".roll-status");
+                if(status){
+                    status.innerText = data.rolls === 1
+                        ? "🎯 1 roll available"
+                        : `🎯 ${data.rolls} rolls available`;
+
+                    if(data.rolls > 0){
+                        status.classList.remove("empty");
+                    }
+                }
+            }
+
+            // optional: show reward popup if returned
+            if(data.reward){
+                showReward(data.reward);
+            }
+        } else {
+            showToast(data.error || "⚠️ Error opening chest");
+        }
+
+    } catch(err){
+        console.error(err);
+        showToast("⚠️ Network error");
+    }
+};
 
 function killChestOverlay(){
     // Remove by ID
