@@ -140,7 +140,7 @@ def child_view(request, child_id):
         "child": child,
         "children": list(Child.objects.filter(family=family)),
         "chests": chests,
-        "rolls_available": Reward.objects.filter(child=child, is_used=False).count(),
+        "rolls_available": 0,
         "squares": build_board(),
     })
 
