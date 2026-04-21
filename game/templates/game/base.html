@@ -229,7 +229,7 @@ window.addEventListener("load", () => {
             {% if children %}
                 {% with total_chests=0 %}
                     {% for c in children %}
-                        {% with total_chests=total_chests|add:c.unopened_chests.count %}{% endwith %}
+                        {% with total_chests=total_chests|add:c.unopened_chests_count %}{% endwith %}
                     {% endfor %}
                     {% if total_chests > 0 %}
                         <span class="nav-badge">{{ total_chests }}</span>
