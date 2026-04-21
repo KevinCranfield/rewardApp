@@ -6,6 +6,16 @@
 
   <h1>🎮 Setup Your Reward Game</h1>
 
+  <div class="onboarding-box">
+    👋 Let’s get started:
+    <ol>
+      <li>Add your child</li>
+      <li>Pick a goal reward 🎯</li>
+      <li>Give first reward 🎁</li>
+      <li>Start playing 🎲</li>
+    </ol>
+  </div>
+
   {% if not request.user.is_premium %}
   <div class="upgrade-banner">
     🔒 Free plan: 1 child, bronze chests only  
@@ -21,7 +31,13 @@
       {% csrf_token %}
       <input class="child-input" type="text" name="name" placeholder="Child name" required>
       <input class="child-colour" type="color" name="colour" value="#3b82f6">
-      <button class="child-btn" type="submit">+ Add Child</button>
+      {% if not request.user.is_premium and children|length >= 1 %}
+        <button class="child-btn" type="button" disabled title="Upgrade to add more children">
+          🔒 Upgrade for more children
+        </button>
+      {% else %}
+        <button class="child-btn" type="submit">+ Add Child</button>
+      {% endif %}
     </form>
 
     <div class="children-grid">
@@ -57,10 +73,19 @@
             {% endfor %}
           </div>
 
-          <!-- ➕ Add reward button (opens modal) -->
-          <button class="add-reward-btn" onclick="openRewardModal({{ child.id }}, '{{ child.name|escapejs }}')">
-            + Add Reward
-          </button>
+          {% if child.reward_types.count == 0 %}
+            <button class="add-reward-btn" onclick="openRewardModal({{ child.id }}, '{{ child.name|escapejs }}')">
+              🎁 Give First Reward
+            </button>
+          {% else %}
+            <button class="add-reward-btn" onclick="openRewardModal({{ child.id }}, '{{ child.name|escapejs }}')">
+              + Add Reward
+            </button>
+          {% endif %}
+
+          {% if child.reward_types.count > 0 %}
+            <a href="/child/{{ child.id }}/" class="start-game-btn">🎮 Play</a>
+          {% endif %}
 
           <form method="POST" action="/remove-child/{{ child.id }}/" class="remove-child-form" data-child-id="{{ child.id }}" style="display:inline;">
             {% csrf_token %}
@@ -259,6 +284,33 @@
 
 .add-reward-btn:hover {
   background: #16a34a;
+}
+
+.onboarding-box {
+  background: #eef2ff;
+  padding: 10px;
+  border-radius: 10px;
+  margin-bottom: 15px;
+  font-size: 13px;
+}
+
+.onboarding-box ol {
+  margin: 5px 0 0 15px;
+}
+
+.start-game-btn {
+  display: block;
+  margin-top: 8px;
+  background: #3b82f6;
+  color: white;
+  padding: 6px;
+  border-radius: 8px;
+  text-decoration: none;
+  font-size: 12px;
+}
+
+.start-game-btn:hover {
+  background: #2563eb;
 }
 </style>
 
