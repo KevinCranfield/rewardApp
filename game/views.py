@@ -64,8 +64,13 @@ def home(request):
         family = get_family(request.user)
         children = family.children.all()
 
+    # add rolls_available for badge usage
+    children_list = list(children)
+    for c in children_list:
+        c.rolls_available = Reward.objects.filter(child=c, is_used=False).count()
+
     return render(request, "game/home.html", {
-        "children": children
+        "children": children_list
     })
 
 def login_view(request):
@@ -587,7 +592,11 @@ def get_child_state(request):
 def setup_page(request):
     family = get_family(request.user)
 
-    children = family.children.all()
+    children = list(family.children.all())
+
+    # add rolls_available for badge usage
+    for c in children:
+        c.rolls_available = Reward.objects.filter(child=c, is_used=False).count()
 
     # 🔥 Show rewards per child + defaults
     rewards = RewardType.objects.filter(

@@ -10,8 +10,8 @@
     👋 Let’s get started:
     <ol>
       <li>Add your child</li>
-      <li>Pick a goal reward 🎯</li>
-      <li>Give first reward 🎁</li>
+      <li>Add rewards 🎁</li>
+      <li>Pick a goal 🎯</li>
       <li>Start playing 🎲</li>
     </ol>
   </div>
@@ -31,6 +31,7 @@
       {% csrf_token %}
       <input class="child-input" type="text" name="name" placeholder="Child name" required>
       <input class="child-colour" type="color" name="colour" value="#3b82f6">
+
       {% if not request.user.is_premium and children|length >= 1 %}
         <button class="child-btn" type="button" disabled title="Upgrade to add more children">
           🔒 Upgrade for more children
@@ -311,6 +312,10 @@
 
 .start-game-btn:hover {
   background: #2563eb;
+}
+
+.setup-actions {
+  margin-bottom: 20px;
 }
 </style>
 

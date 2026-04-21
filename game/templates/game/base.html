@@ -50,6 +50,30 @@ body.loaded{visibility:visible;}
     opacity:0;
     transform:scale(1.05);
 }
+
+.nav-item.active {
+    color: #facc15;
+    font-weight: 600;
+}
+
+.nav-item.active span {
+    border-bottom: 2px solid #facc15;
+}
+
+.nav-badge {
+    position: absolute;
+    top: 2px;
+    right: 8px;
+    background: red;
+    color: white;
+    font-size: 10px;
+    padding: 2px 5px;
+    border-radius: 10px;
+}
+
+.nav-item {
+    position: relative;
+}
 </style>
 </head>
 
@@ -82,7 +106,7 @@ body.loaded{visibility:visible;}
     <div class="nav-right">
         <a href="/">Home</a>
         {% if request.user.is_authenticated %}
-            <a href="/dashboard/">Dashboard</a>
+            <a href="/dashboard/">Add Rewards</a>
             <a href="/setup/">Setup</a>
         {% endif %}
 
@@ -195,13 +219,40 @@ window.addEventListener("load", () => {
 </script>
 
 <div class="bottom-nav">
-    <a href="/" class="nav-item">🏠<span>Home</span></a>
+    <a href="/" class="nav-item {% if request.path == '/' %}active{% endif %}">🏠<span>Home</span></a>
 
     {% if request.user.is_authenticated %}
-        <a href="/dashboard/" class="nav-item">⚙️<span>Parent</span></a>
+        <a href="/setup/" class="nav-item {% if request.path.startswith:'/setup' %}active{% endif %}">🧱<span>Setup</span></a>
+        <a href="/dashboard/" class="nav-item {% if request.path.startswith:'/dashboard' %}active{% endif %}">
+            🎁
+            <span>Rewards</span>
+            {% if children %}
+                {% with total_chests=0 %}
+                    {% for c in children %}
+                        {% with total_chests=total_chests|add:c.unopened_chests.count %}{% endwith %}
+                    {% endfor %}
+                    {% if total_chests > 0 %}
+                        <span class="nav-badge">{{ total_chests }}</span>
+                    {% endif %}
+                {% endwith %}
+            {% endif %}
+        </a>
 
         {% if children and children|length > 0 %}
-            <a href="/child/{{ children.0.id }}/" class="nav-item">🎮<span>Play</span></a>
+            <a href="/child/{{ children.0.id }}/" class="nav-item {% if request.path.startswith:'/child' %}active{% endif %}">
+                🎮
+                <span>Play</span>
+                {% if children %}
+                    {% with total_rolls=0 %}
+                        {% for c in children %}
+                            {% with total_rolls=total_rolls|add:c.rolls_available %}{% endwith %}
+                        {% endfor %}
+                        {% if total_rolls > 0 %}
+                            <span class="nav-badge">{{ total_rolls }}</span>
+                        {% endif %}
+                    {% endwith %}
+                {% endif %}
+            </a>
         {% endif %}
     {% endif %}
 </div>

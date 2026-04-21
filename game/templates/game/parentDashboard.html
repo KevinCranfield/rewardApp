@@ -111,34 +111,10 @@
         <h2>⚡ Quick Actions</h2>
 
         <div class="action-buttons">
-            <button class="add-toggle-btn" onclick="toggleAddChild()">+ Add Child</button>
             <button class="add-toggle-btn" onclick="togglePinSection()">🔐 Change PIN</button>
             <button class="danger-btn" id="resetBoardBtn">🔄 Reset Board</button>
         </div>
 
-    </div>
-
-    <div id="addChildForm" class="section-card hidden">
-        <h3>Add Child</h3>
-
-        <form method="POST" action="{% url 'add_child' %}">
-            {% csrf_token %}
-
-            <input type="text" name="name" placeholder="Child name" required class="reward-input">
-
-            <input type="hidden" name="colour" id="colourInput" required>
-            <div class="colour-picker">
-                <div class="colour-circle" data-colour="blue" style="background:#3b82f6"></div>
-                <div class="colour-circle" data-colour="green" style="background:#22c55e"></div>
-                <div class="colour-circle" data-colour="red" style="background:#ef4444"></div>
-                <div class="colour-circle" data-colour="yellow" style="background:#eab308"></div>
-                <div class="colour-circle" data-colour="purple" style="background:#a855f7"></div>
-                <div class="colour-circle" data-colour="orange" style="background:#f97316"></div>
-            </div>
-            <div id="usedColours" data-colours="{{ used_colours|join:',' }}"></div>
-
-            <button type="submit" class="reward-btn">Add Child</button>
-        </form>
     </div>
 
     <div id="pinSection" class="section-card hidden">
