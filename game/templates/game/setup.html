@@ -1,6 +1,136 @@
-{% if not request.user.is_premium %}
-<div class="upgrade-banner">
-  🔒 Free plan: 1 child, bronze chests only  
-  <a href="/upgrade/">⭐ Upgrade to Premium</a>
+{% extends "game/base.html" %}
+
+{% block content %}
+
+<div class="setup-container">
+
+  <h1>🎮 Setup Your Reward Game</h1>
+
+  {% if not request.user.is_premium %}
+  <div class="upgrade-banner">
+    🔒 Free plan: 1 child, bronze chests only  
+    <a href="/upgrade/">⭐ Upgrade to Premium</a>
+  </div>
+  {% endif %}
+
+  <!-- 👶 CHILDREN -->
+  <div class="setup-section">
+    <h2>👶 Children</h2>
+
+    <form method="POST" action="/add-child/" class="child-form">
+      {% csrf_token %}
+      <input type="text" name="name" placeholder="Child name" required>
+      <input type="color" name="colour" value="#3b82f6">
+      <button type="submit">+ Add Child</button>
+    </form>
+
+    <div class="children-grid">
+      {% for child in children %}
+        <div class="child-card">
+          <div class="child-avatar" style="background: {{ child.colour }}"></div>
+          <div class="child-name">{{ child.name }}</div>
+          <a href="/remove-child/{{ child.id }}/" class="remove-child">Remove</a>
+        </div>
+      {% empty %}
+        <p>No children added yet</p>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- 🎁 REWARDS -->
+  <div class="setup-section">
+    <h2>🎁 Rewards</h2>
+
+    <div class="rewards-grid">
+      {% for reward in rewards %}
+        <div class="reward-card">
+          {% if reward.image %}
+            <img src="{{ reward.image.url }}" class="reward-img">
+          {% else %}
+            <div class="reward-placeholder">🎁</div>
+          {% endif %}
+          <div class="reward-name">{{ reward.name }}</div>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+
 </div>
-{% endif %}
+
+<style>
+.setup-container {
+  max-width: 900px;
+  margin: auto;
+  padding: 20px;
+}
+
+.setup-section {
+  margin-top: 30px;
+}
+
+.child-form {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.children-grid {
+  display: flex;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+
+.child-card {
+  background: #f3f4f6;
+  padding: 15px;
+  border-radius: 12px;
+  text-align: center;
+  width: 120px;
+}
+
+.child-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  margin: auto;
+}
+
+.remove-child {
+  color: red;
+  font-size: 12px;
+}
+
+.rewards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 15px;
+}
+
+.reward-card {
+  background: white;
+  border-radius: 12px;
+  padding: 10px;
+  text-align: center;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.reward-img {
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+}
+
+.reward-placeholder {
+  font-size: 40px;
+}
+
+.upgrade-banner {
+  background: #fee2e2;
+  padding: 10px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+}
+
+</style>
+
+{% endblock %}
