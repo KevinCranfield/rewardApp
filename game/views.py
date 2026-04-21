@@ -9,6 +9,7 @@ import random
 import json
 
 from django.contrib.auth.views import PasswordResetView
+from django.db.models import Q
 
 from .models import Family, Child, Roll, Reward, Chest, RewardType
 
@@ -554,7 +555,10 @@ def setup_page(request):
 
     children = family.children.all()
 
-    rewards = RewardType.objects.filter(user=request.user) | RewardType.objects.filter(is_default=True)
+    # 🔥 Show rewards per child + defaults
+    rewards = RewardType.objects.filter(
+        Q(child__in=children) | Q(is_default=True)
+    ).distinct()
 
     return render(request, "game/setup.html", {
         "children": children,
