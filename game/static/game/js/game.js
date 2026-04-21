@@ -1382,7 +1382,7 @@ window.addEventListener("DOMContentLoaded", () => {
             e.preventDefault();
             e.stopPropagation();
 
-            const chestId = btn.dataset.chestId || btn.getAttribute("data-chest-id");
+            const chestId = btn.dataset.chestId || btn.getAttribute("data-chest-id") || btn.getAttribute("data-id");
 
             // Prevent double click spam
             if(btn.classList.contains("chest-opening")){
@@ -1392,6 +1392,11 @@ window.addEventListener("DOMContentLoaded", () => {
             btn.classList.add("chest-opening");
 
             console.log("CLICK CHEST:", chestId);
+            if(!chestId){
+                console.error("❌ Missing chestId on element:", btn);
+                btn.classList.remove("chest-opening");
+                return;
+            }
             console.log("CHEST HANDLER ACTIVE - PREMIUM");
 
 
@@ -1422,7 +1427,8 @@ window.addEventListener("DOMContentLoaded", () => {
                         btn.classList.add("open");
                     }, 200);
 
-                    openChest(btn);
+                    openChest(chestId);
+                    console.log("✅ openChest called with:", chestId);
                     // 🔥 Remove chest from UI instantly after opening
                     setTimeout(() => {
                         if(btn && btn.isConnected){
