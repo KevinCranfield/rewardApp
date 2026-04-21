@@ -14,22 +14,19 @@
 <div class="chests-row" id="chests-row">
     {% for chest in child.chests.all %}
         {% if not chest.is_opened %}
-    <button
-        class="chest-btn chest-{{ chest.tier }}"
+    <div
+        class="chest chest-{{ chest.tier }}"
         data-chest-id="{{ chest.id }}"
         data-child="{{ chest.child.id }}"
         data-tier="{{ chest.tier }}"
         onclick="openChest(this)"
     >
-        <span class="chest-icon">
-            {% if chest.tier == "gold" %}🟡
-            {% elif chest.tier == "silver" %}⚪
-            {% else %}🟤
-            {% endif %}
-        </span>
-        <span class="chest-label">{{ chest.tier|capfirst }}</span>
-        <span class="chest-tap">Tap to open!</span>
-    </button>
+        <div class="chest-lid"></div>
+        <div class="chest-base"></div>
+        <div class="chest-glow"></div>
+        <div class="chest-label">{{ chest.tier|capfirst }} Chest</div>
+        <div class="chest-tap">Tap to open!</div>
+    </div>
         {% endif %}
     {% endfor %}
 </div>

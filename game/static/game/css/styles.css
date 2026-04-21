@@ -2446,6 +2446,116 @@ html, body {
    CHESTS
 ========================= */
 
+/* =========================
+   NEW CHEST STRUCTURE (3D)
+========================= */
+
+.chest {
+    position: relative;
+    width: 140px;
+    height: 120px;
+    margin: 10px auto;
+    cursor: pointer;
+    perspective: 800px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+/* Base */
+.chest-base {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: 65%;
+    border-radius: 14px;
+    box-shadow: 0 10px 25px rgba(0,0,0,.35);
+}
+
+/* Lid */
+.chest-lid {
+    position: absolute;
+    top: 0;
+    width: 100%;
+    height: 55%;
+    border-radius: 14px 14px 6px 6px;
+    transform-origin: bottom;
+    transition: transform .5s ease;
+}
+
+/* Glow */
+.chest-glow {
+    position: absolute;
+    inset: 0;
+    border-radius: 14px;
+    opacity: 0;
+    transition: opacity .4s ease;
+}
+
+/* OPEN STATE */
+.chest.open .chest-lid {
+    transform: rotateX(-120deg);
+}
+
+.chest.open .chest-glow {
+    opacity: 1;
+}
+
+/* LABEL */
+.chest-label {
+    position: relative;
+    z-index: 2;
+    font-weight: 700;
+    font-size: 14px;
+    margin-top: 8px;
+}
+
+.chest-tap {
+    font-size: 11px;
+    opacity: 0.8;
+}
+
+/* =========================
+   TIER STYLES
+========================= */
+
+.chest-bronze .chest-base {
+    background: linear-gradient(#b45309, #78350f);
+}
+
+.chest-bronze .chest-lid {
+    background: linear-gradient(#d97706, #92400e);
+}
+
+.chest-bronze .chest-glow {
+    background: radial-gradient(circle, rgba(255,200,0,0.6), transparent);
+}
+
+.chest-silver .chest-base {
+    background: linear-gradient(#9ca3af, #4b5563);
+}
+
+.chest-silver .chest-lid {
+    background: linear-gradient(#d1d5db, #6b7280);
+}
+
+.chest-silver .chest-glow {
+    background: radial-gradient(circle, rgba(255,255,255,0.7), transparent);
+}
+
+.chest-gold .chest-base {
+    background: linear-gradient(#facc15, #b45309);
+}
+
+.chest-gold .chest-lid {
+    background: linear-gradient(#fde047, #ca8a04);
+}
+
+.chest-gold .chest-glow {
+    background: radial-gradient(circle, rgba(255,215,0,0.8), transparent);
+}
+
 .chests-row {
     display: flex;
     justify-content: center;

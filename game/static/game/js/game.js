@@ -1361,7 +1361,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 // Ensure chest buttons are clickable and trigger open
 window.addEventListener("DOMContentLoaded", () => {
-    document.querySelectorAll(".chest-btn").forEach(btn => {
+    document.querySelectorAll(".chest").forEach(btn => {
         btn.addEventListener("click", (e) => {
             e.preventDefault();
             e.stopPropagation();
@@ -1374,7 +1374,6 @@ window.addEventListener("DOMContentLoaded", () => {
                 return;
             }
             btn.classList.add("chest-opening");
-            btn.disabled = true;
 
             console.log("CLICK CHEST:", chestId);
             console.log("CHEST HANDLER ACTIVE - PREMIUM");
@@ -1414,7 +1413,7 @@ window.addEventListener("DOMContentLoaded", () => {
 
                     // Lid open effect
                     setTimeout(() => {
-                        btn.classList.add("chest-lid-open");
+                        btn.classList.add("open");
                     }, 200);
 
                     openChest(btn);
@@ -1436,11 +1435,9 @@ window.addEventListener("DOMContentLoaded", () => {
                             "chest-gold-glow",
                             "chest-silver-glow",
                             "chest-bronze-glow",
-                            "chest-lid-open",
+                            "open",
                             "chest-burst"
                         );
-
-                        btn.disabled = false;
                     }, 1500);
                 } catch(err){
                     console.error(err);
@@ -1450,14 +1447,12 @@ window.addEventListener("DOMContentLoaded", () => {
                         "chest-gold-glow",
                         "chest-silver-glow",
                         "chest-bronze-glow",
-                        "chest-lid-open"
+                        "open"
                     );
-                    btn.disabled = false;
                 }
             } else {
                 console.error("openChest missing or chestId not found");
                 btn.classList.remove("chest-opening");
-                btn.disabled = false;
             }
         });
     });
