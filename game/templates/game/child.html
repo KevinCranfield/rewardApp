@@ -10,17 +10,17 @@
   <div style="text-align:center; margin:20px 0;">
     <button
       onclick="roll({{ child.id }})"
-      class="big-roll roll-btn {% if child.rolls_available == 0 %}disabled{% endif %}"
+      class="big-roll roll-btn {% if rolls_available == 0 %}disabled{% endif %}"
       data-child="{{ child.id }}"
-      {% if child.rolls_available == 0 %}disabled{% endif %}
+      {% if rolls_available == 0 %}disabled{% endif %}
     >
       🎲 Roll
     </button>
 
-    <div class="roll-status {% if child.rolls_available > 0 %}available{% else %}empty{% endif %}"
+    <div class="roll-status {% if rolls_available > 0 %}available{% else %}empty{% endif %}"
          data-child="{{ child.id }}">
-      {% if child.rolls_available > 0 %}
-        🎯 {{ child.rolls_available }} roll{{ child.rolls_available|pluralize }} available
+      {% if rolls_available > 0 %}
+        🎯 {{ rolls_available }} roll{{ rolls_available|pluralize }} available
       {% else %}
         No more rolls — go earn another reward 🙂
       {% endif %}
@@ -240,8 +240,8 @@ function openChest(chestId){
 
         // 🎯 update rolls UI
         const rollStatus = document.querySelector(".roll-status");
-        if(rollStatus && data.rolls_available !== undefined){
-            rollStatus.innerText = `🎯 ${data.rolls_available} roll${data.rolls_available == 1 ? '' : 's'} available`;
+        if(rollStatus && data.rolls !== undefined){
+            rollStatus.innerText = `🎯 ${data.rolls} roll${data.rolls == 1 ? '' : 's'} available`;
         }
 
         // 🎁 reward popup (if provided)

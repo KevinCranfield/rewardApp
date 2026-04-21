@@ -245,12 +245,12 @@ window.addEventListener("load", () => {
                 🎮
                 <span>Play</span>
                 {% if children %}
-                    {% with total_rolls=0 %}
+                    {% with total_opened=0 %}
                         {% for c in children %}
-                            {% with total_rolls=total_rolls|add:c.rolls_available %}{% endwith %}
+                            {% with total_opened=total_opened|add:c.unopened_chests_count %}{% endwith %}
                         {% endfor %}
-                        {% if total_rolls > 0 %}
-                            <span class="nav-badge">{{ total_rolls }}</span>
+                        {% if total_opened > 0 %}
+                            <span class="nav-badge">{{ total_opened }}</span>
                         {% endif %}
                     {% endwith %}
                 {% endif %}

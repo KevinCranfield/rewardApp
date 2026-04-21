@@ -27,7 +27,7 @@
                 </div>
 
                 <div class="child-info" data-rolls>
-                    Chests waiting: {{ child.unopened_chests.count }}
+                    Chests waiting: {{ child.unopened_chests_count }}
                 </div>
 
                 <div class="reward-section">
@@ -77,7 +77,7 @@
                 </div>
 
                 <div class="reward-history">
-                    {% if child.unopened_chests.count > 0 %}
+                    {% if child.unopened_chests_count > 0 %}
                         {% for reward in child.all_rewards|slice:":5" %}
                             <div class="reward-item">
                                 <span>
