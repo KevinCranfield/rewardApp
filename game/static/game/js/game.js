@@ -1414,19 +1414,31 @@ window.addEventListener("DOMContentLoaded", () => {
                     }, 200);
 
                     openChest(btn);
-                    // 🔥 FAST SYNC: read updated rolls directly from DOM (no extra fetch)
-                    setTimeout(() => {
+                    // ⚡ INSTANT SYNC: update roll button on next paint (no fixed delay)
+                    const syncRollUI = () => {
                         const childId = document.querySelector(".child-view")?.dataset.childId;
                         if(!childId) return;
 
                         const rollBtn = document.querySelector(`.roll-btn[data-child="${childId}"]`);
-                        const rollsEl = document.querySelector(`[data-rolls]`);
                         const status = document.querySelector(`.roll-status[data-child="${childId}"]`) 
                                        || document.querySelector(".roll-status");
 
                         let rolls = 0;
-                        if(rollsEl){
-                            rolls = parseInt(rollsEl.textContent.replace(/\D/g, "")) || 0;
+
+                        // Prefer reading from roll-status (child view)
+                        if(status){
+                            const match = status.textContent.match(/\d+/);
+                            if(match){
+                                rolls = parseInt(match[0]);
+                            }
+                        }
+
+                        // Fallback: parent dashboard element
+                        if(!rolls){
+                            const rollsEl = document.querySelector(`[data-rolls]`);
+                            if(rollsEl){
+                                rolls = parseInt(rollsEl.textContent.replace(/\D/g, "")) || 0;
+                            }
                         }
 
                         if(status){
@@ -1455,7 +1467,10 @@ window.addEventListener("DOMContentLoaded", () => {
                                 rollBtn.style.cursor = "not-allowed";
                             }
                         }
-                    }, 500);
+                    };
+
+                    // Run after DOM updates (2 frames)
+                    requestAnimationFrame(() => requestAnimationFrame(syncRollUI));
                     // 🎯 Trigger install after exciting moment (only if available)
                     if(document.body.dataset.pwaReady === "true"){
                         setTimeout(() => {
