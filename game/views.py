@@ -125,7 +125,7 @@ def child_view(request, child_id):
 
     return render(request, "game/child.html", {
         "child": child,
-        "children": [child],
+        "children": Child.objects.filter(family=family),
         "chests": chests,
         "rolls_available": rolls_available,
         "squares": build_board(),
