@@ -299,16 +299,12 @@ def add_reward(request):
 
 @login_required
 @require_POST
-def open_chest(request):
-    chest_id = request.POST.get("chest_id")
-    child_id = request.POST.get("child_id")
-
+def open_chest(request, chest_id):
     family = get_family(request.user)
 
     with transaction.atomic():
         chest = Chest.objects.select_for_update().filter(
             id=chest_id,
-            child_id=child_id,
             child__family=family
         ).first()
 
