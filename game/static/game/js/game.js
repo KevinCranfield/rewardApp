@@ -21,7 +21,7 @@
 // 19. FIX: board reset uses custom confirm modal — native confirm() blocked in PWA standalone mode
 // =============================================
 
-console.log("🔥 GAME JS VERSION: REMOVE CHILD + NAV FIX LIVE v2.12");
+console.log("🔥 GAME JS VERSION: REMOVE CHILD + NAV FIX LIVE v2.13");
 
 
 const BOARD_SIZE = 64;
@@ -1566,7 +1566,7 @@ window.openChest = async function(chestId){
     console.log("OPEN CHEST FUNCTION CALLED:", chestId);
 
     try{
-        const res = await fetch(`/open-chest/${chestId}/`, {
+        const res = await fetch(`/open-chest/?chest_id=${chestId}`, {
             method: "POST",
             headers: {
                 "X-CSRFToken": getCSRFToken(),
