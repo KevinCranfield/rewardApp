@@ -62,7 +62,10 @@
             + Add Reward
           </button>
 
-          <a href="/remove-child/{{ child.id }}/" class="remove-child">Remove</a>
+          <form method="POST" action="/remove-child/{{ child.id }}/" style="display:inline;">
+            {% csrf_token %}
+            <button type="submit" class="remove-child">Remove</button>
+          </form>
         </div>
       {% empty %}
         <p>No children added yet</p>
