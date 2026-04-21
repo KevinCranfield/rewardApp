@@ -1,0 +1,6 @@
+{% if not request.user.is_premium %}
+<div class="upgrade-banner">
+  🔒 Free plan: 1 child, bronze chests only  
+  <a href="/upgrade/">⭐ Upgrade to Premium</a>
+</div>
+{% endif %}

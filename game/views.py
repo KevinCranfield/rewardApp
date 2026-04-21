@@ -130,6 +130,15 @@ def child_view(request, child_id):
 def add_child(request):
     if request.method == "POST":
         family = get_family(request.user)
+
+        # 🔒 FREE PLAN LIMIT: only 1 child allowed
+        if not getattr(request.user, "is_premium", False):
+            if family.children.count() >= 1:
+                return JsonResponse({
+                    "success": False,
+                    "error": "Free plan allows only 1 child. Upgrade to add more."
+                })
+
         name = request.POST.get("name")
         colour = request.POST.get("colour")
 
