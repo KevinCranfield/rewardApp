@@ -354,7 +354,7 @@ def open_chest(request, chest_id=None):
         "success": True,
         "tier": chest.tier,
         "rolls_awarded": rolls_to_award,
-        "total_rolls": total_rolls
+        "rolls": total_rolls
     })
 
 
