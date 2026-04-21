@@ -1423,6 +1423,15 @@ window.addEventListener("DOMContentLoaded", () => {
                     }, 200);
 
                     openChest(btn);
+                    // 🔥 Remove chest from UI instantly after opening
+                    setTimeout(() => {
+                        if(btn && btn.isConnected){
+                            btn.style.transition = "opacity .25s ease, transform .25s ease";
+                            btn.style.opacity = "0";
+                            btn.style.transform = "scale(0.8)";
+                            setTimeout(() => btn.remove(), 250);
+                        }
+                    }, 800);
                     // ⚡ INSTANT SYNC: update roll button on next paint (no fixed delay)
                     const syncRollUI = () => {
                         const childId = document.querySelector(".child-view")?.dataset.childId;
@@ -1434,15 +1443,23 @@ window.addEventListener("DOMContentLoaded", () => {
 
                         let rolls = 0;
 
-                        // Prefer reading from roll-status (child view)
-                        if(status){
+                        // Prefer backend-updated state if available
+                        if(window.__lastChildren){
+                            const child = window.__lastChildren.find(c => String(c.id) === String(childId));
+                            if(child && typeof child.rolls_available !== "undefined"){
+                                rolls = child.rolls_available;
+                            }
+                        }
+
+                        // Fallback: DOM parsing
+                        if(!rolls && status){
                             const match = status.textContent.match(/\d+/);
                             if(match){
                                 rolls = parseInt(match[0]);
                             }
                         }
 
-                        // Fallback: parent dashboard element
+                        // Final fallback
                         if(!rolls){
                             const rollsEl = document.querySelector(`[data-rolls]`);
                             if(rollsEl){
