@@ -299,8 +299,11 @@ def add_reward(request):
 
 @login_required
 @require_POST
-def open_chest(request, chest_id):
+def open_chest(request, chest_id=None):
     family = get_family(request.user)
+    # Support both URL param and POST body
+    if chest_id is None:
+        chest_id = request.POST.get("chest_id")
 
     with transaction.atomic():
         chest = Chest.objects.select_for_update().filter(

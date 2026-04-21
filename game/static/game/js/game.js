@@ -21,7 +21,7 @@
 // 19. FIX: board reset uses custom confirm modal — native confirm() blocked in PWA standalone mode
 // =============================================
 
-console.log("🔥 GAME JS VERSION: REMOVE CHILD + NAV FIX LIVE v2.13");
+console.log("🔥 GAME JS VERSION: REMOVE CHILD + NAV FIX LIVE v2.14");
 
 
 const BOARD_SIZE = 64;
@@ -1566,7 +1566,7 @@ window.openChest = async function(chestId){
     console.log("OPEN CHEST FUNCTION CALLED:", chestId);
 
     try{
-        const res = await fetch(`/open-chest/?chest_id=${chestId}`, {
+        const res = await fetch(`/open-chest/${chestId}/`, {
             method: "POST",
             headers: {
                 "X-CSRFToken": getCSRFToken(),
@@ -1577,17 +1577,23 @@ window.openChest = async function(chestId){
 
         if(!res.ok){
             console.error("Open chest failed:", res.status);
-            showToast("⚠️ Failed to open chest");
+            showToast(`⚠️ Failed to open chest (${res.status})`);
             return;
         }
 
         const data = await res.json();
+        if(!data || typeof data !== "object"){
+            console.error("Invalid chest response:", data);
+            showToast("⚠️ Server error");
+            return;
+        }
         console.log("CHEST RESPONSE:", data);
 
         if(data.success){
             // update rolls immediately from backend truth
             if(data.rolls !== undefined){
                 const status = document.querySelector(".roll-status");
+                const rollBtn = document.querySelector(".roll-btn");
                 if(status){
                     status.innerText = data.rolls === 1
                         ? "🎯 1 roll available"
@@ -1596,6 +1602,13 @@ window.openChest = async function(chestId){
                     if(data.rolls > 0){
                         status.classList.remove("empty");
                     }
+                }
+                if(rollBtn){
+                    const hasRolls = data.rolls > 0;
+                    rollBtn.disabled = !hasRolls;
+                    rollBtn.classList.toggle("disabled", !hasRolls);
+                    rollBtn.style.opacity = hasRolls ? "1" : "0.5";
+                    rollBtn.style.cursor = hasRolls ? "pointer" : "not-allowed";
                 }
             }
 
