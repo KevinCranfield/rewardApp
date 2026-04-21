@@ -34,15 +34,20 @@
     {% if chests %}
       <div class="chest-list" style="display:flex; gap:10px; justify-content:center; flex-wrap:wrap;">
         {% for chest in chests %}
-          <button
+          <div
             class="chest chest-{{ chest.tier }}"
             data-chest-id="{{ chest.id }}"
             data-tier="{{ chest.tier }}"
-            style="padding:10px 14px; border-radius:12px; background:#f5f5f5; min-width:120px; border:none; cursor:pointer;"
+            style="width:120px; height:90px; position:relative; cursor:pointer;"
           >
-            <div style="font-weight:700;">{{ chest.tier|title }}</div>
-            <div style="font-size:12px; opacity:.8;">+{{ chest.rolls_awarded }} rolls</div>
-          </button>
+            <div class="chest-lid"></div>
+            <div class="chest-base"></div>
+            <div class="chest-glow"></div>
+
+            <div class="chest-label" style="position:absolute; bottom:-18px; width:100%; text-align:center; font-size:12px;">
+              +{{ chest.rolls_awarded }} roll{{ chest.rolls_awarded|pluralize }}
+            </div>
+          </div>
         {% endfor %}
       </div>
     {% else %}
@@ -99,6 +104,56 @@
 </div>
 
 <style>
+/* 🎁 Chest 3D fix */
+.chest {
+  perspective: 600px;
+}
+
+.chest-lid {
+  transform-origin: bottom;
+  transition: transform 0.4s ease;
+}
+
+.chest-base {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  height: 60%;
+  border-radius: 0 0 12px 12px;
+}
+
+.chest-lid {
+  position: absolute;
+  top: 0;
+  width: 100%;
+  height: 40%;
+  border-radius: 12px 12px 0 0;
+}
+
+/* Bronze */
+.chest-bronze .chest-base { background: linear-gradient(#cd7f32, #8b4513); }
+.chest-bronze .chest-lid  { background: linear-gradient(#e6a15a, #b87333); }
+
+/* Silver */
+.chest-silver .chest-base { background: linear-gradient(#ccc, #888); }
+.chest-silver .chest-lid  { background: linear-gradient(#eee, #aaa); }
+
+/* Gold */
+.chest-gold .chest-base { background: linear-gradient(#ffd700, #c9a000); }
+.chest-gold .chest-lid  { background: linear-gradient(#fff176, #fbc02d); }
+
+.chest-glow {
+  position: absolute;
+  inset: 0;
+  border-radius: 12px;
+  opacity: 0;
+  box-shadow: 0 0 20px rgba(255,215,0,0.6);
+  transition: opacity 0.3s ease;
+}
+
+.chest:hover .chest-glow {
+  opacity: 1;
+}
 .reward-display {
   position: fixed;
   inset: 0;
@@ -139,5 +194,85 @@
   display: none;
 }
 </style>
+
+<script>
+// 🔐 CSRF helper
+function getCSRFToken(){
+    return document.cookie.split(';')
+        .map(c => c.trim())
+        .find(c => c.startsWith('csrftoken='))
+        ?.split('=')[1];
+}
+
+// 🎁 Open chest
+function openChest(chestId){
+    console.log("OPEN CHEST FUNCTION CALLED:", chestId);
+
+    fetch(`/open-chest/${chestId}/`, {
+        method: "POST",
+        headers: {
+            "X-CSRFToken": getCSRFToken(),
+            "X-Requested-With": "XMLHttpRequest"
+        }
+    })
+    .then(res => res.json())
+    .then(data => {
+        console.log("CHEST RESPONSE:", data);
+
+        if(!data.success){
+            alert(data.error || "Error opening chest");
+            return;
+        }
+
+        // 🎉 animation + feedback
+        if(navigator.vibrate){
+            navigator.vibrate([80,40,80]);
+        }
+
+        // 💥 simple visual feedback
+        const chestEl = document.querySelector(`[data-chest-id="${chestId}"]`);
+        if(chestEl){
+            chestEl.style.transform = "scale(1.2)";
+            setTimeout(()=>{
+                chestEl.remove();
+            }, 300);
+        }
+
+        // 🎯 update rolls UI
+        const rollStatus = document.querySelector(".roll-status");
+        if(rollStatus && data.rolls_available !== undefined){
+            rollStatus.innerText = `🎯 ${data.rolls_available} roll${data.rolls_available == 1 ? '' : 's'} available`;
+        }
+
+        // 🎁 reward popup (if provided)
+        if(data.reward_name){
+            const display = document.getElementById("reward-display");
+            const img = document.getElementById("reward-image");
+            const name = document.getElementById("reward-name");
+
+            if(display && img && name){
+                img.src = data.reward_image || "";
+                name.innerText = data.reward_name;
+                display.classList.remove("hidden");
+            }
+        }
+    })
+    .catch(err => {
+        console.error(err);
+        alert("⚠️ Network error");
+    });
+}
+
+// 🧠 Attach click handlers (fallback if game.js misses)
+document.querySelectorAll('.chest').forEach(btn => {
+    btn.addEventListener('click', function(){
+        const chestId = this.dataset.chestId;
+        console.log("CLICK CHEST (child.html):", chestId);
+        if(chestId){
+            openChest(chestId);
+        }
+    });
+});
+</script>
 
 {% endblock %}

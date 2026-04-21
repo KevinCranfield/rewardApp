@@ -21,7 +21,7 @@
 // 19. FIX: board reset uses custom confirm modal — native confirm() blocked in PWA standalone mode
 // =============================================
 
-console.log("🔥 GAME JS VERSION: REMOVE CHILD + NAV FIX LIVE v2.11");
+console.log("🔥 GAME JS VERSION: REMOVE CHILD + NAV FIX LIVE v2.12");
 
 
 const BOARD_SIZE = 64;
@@ -1425,6 +1425,11 @@ window.addEventListener("DOMContentLoaded", () => {
                     // Lid open effect
                     setTimeout(() => {
                         btn.classList.add("open");
+                        const lid = btn.querySelector(".chest-lid");
+                        if(lid){
+                            lid.style.transform = "rotateX(-110deg) translateY(-8px)";
+                            lid.style.transition = "transform 0.4s ease";
+                        }
                     }, 200);
 
                     openChest(chestId);
@@ -1524,6 +1529,10 @@ window.addEventListener("DOMContentLoaded", () => {
                             "open",
                             "chest-burst"
                         );
+                        const lidReset = btn.querySelector(".chest-lid");
+                        if(lidReset){
+                            lidReset.style.transform = "";
+                        }
                     }, 1500);
                 } catch(err){
                     console.error(err);
