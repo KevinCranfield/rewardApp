@@ -1606,3 +1606,38 @@ function triggerInstallPrompt(){
         document.body.dataset.pwaReady = "false";
     });
 }
+// =========================
+// REMOVE CHILD (force reload fix)
+// =========================
+
+document.addEventListener("DOMContentLoaded", () => {
+    document.querySelectorAll(".remove-child-btn").forEach(btn => {
+        btn.addEventListener("click", (e) => {
+            e.preventDefault();
+
+            const childId = btn.dataset.childId;
+            if(!childId) return;
+
+            showConfirm("Remove this child?", () => {
+                fetch(`/remove-child/${childId}/`, {
+                    method: "POST",
+                    headers: {
+                        "X-CSRFToken": getCSRFToken()
+                    }
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if(data.success){
+                        // 🔥 CRITICAL: reload ensures navbar + limits update
+                        window.location.reload();
+                    } else {
+                        showToast(data.error || "Error removing child");
+                    }
+                })
+                .catch(() => {
+                    showToast("⚠️ Network error");
+                });
+            });
+        });
+    });
+});
