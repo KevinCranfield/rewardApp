@@ -1606,6 +1606,38 @@ function triggerInstallPrompt(){
         document.body.dataset.pwaReady = "false";
     });
 }
+
+// =============================================
+// NAV STATE SYSTEM (single source of truth)
+// =============================================
+
+function rebuildChildNav(){
+    const navContainer = document.querySelector(".child-nav");
+    if(!navContainer) return;
+
+    navContainer.innerHTML = "";
+
+    const children = window.__lastChildren || [];
+
+    children.forEach(child => {
+        const link = document.createElement("a");
+        link.href = `/child/${child.id}/`;
+        link.className = "nav-child";
+        link.dataset.childId = child.id;
+
+        link.innerHTML = `<span class="child-dot" style="background:${child.colour || '#3b82f6'}"></span> ${child.name}`;
+
+        navContainer.appendChild(link);
+    });
+}
+
+function syncNavAfterRemove(childId){
+    if(window.__lastChildren){
+        window.__lastChildren = window.__lastChildren.filter(c => String(c.id) !== String(childId));
+    }
+    rebuildChildNav();
+}
+
 // =========================
 // REMOVE CHILD (dynamic no reload)
 // =========================
@@ -1648,10 +1680,8 @@ document.addEventListener("DOMContentLoaded", () => {
                             }
                         });
 
-                        // 🔥 Sync client cache so UI doesn't re-render old child
-                        if(window.__lastChildren){
-                            window.__lastChildren = window.__lastChildren.filter(c => String(c.id) !== String(childId));
-                        }
+                        // 🔥 Sync + rebuild nav from state
+                        syncNavAfterRemove(childId);
 
                         // ✅ Re-enable Add Child button if it was disabled
                         const addBtn = document.querySelector(".child-btn[disabled]");
