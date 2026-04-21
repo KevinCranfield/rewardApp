@@ -21,7 +21,7 @@
 // 19. FIX: board reset uses custom confirm modal — native confirm() blocked in PWA standalone mode
 // =============================================
 
-console.log("🔥 GAME JS VERSION: REMOVE CHILD + NAV FIX LIVE v2");
+console.log("🔥 GAME JS VERSION: REMOVE CHILD + NAV FIX LIVE v2.1");
 
 
 const BOARD_SIZE = 64;
@@ -1638,10 +1638,20 @@ document.addEventListener("DOMContentLoaded", () => {
                             setTimeout(() => childCard.remove(), 250);
                         }
 
-                        // ✅ Remove from navbar
-                        document.querySelectorAll(`[data-child-id="${childId}"]`).forEach(el => el.remove());
-                        // 🔥 Fallback: remove any nav links without data attribute
-                        document.querySelectorAll(`a[href="/child/${childId}/"]`).forEach(el => el.remove());
+                        // ✅ Remove from navbar (robust match)
+                        document.querySelectorAll(`.nav-child`).forEach(el => {
+                            const href = el.getAttribute("href") || "";
+                            const idAttr = el.dataset.childId || "";
+
+                            if(idAttr == childId || href.includes(`/child/${childId}/`)){
+                                el.remove();
+                            }
+                        });
+
+                        // 🔥 Sync client cache so UI doesn't re-render old child
+                        if(window.__lastChildren){
+                            window.__lastChildren = window.__lastChildren.filter(c => String(c.id) !== String(childId));
+                        }
 
                         // ✅ Re-enable Add Child button if it was disabled
                         const addBtn = document.querySelector(".child-btn[disabled]");
@@ -1665,7 +1675,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         const currentPath = window.location.pathname;
 
                         if(currentPath.includes(`/child/${childId}/`)){
-                            const remaining = document.querySelectorAll(".nav-child");
+                            const remaining = document.querySelectorAll(".nav-child[href*='/child/']");
 
                             if(remaining.length > 0){
                                 window.location.href = remaining[0].getAttribute("href");
