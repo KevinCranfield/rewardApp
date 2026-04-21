@@ -57,12 +57,21 @@
                             <button type="submit" name="tier" value="1" class="reward-btn bronze-btn" onclick="this.form.chest_type.value='bronze'">
                                 🟤 Bronze Chest (+1 Roll)
                             </button>
+                            {% if is_premium %}
                             <button type="submit" name="tier" value="2" class="reward-btn silver-btn" onclick="this.form.chest_type.value='silver'">
                                 ⚪ Silver Chest (+2 Rolls)
                             </button>
                             <button type="submit" name="tier" value="3" class="reward-btn gold-btn" onclick="this.form.chest_type.value='gold'">
                                 🟡 Gold Chest (+3 Rolls)
                             </button>
+                            {% else %}
+                            <button type="button" class="reward-btn silver-btn disabled" title="Upgrade to unlock">
+                                ⚪ Silver (Premium)
+                            </button>
+                            <button type="button" class="reward-btn gold-btn disabled" title="Upgrade to unlock">
+                                🟡 Gold (Premium)
+                            </button>
+                            {% endif %}
                         </div>
                     </form>
                 </div>

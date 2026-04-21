@@ -44,6 +44,13 @@ def get_family(user):
     return family
 
 
+# Helper for children context
+def get_children_context(request):
+    if request.user.is_authenticated:
+        return {"children": get_family(request.user).children.all()}
+    return {"children": []}
+
+
 def is_parent_authenticated(request):
     auth = request.session.get("parent_authed")
     auth_time = request.session.get("parent_auth_time")
@@ -85,9 +92,9 @@ def login_view(request):
             login(request, user)
             return redirect("dashboard")
 
-        return render(request, "game/login.html", {"error": "Invalid login"})
+        return render(request, "game/login.html", {"error": "Invalid login", **get_children_context(request)})
 
-    return render(request, "game/login.html")
+    return render(request, "game/login.html", get_children_context(request))
 
 def logout_view(request):
     logout(request)
@@ -127,7 +134,7 @@ def child_view(request, child_id):
     rolls_available = Reward.objects.filter(child=child, is_used=False).count()
 
     # Pass child.rolls_available so the template can use it
-    child.rolls_available = rolls_available
+    # child.rolls_available = rolls_available
 
     return render(request, "game/child.html", {
         "child": child,
@@ -215,6 +222,10 @@ def give_chest(request):
     tier_name = tier_map.get(str(tier).lower(), "bronze")
     print("DEBUG add_reward mapped tier_name:", tier_name)
 
+    # Enforce free tier restriction
+    if not getattr(request.user, "is_premium", False):
+        tier_name = "bronze"
+
     chest = Chest.objects.create(
         child=child,
         tier=tier_name,
@@ -267,6 +278,10 @@ def add_reward(request):
 
     tier_name = tier_map.get(str(tier).lower(), "bronze")
     print("DEBUG give_chest mapped tier_name:", tier_name)
+
+    # Enforce free tier restriction
+    if not getattr(request.user, "is_premium", False):
+        tier_name = "bronze"
 
     chest = Chest.objects.create(
         child=child,
@@ -467,9 +482,9 @@ def enter_pin(request):
             request.session["parent_auth_time"] = timezone.now().timestamp()
             return redirect("dashboard")
 
-        return render(request, "game/pin.html", {"error": "Invalid PIN"})
+        return render(request, "game/pin.html", {"error": "Invalid PIN", **get_children_context(request)})
 
-    return render(request, "game/pin.html")
+    return render(request, "game/pin.html", get_children_context(request))
 
 @login_required
 @require_POST
@@ -532,7 +547,7 @@ def signup(request):
             login(request, user, backend='django.contrib.auth.backends.ModelBackend')
             return redirect("setup_page")
 
-    return render(request, "game/signup.html")
+    return render(request, "game/signup.html", get_children_context(request))
 
 
 # New function to change the parent's PIN
