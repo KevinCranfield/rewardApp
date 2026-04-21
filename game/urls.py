@@ -5,6 +5,7 @@ from . import views
 urlpatterns = [
     path("", views.home, name="home"),              # 🏠 HOME
     path("dashboard/", views.dashboard, name="dashboard"),  # 👨‍👩‍👧 PARENT
+    path("setup/", views.setup_page, name="setup_page"),  # ⚙️ SETUP PAGE
 
     # 👶 CHILD GAME (by id)
     path("child/<int:child_id>/", views.child_view, name="child_view"),

@@ -97,3 +97,15 @@ class Reward(models.Model):
 
     def __str__(self):
         return f"{self.child.name} - {self.reason}"
+
+
+# RewardType model
+class RewardType(models.Model):
+    name = models.CharField(max_length=100)
+    image = models.ImageField(upload_to="rewards/", blank=True, null=True)
+
+    is_default = models.BooleanField(default=False)
+    user = models.ForeignKey(User, null=True, blank=True, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.name
