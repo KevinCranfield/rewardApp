@@ -138,7 +138,7 @@ def add_child(request):
                 return JsonResponse({
                     "success": False,
                     "error": "Free plan allows only 1 child. Upgrade to add more."
-                })
+                }, status=400)
 
         name = request.POST.get("name")
         colour = request.POST.get("colour")
@@ -146,7 +146,18 @@ def add_child(request):
         if name and colour:
             Child.objects.create(family=family, name=name, colour=colour)
 
-    return redirect("dashboard")
+        # If AJAX request, return JSON
+        if request.headers.get("x-requested-with") == "XMLHttpRequest":
+            return JsonResponse({
+                "success": True,
+                "child": {
+                    "name": name,
+                    "colour": colour
+                }
+            })
+
+        # fallback (non-AJAX)
+        return redirect("setup_page")
 
 
 # New function to give a chest directly to a child

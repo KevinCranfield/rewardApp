@@ -286,13 +286,17 @@ function roll(childId){
             }
             // FIX 12: button re-enable is handled at animation end in animateMovement/animateJump
             // — removed competing setTimeout here that caused double-roll race condition
+
+            // 🎁 Reward trigger AFTER movement completes
+            if(data.reward){
+                const steps = Math.abs((data.from || current) - data.position);
+                const duration = steps * 220 + 400; // match movement timing
+
+                setTimeout(() => {
+                    showReward(data.reward);
+                }, duration);
+            }
         });
-        // 🎁 Reward trigger (after movement finishes)
-        if(data.reward){
-            setTimeout(() => {
-                showReward(data.reward);
-            }, 300);
-        }
 
         showToast("🎲 Rolled " + data.dice);
 
