@@ -110,14 +110,16 @@ body.loaded{visibility:visible;}
             <a href="/setup/">Setup</a>
         {% endif %}
 
-        {% if children %}
-            {% for c in children %}
-                <a href="/child/{{ c.id }}/" class="child-link nav-child" data-child-id="{{ c.id }}">
-                    <span class="nav-dot" style="background: {{ c.colour }}"></span>
-                    {{ c.name }}
-                </a>
-            {% endfor %}
-        {% endif %}
+        <div class="child-nav">
+            {% if children %}
+                {% for c in children %}
+                    <a href="/child/{{ c.id }}/" class="child-link nav-child" data-child-id="{{ c.id }}">
+                        <span class="nav-dot" style="background: {{ c.colour }}"></span>
+                        {{ c.name }}
+                    </a>
+                {% endfor %}
+            {% endif %}
+        </div>
 
         {% if request.user.is_authenticated %}
             <span class="nav-user">👤 {{ request.user.username }}</span>
