@@ -28,6 +28,15 @@ class Child(models.Model):
 
     position = models.IntegerField(default=0)
 
+    # 🎯 Main reward (goal when reaching square 64)
+    main_reward = models.ForeignKey(
+        'RewardType',
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="goal_for_children"
+    )
+
     def __str__(self):
         return self.name
 

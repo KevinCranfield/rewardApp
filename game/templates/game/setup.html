@@ -29,6 +29,21 @@
         <div class="child-card">
           <div class="child-avatar" style="background: {{ child.colour }}"></div>
           <div class="child-name">{{ child.name }}</div>
+
+          <!-- 🎁 Rewards for this child -->
+          <div class="child-rewards">
+            {% for reward in child.reward_types.all %}
+              <div class="mini-reward">{{ reward.name }}</div>
+            {% empty %}
+              <div class="no-reward">No rewards yet</div>
+            {% endfor %}
+          </div>
+
+          <!-- ➕ Add reward button (opens modal) -->
+          <button class="add-reward-btn" onclick="openRewardModal({{ child.id }}, '{{ child.name|escapejs }}')">
+            + Add Reward
+          </button>
+
           <a href="/remove-child/{{ child.id }}/" class="remove-child">Remove</a>
         </div>
       {% empty %}
@@ -132,5 +147,74 @@
 }
 
 </style>
+
+.child-rewards {
+  margin-top: 8px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  justify-content: center;
+}
+
+.mini-reward {
+  background: #e0f2fe;
+  padding: 3px 6px;
+  border-radius: 6px;
+  font-size: 11px;
+}
+
+.no-reward {
+  font-size: 11px;
+  color: #888;
+}
+
+.add-reward-btn {
+  margin-top: 8px;
+  font-size: 12px;
+  background: #22c55e;
+  color: white;
+  border: none;
+  padding: 4px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.add-reward-btn:hover {
+  background: #16a34a;
+}
+
+<!-- 🎁 Add Reward Modal -->
+<div id="reward-modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); align-items:center; justify-content:center; z-index:999;">
+  <div style="background:white; padding:20px; border-radius:12px; width:320px;">
+    <h3 id="modal-title">Add Reward</h3>
+
+    <form method="POST" action="/add-reward-type/" enctype="multipart/form-data">
+      {% csrf_token %}
+      <input type="hidden" name="child_id" id="modal-child-id">
+
+      <input type="text" name="name" placeholder="Reward name" required style="width:100%; margin-bottom:10px;">
+
+      <input type="file" name="image" accept="image/*" style="margin-bottom:10px;">
+
+      <button type="submit" style="width:100%; background:#22c55e; color:white; border:none; padding:8px; border-radius:8px;">
+        Save Reward
+      </button>
+    </form>
+
+    <button onclick="closeRewardModal()" style="margin-top:10px; width:100%;">Cancel</button>
+  </div>
+</div>
+
+<script>
+function openRewardModal(childId, childName){
+  document.getElementById('reward-modal').style.display = 'flex';
+  document.getElementById('modal-child-id').value = childId;
+  document.getElementById('modal-title').innerText = 'Add reward for ' + childName;
+}
+
+function closeRewardModal(){
+  document.getElementById('reward-modal').style.display = 'none';
+}
+</script>
 
 {% endblock %}

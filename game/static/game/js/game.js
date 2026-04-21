@@ -268,7 +268,6 @@ function roll(childId){
         console.log("ROLL:", data);
         console.log("Rolls remaining:", data.rolls_remaining);
 
-
         showDice(data.dice, () => {
             if(data.jump){
                 // First move to jump start
@@ -288,6 +287,12 @@ function roll(childId){
             // FIX 12: button re-enable is handled at animation end in animateMovement/animateJump
             // — removed competing setTimeout here that caused double-roll race condition
         });
+        // 🎁 Reward trigger (after movement finishes)
+        if(data.reward){
+            setTimeout(() => {
+                showReward(data.reward);
+            }, 300);
+        }
 
         showToast("🎲 Rolled " + data.dice);
 
@@ -1557,6 +1562,29 @@ window.addEventListener("beforeinstallprompt", (e) => {
     // Optional: trigger install after reward/chest later
     document.body.dataset.pwaReady = "true";
 });
+
+// 🎁 Reward display popup
+function showReward(reward){
+    const display = document.getElementById("reward-display");
+    const img = document.getElementById("reward-image");
+    const name = document.getElementById("reward-name");
+
+    if(!display) return;
+
+    img.src = reward.image || "";
+    name.innerText = reward.name || "Reward";
+
+    display.classList.remove("hidden");
+
+    try{
+        burstConfetti(40);
+        if(navigator.vibrate){ navigator.vibrate([60,30,60]); }
+    }catch(e){}
+
+    setTimeout(() => {
+        display.classList.add("hidden");
+    }, 3000);
+}
 
 // Function to trigger install (can be called from anywhere)
 function triggerInstallPrompt(){

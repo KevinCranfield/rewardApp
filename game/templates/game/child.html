@@ -1,11 +1,119 @@
-def add_child(request):
-    if request.method == "POST":
-        family = get_family(request.user)
+{% extends "game/base.html" %}
 
-        # 🔒 FREE PLAN LIMIT: only 1 child allowed
-        if not getattr(request.user, "is_premium", False):
-            if family.children.count() >= 1:
-                return JsonResponse({
-                    "success": False,
-                    "error": "Free plan allows only 1 child. Upgrade to add more."
-                })
+{% block content %}
+
+<div class="child-view" data-child-id="{{ child.id }}">
+
+  <h2>{{ child.name }}'s Game</h2>
+
+  <!-- 🎯 Roll button -->
+  <div style="text-align:center; margin:20px 0;">
+    <button
+      onclick="roll({{ child.id }})"
+      class="big-roll roll-btn {% if child.rolls_available == 0 %}disabled{% endif %}"
+      data-child="{{ child.id }}"
+      {% if child.rolls_available == 0 %}disabled{% endif %}
+    >
+      🎲 Roll
+    </button>
+
+    <div class="roll-status {% if child.rolls_available > 0 %}available{% else %}empty{% endif %}"
+         data-child="{{ child.id }}">
+      {% if child.rolls_available > 0 %}
+        🎯 {{ child.rolls_available }} roll{{ child.rolls_available|pluralize }} available
+      {% else %}
+        No more rolls — go earn another reward 🙂
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- 🎮 FULL BOARD -->
+  <div class="board-wrapper">
+    <div class="board" id="game-board">
+        {% if squares %}
+            {% for row in squares %}
+                {% for num in row %}
+                    <div class="square" data-square="{{ num }}">
+                        <span class="square-number">{{ num }}</span>
+                        <div class="token-container">
+                            {% if child.position == num %}
+                                <div
+                                    class="token"
+                                    id="token-{{ child.id }}"
+                                    style="
+                                        background: {{ child.colour }};
+                                        width: 28px;
+                                        height: 28px;
+                                        border-radius: 50%;
+                                        display: flex;
+                                        align-items: center;
+                                        justify-content: center;
+                                        color: white;
+                                        font-weight: bold;
+                                    "
+                                >
+                                    {{ child.name|slice:":1" }}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endfor %}
+        {% endif %}
+    </div>
+    <svg class="board-overlay"></svg>
+  </div>
+
+</div>
+
+<!-- 🎁 Reward Display -->
+<div id="reward-display" class="reward-display hidden">
+  <div class="reward-card">
+    <img id="reward-image" src="" />
+    <div id="reward-name"></div>
+  </div>
+</div>
+
+<style>
+.reward-display {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.reward-card {
+  background: white;
+  padding: 20px;
+  border-radius: 16px;
+  text-align: center;
+  animation: rewardPop 0.5s ease;
+}
+
+.reward-card img {
+  width: 120px;
+  height: 120px;
+  object-fit: cover;
+}
+
+#reward-name {
+  margin-top: 10px;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+@keyframes rewardPop {
+  0% { transform: scale(0.5); opacity: 0; }
+  70% { transform: scale(1.1); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.hidden {
+  display: none;
+}
+</style>
+
+{% endblock %}

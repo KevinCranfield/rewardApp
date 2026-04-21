@@ -404,6 +404,16 @@ def roll(request):
         for c in all_children
     ]
 
+    # 🎁 Reward trigger when reaching square 64
+    reward_data = None
+    if child.position == 64:
+        reward_obj = RewardType.objects.filter(child=child).order_by("?").first()
+        if reward_obj:
+            reward_data = {
+                "name": reward_obj.name,
+                "image": reward_obj.image.url if reward_obj.image else None
+            }
+
     return JsonResponse({
         "success": True,
         "dice": roll_value,
@@ -412,7 +422,8 @@ def roll(request):
         "rolls_remaining": remaining,
         "jump": jump_to is not None,
         "from": jump_from,
-        "children": children_data,   # FIX: token colour data for JS
+        "children": children_data,
+        "reward": reward_data,   # 🎁 send reward to frontend
     })
 
 
@@ -565,6 +576,28 @@ def setup_page(request):
         "rewards": rewards,
     })
 
+
+# 🎁 Add reward type for a specific child
+@login_required
+def add_reward_type(request):
+    if request.method == "POST":
+        family = get_family(request.user)
+
+        child_id = request.POST.get("child_id")
+        name = request.POST.get("name")
+        image = request.FILES.get("image")
+
+        child = Child.objects.filter(id=child_id, family=family).first()
+
+        if child and name:
+            RewardType.objects.create(
+                name=name,
+                image=image,
+                child=child,
+                user=request.user
+            )
+
+    return redirect("setup_page")
 
 # Custom password reset view
 class CustomPasswordResetView(PasswordResetView):
