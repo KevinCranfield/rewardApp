@@ -404,15 +404,14 @@ def roll(request):
         for c in all_children
     ]
 
-    # 🎁 Reward trigger when reaching square 64
+    # 🎁 Main reward trigger when reaching square 64 (pre-selected goal)
     reward_data = None
-    if child.position == 64:
-        reward_obj = RewardType.objects.filter(child=child).order_by("?").first()
-        if reward_obj:
-            reward_data = {
-                "name": reward_obj.name,
-                "image": reward_obj.image.url if reward_obj.image else None
-            }
+    if child.position == 64 and getattr(child, "main_reward", None):
+        reward_obj = child.main_reward
+        reward_data = {
+            "name": reward_obj.name,
+            "image": reward_obj.image.url if reward_obj.image else None
+        }
 
     return JsonResponse({
         "success": True,

@@ -30,6 +30,24 @@
           <div class="child-avatar" style="background: {{ child.colour }}"></div>
           <div class="child-name">{{ child.name }}</div>
 
+          <!-- 🎯 Main Reward (Goal) -->
+          <form method="POST" action="/set-main-reward/" class="main-reward-form">
+            {% csrf_token %}
+            <input type="hidden" name="child_id" value="{{ child.id }}">
+
+            <select name="reward_id">
+              <option value="">Select goal</option>
+              {% for reward in rewards %}
+                <option value="{{ reward.id }}"
+                  {% if child.main_reward and child.main_reward.id == reward.id %}selected{% endif %}>
+                  {{ reward.name }}
+                </option>
+              {% endfor %}
+            </select>
+
+            <button type="submit">🎯 Goal</button>
+          </form>
+
           <!-- 🎁 Rewards for this child -->
           <div class="child-rewards">
             {% for reward in child.reward_types.all %}
@@ -146,6 +164,31 @@
   margin-bottom: 20px;
 }
 
+  .main-reward-form {
+    margin-top: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  .main-reward-form select {
+    font-size: 12px;
+    padding: 3px;
+  }
+
+  .main-reward-form button {
+    font-size: 11px;
+    background: #f59e0b;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 4px;
+    cursor: pointer;
+  }
+
+  .main-reward-form button:hover {
+    background: #d97706;
+  }
 </style>
 
 .child-rewards {
