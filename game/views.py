@@ -174,8 +174,9 @@ def add_child(request):
             return JsonResponse({
                 "success": True,
                 "child": {
-                    "name": name,
-                    "colour": colour
+                    "id": child.id,
+                    "name": child.name,
+                    "colour": child.colour
                 }
             })
 
