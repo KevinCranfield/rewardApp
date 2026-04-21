@@ -1640,6 +1640,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
                         // ✅ Remove from navbar
                         document.querySelectorAll(`[data-child-id="${childId}"]`).forEach(el => el.remove());
+                        // 🔥 Fallback: remove any nav links without data attribute
+                        document.querySelectorAll(`a[href="/child/${childId}/"]`).forEach(el => el.remove());
 
                         // ✅ Re-enable Add Child button if it was disabled
                         const addBtn = document.querySelector(".child-btn[disabled]");
@@ -1658,6 +1660,19 @@ document.addEventListener("DOMContentLoaded", () => {
                         }
 
                         showToast("Child removed");
+
+                        // 🔥 AUTO SWITCH CHILD (avoid dead page)
+                        const currentPath = window.location.pathname;
+
+                        if(currentPath.includes(`/child/${childId}/`)){
+                            const remaining = document.querySelectorAll(".nav-child");
+
+                            if(remaining.length > 0){
+                                window.location.href = remaining[0].getAttribute("href");
+                            } else {
+                                window.location.href = "/setup/";
+                            }
+                        }
 
                     } else {
                         showToast(data.error || "Error removing child");
