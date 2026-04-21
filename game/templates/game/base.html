@@ -222,8 +222,8 @@ window.addEventListener("load", () => {
     <a href="/" class="nav-item {% if request.path == '/' %}active{% endif %}">🏠<span>Home</span></a>
 
     {% if request.user.is_authenticated %}
-        <a href="/setup/" class="nav-item {% if request.path.startswith:'/setup' %}active{% endif %}">🧱<span>Setup</span></a>
-        <a href="/dashboard/" class="nav-item {% if request.path.startswith:'/dashboard' %}active{% endif %}">
+        <a href="/setup/" class="nav-item {% if request.path|slice:":6" == "/setup" %}active{% endif %}">🧱<span>Setup</span></a>
+        <a href="/dashboard/" class="nav-item {% if request.path|slice:":10" == "/dashboard" %}active{% endif %}">
             🎁
             <span>Rewards</span>
             {% if children %}
@@ -239,7 +239,7 @@ window.addEventListener("load", () => {
         </a>
 
         {% if children and children|length > 0 %}
-            <a href="/child/{{ children.0.id }}/" class="nav-item {% if request.path.startswith:'/child' %}active{% endif %}">
+            <a href="/child/{{ children.0.id }}/" class="nav-item {% if request.path|slice:":6" == "/child" %}active{% endif %}">
                 🎮
                 <span>Play</span>
                 {% if children %}
