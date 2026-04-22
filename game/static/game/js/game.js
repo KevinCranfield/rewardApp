@@ -1817,3 +1817,31 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
 });
+
+// =========================
+// REWARD IMAGE PREVIEW SUPPORT
+// =========================
+document.addEventListener("DOMContentLoaded", () => {
+    const input = document.getElementById("reward-image-input");
+    const preview = document.getElementById("reward-image-preview");
+
+    if(!input || !preview) return;
+
+    input.addEventListener("change", () => {
+        const file = input.files[0];
+
+        if(!file){
+            preview.style.display = "none";
+            preview.src = "";
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            preview.src = e.target.result;
+            preview.style.display = "block";
+        };
+
+        reader.readAsDataURL(file);
+    });
+});
