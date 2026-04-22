@@ -378,6 +378,18 @@
     font-size: 11px;
     color: #16a34a;
   }
+
+.reward-preset {
+  cursor: pointer;
+  text-align: center;
+  padding: 6px;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+.reward-preset:hover {
+  background: #f3f4f6;
+  transform: scale(1.05);
+}
 </style>
 
 <!-- 🎁 Add Reward Modal -->
@@ -390,6 +402,25 @@
       <input type="hidden" name="child_id" id="modal-child-id">
 
       <input type="text" name="name" placeholder="Reward name" required style="width:100%; margin-bottom:10px;">
+
+      <!-- ⭐ Quick reward presets (free users too) -->
+      <div style="margin-bottom:10px;">
+        <div style="font-size:12px; margin-bottom:6px; font-weight:600;">Quick rewards</div>
+        <div style="display:flex; gap:8px; justify-content:center;">
+          <div class="reward-preset" data-name="Ice Cream" data-img="/static/game/images/icecream.png">
+            <img src="/static/game/images/icecream.png" style="width:40px;height:40px;object-fit:cover;border-radius:8px;">
+            <div style="font-size:11px;">Ice Cream</div>
+          </div>
+          <div class="reward-preset" data-name="Movie Night" data-img="/static/game/images/movie.png">
+            <img src="/static/game/images/movie.png" style="width:40px;height:40px;object-fit:cover;border-radius:8px;">
+            <div style="font-size:11px;">Movie Night</div>
+          </div>
+          <div class="reward-preset" data-name="Screen Time" data-img="/static/game/images/screentime.png">
+            <img src="/static/game/images/screentime.png" style="width:40px;height:40px;object-fit:cover;border-radius:8px;">
+            <div style="font-size:11px;">Screen Time</div>
+          </div>
+        </div>
+      </div>
 
       {% if request.user.is_premium %}
         <label style="font-size:12px; display:block; margin-bottom:4px;">🖼️ Upload image (Premium)</label>
@@ -505,6 +536,14 @@ if (imgInput) {
     reader.readAsDataURL(file);
   });
 }
+
+// ⭐ Quick reward preset click
+const nameInput = document.querySelector('input[name="name"]');
+document.querySelectorAll(".reward-preset").forEach(el => {
+  el.addEventListener("click", () => {
+    nameInput.value = el.dataset.name;
+  });
+});
 </script>
 
 {% endblock %}
