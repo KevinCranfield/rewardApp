@@ -3011,9 +3011,11 @@ body {
 .reward-card img {
     width: 60px;
     height: 60px;
-    object-fit: cover;
+    object-fit: contain;
     border-radius: 12px;
     margin-bottom: 6px;
+    background: #f8fafc;
+    padding: 6px;
 }
 
 .reward-card span {
