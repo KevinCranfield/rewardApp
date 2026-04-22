@@ -48,22 +48,32 @@
           <div class="child-name">{{ child.name }}</div>
 
           <!-- 🎯 Main Reward (Goal) -->
-          <form method="POST" action="/set-main-reward/" class="main-reward-form">
-            {% csrf_token %}
-            <input type="hidden" name="child_id" value="{{ child.id }}">
+          <div class="goal-section">
+            <div class="goal-title">🎯 Choose Goal</div>
 
-            <select name="reward_id" required>
-              <option value="">Select goal</option>
+            <div class="goal-options">
               {% for reward in rewards %}
-                <option value="{{ reward.id }}"
-                  {% if child.main_reward and child.main_reward.id == reward.id %}selected{% endif %}>
-                  {{ reward.name }}
-                </option>
-              {% endfor %}
-            </select>
+                <div class="goal-card {% if child.main_reward and child.main_reward.id == reward.id %}selected{% endif %}"
+                     data-child="{{ child.id }}"
+                     data-reward="{{ reward.id }}">
 
-            <button type="submit">🎯 Goal</button>
-          </form>
+                  {% if reward.image %}
+                    <img src="{{ reward.image.url }}" />
+                  {% else %}
+                    🎁
+                  {% endif %}
+
+                  <div>{{ reward.name }}</div>
+                </div>
+              {% endfor %}
+            </div>
+
+            {% if child.main_reward %}
+              <div class="goal-selected">
+                ✅ {{ child.main_reward.name }}
+              </div>
+            {% endif %}
+          </div>
 
           <!-- 🎁 Rewards for this child -->
           <div class="child-rewards">
@@ -319,6 +329,58 @@
 }
 </style>
 
+.goal-section {
+  margin-top: 10px;
+}
+
+.goal-title {
+  font-weight: 600;
+  margin-bottom: 8px;
+  font-size: 13px;
+}
+
+.goal-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  justify-content: center;
+}
+
+.goal-card {
+  background: #f3f4f6;
+  border-radius: 10px;
+  padding: 8px;
+  cursor: pointer;
+  text-align: center;
+  width: 70px;
+  transition: all 0.2s ease;
+  border: 2px solid transparent;
+  font-size: 11px;
+}
+
+.goal-card:hover {
+  transform: scale(1.05);
+  background: #e5e7eb;
+}
+
+.goal-card.selected {
+  border: 2px solid #22c55e;
+  background: #dcfce7;
+}
+
+.goal-card img {
+  width: 30px;
+  height: 30px;
+  object-fit: cover;
+  margin-bottom: 4px;
+}
+
+.goal-selected {
+  margin-top: 6px;
+  font-size: 11px;
+  color: #16a34a;
+}
+
 <!-- 🎁 Add Reward Modal -->
 <div id="reward-modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); align-items:center; justify-content:center; z-index:999;">
   <div style="background:white; padding:20px; border-radius:12px; width:320px;">
@@ -383,5 +445,35 @@ document.querySelectorAll(".remove-child-form").forEach(form => {
   });
 });
 </script>
+
+// 🎯 Select goal via cards (AJAX)
+document.addEventListener("click", async (e) => {
+  const card = e.target.closest(".goal-card");
+  if (!card) return;
+
+  const childId = card.dataset.child;
+  const rewardId = card.dataset.reward;
+
+  try {
+    const res = await fetch("/set-main-reward/", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+        "X-CSRFToken": document.querySelector('[name=csrfmiddlewaretoken]').value
+      },
+      body: `child_id=${childId}&reward_id=${rewardId}`
+    });
+
+    if (!res.ok) throw new Error();
+
+    document.querySelectorAll(`.goal-card[data-child="${childId}"]`)
+      .forEach(el => el.classList.remove("selected"));
+
+    card.classList.add("selected");
+
+  } catch {
+    alert("Failed to set goal");
+  }
+});
 
 {% endblock %}
