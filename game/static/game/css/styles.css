@@ -2988,9 +2988,9 @@ body {
     pointer-events: auto !important;
     z-index: 99999 !important;
 }
-# =========================
-#    REWARD IMAGE UPLOAD + CARDS
-# =========================
+/* =========================
+   REWARD IMAGE UPLOAD + CARDS
+========================= */
 
 .reward-card {
     background: white;

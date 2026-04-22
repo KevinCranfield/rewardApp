@@ -635,6 +635,9 @@ def add_reward_type(request):
         child_id = request.POST.get("child_id")
         name = request.POST.get("name")
         image = request.FILES.get("image")
+        # 🔒 Enforce premium for image uploads
+        if not getattr(request.user, "is_premium", False):
+            image = None
 
         child = Child.objects.filter(id=child_id, family=family).first()
 
