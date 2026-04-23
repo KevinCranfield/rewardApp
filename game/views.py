@@ -27,13 +27,11 @@ def build_board():
             current_row.append(num)
             num += 1
 
-        # Reverse every other row for snake pattern
         if row % 2 == 1:
             current_row.reverse()
 
         squares.append(current_row)
 
-    # 🔥 Flip vertically so row 1 is at the bottom
     squares.reverse()
 
     return squares
@@ -133,6 +131,7 @@ def child_view(request, child_id):
         "chests": chests,
         "rolls_available": 0,
         "squares": build_board(),
+        "main_reward": child.main_reward,  # 🎯 pass main reward to template
     })
 
 
