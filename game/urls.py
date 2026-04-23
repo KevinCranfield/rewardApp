@@ -3,9 +3,9 @@ from django.contrib.auth import views as auth_views
 from . import views
 
 urlpatterns = [
-    path("", views.home, name="home"),              # 🏠 HOME
-    path("dashboard/", views.dashboard, name="dashboard"),  # 👨‍👩‍👧 PARENT
-    path("setup/", views.setup_page, name="setup_page"),  # ⚙️ SETUP PAGE
+    path("", views.home, name="home"),
+    path("dashboard/", views.dashboard, name="dashboard"),
+    path("setup/", views.setup_page, name="setup_page"),
 
     # 👶 CHILD GAME (by id)
     path("child/<int:child_id>/", views.child_view, name="child_view"),
@@ -16,6 +16,7 @@ urlpatterns = [
     path("add-reward/", views.add_reward, name="add_reward"),
     path("add-reward-type/", views.add_reward_type, name="add_reward_type"),
     path("set-main-reward/", views.set_main_reward, name="set_main_reward"),
+    path("add-main-reward/", views.add_main_reward, name="add_main_reward"),  # 🎯 NEW
     path("roll/", views.roll, name="roll"),
     path("reset-board/", views.reset_board, name="reset_board"),
 

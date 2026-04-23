@@ -1,7 +1,3 @@
-<div style="background:red;color:white;padding:10px;">
-  THIS IS SETUP.HTML TEST
-</div>
-
 {% extends "game/base.html" %}
 {% load static %}
 
@@ -12,18 +8,17 @@
   <h1>🎮 Setup Your Reward Game</h1>
 
   <div class="onboarding-box">
-    👋 Let’s get started:
+    👋 Let's get started:
     <ol>
       <li>Add your child</li>
-      <li>Add rewards 🎁</li>
       <li>Pick a goal 🎯</li>
       <li>Start playing 🎲</li>
     </ol>
   </div>
 
-  {% if not request.user.is_premium %}
+  {% if not is_premium %}
   <div class="upgrade-banner">
-    🔒 Free plan: 1 child, bronze chests only  
+    🔒 Free plan: 1 child, bronze chests only —
     <a href="/upgrade/">⭐ Upgrade to Premium</a>
   </div>
   {% endif %}
@@ -37,7 +32,7 @@
       <input class="child-input" type="text" name="name" placeholder="Child name" required>
       <input class="child-colour" type="color" name="colour" value="#3b82f6">
 
-      {% if not request.user.is_premium and children|length >= 1 %}
+      {% if not is_premium and children|length >= 1 %}
         <button class="child-btn" type="button" disabled title="Upgrade to add more children">
           🔒 Upgrade for more children
         </button>
@@ -57,7 +52,7 @@
             <div class="goal-title">🎯 Choose Goal</div>
 
             <div class="goal-options">
-              {% for reward in rewards %}
+              {% for reward in main_rewards %}
                 <div class="goal-card {% if child.main_reward and child.main_reward.id == reward.id %}selected{% endif %}"
                      data-child="{{ child.id }}"
                      data-reward="{{ reward.id }}">
@@ -65,7 +60,22 @@
                   {% if reward.image %}
                     <img src="{{ reward.image.url }}" />
                   {% else %}
-                    🎁
+                    <!-- fallback to static preset images by name -->
+                    {% if reward.name == "Ice Cream" %}
+                      <img src="{% static 'game/images/icecream.png' %}" />
+                    {% elif reward.name == "Movie Night" %}
+                      <img src="{% static 'game/images/movie.png' %}" />
+                    {% elif reward.name == "Trip to Park" %}
+                      <img src="{% static 'game/images/park.png' %}" />
+                    {% elif reward.name == "Screen Time" %}
+                      <img src="{% static 'game/images/screentime.png' %}" />
+                    {% elif reward.name == "New Toy" %}
+                      <img src="{% static 'game/images/toy.png' %}" />
+                    {% elif reward.name == "Sweet Treat" %}
+                      <img src="{% static 'game/images/treat.png' %}" />
+                    {% else %}
+                      🎁
+                    {% endif %}
                   {% endif %}
 
                   <div>{{ reward.name }}</div>
@@ -78,28 +88,14 @@
                 ✅ {{ child.main_reward.name }}
               </div>
             {% endif %}
+
+            <!-- 🔒 Free: add text reward with standard image | 💎 Paid: add with custom image -->
+            <button class="add-goal-btn" onclick="openGoalModal({{ child.id }}, '{{ child.name|escapejs }}')">
+              + Custom Goal
+            </button>
           </div>
 
-          <!-- 🎁 Rewards for this child -->
-          <div class="child-rewards">
-            {% for reward in child.reward_types.all %}
-              <div class="mini-reward">{{ reward.name }}</div>
-            {% empty %}
-              <div class="no-reward">No rewards yet</div>
-            {% endfor %}
-          </div>
-
-          {% if child.reward_types.count == 0 %}
-            <button class="add-reward-btn" onclick="openRewardModal({{ child.id }}, '{{ child.name|escapejs }}')">
-              🎁 Give First Reward
-            </button>
-          {% else %}
-            <button class="add-reward-btn" onclick="openRewardModal({{ child.id }}, '{{ child.name|escapejs }}')">
-              + Add Reward
-            </button>
-          {% endif %}
-
-          {% if child.reward_types.count > 0 %}
+          {% if child.main_reward %}
             <a href="/child/{{ child.id }}/" class="start-game-btn">🎮 Play</a>
           {% endif %}
 
@@ -110,24 +106,6 @@
         </div>
       {% empty %}
         <p>No children added yet</p>
-      {% endfor %}
-    </div>
-  </div>
-
-  <!-- 🎁 REWARDS -->
-  <div class="setup-section">
-    <h2>🎁 Rewards</h2>
-
-    <div class="rewards-grid">
-      {% for reward in rewards %}
-        <div class="reward-card">
-          {% if reward.image %}
-            <img src="{{ reward.image.url }}" class="reward-img">
-          {% else %}
-            <div class="reward-placeholder">🎁</div>
-          {% endif %}
-          <div class="reward-name">{{ reward.name }}</div>
-        </div>
       {% endfor %}
     </div>
   </div>
@@ -190,7 +168,7 @@
   padding: 15px;
   border-radius: 12px;
   text-align: center;
-  width: 160px;
+  width: 180px;
   min-height: 220px;
 }
 
@@ -201,33 +179,19 @@
   margin: auto;
 }
 
+.child-name {
+  font-weight: 600;
+  margin-top: 6px;
+  margin-bottom: 4px;
+}
+
 .remove-child {
   color: red;
   font-size: 12px;
-}
-
-.rewards-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-  gap: 15px;
-}
-
-.reward-card {
-  background: white;
-  border-radius: 12px;
-  padding: 10px;
-  text-align: center;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-}
-
-.reward-img {
-  width: 60px;
-  height: 60px;
-  object-fit: cover;
-}
-
-.reward-placeholder {
-  font-size: 40px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  margin-top: 8px;
 }
 
 .upgrade-banner {
@@ -235,71 +199,6 @@
   padding: 10px;
   border-radius: 10px;
   margin-bottom: 20px;
-}
-
-  .main-reward-form {
-    margin-top: 8px;
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
-  }
-
-  .main-reward-form select {
-    font-size: 12px;
-    padding: 6px;
-    width: 100%;
-    border-radius: 6px;
-    border: 1px solid #ccc;
-  }
-
-  .main-reward-form button {
-    font-size: 11px;
-    background: #f59e0b;
-    color: white;
-    border: none;
-    border-radius: 6px;
-    padding: 6px;
-    cursor: pointer;
-    width: 100%;
-  }
-
-  .main-reward-form button:hover {
-    background: #d97706;
-  }
-
-.child-rewards {
-  margin-top: 8px;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 5px;
-  justify-content: center;
-}
-
-.mini-reward {
-  background: #e0f2fe;
-  padding: 3px 6px;
-  border-radius: 6px;
-  font-size: 11px;
-}
-
-.no-reward {
-  font-size: 11px;
-  color: #888;
-}
-
-.add-reward-btn {
-  margin-top: 8px;
-  font-size: 12px;
-  background: #22c55e;
-  color: white;
-  border: none;
-  padding: 4px 8px;
-  border-radius: 6px;
-  cursor: pointer;
-}
-
-.add-reward-btn:hover {
-  background: #16a34a;
 }
 
 .onboarding-box {
@@ -329,185 +228,118 @@
   background: #2563eb;
 }
 
-.setup-actions {
-  margin-bottom: 20px;
+.goal-section {
+  margin-top: 10px;
 }
-  .goal-section {
-    margin-top: 10px;
-  }
 
-  .goal-title {
-    font-weight: 600;
-    margin-bottom: 8px;
-    font-size: 13px;
-  }
+.goal-title {
+  font-weight: 600;
+  margin-bottom: 8px;
+  font-size: 13px;
+}
 
-  .goal-options {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
-    justify-content: center;
-  }
+.goal-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  justify-content: center;
+}
 
-  .goal-card {
-    background: #f3f4f6;
-    border-radius: 10px;
-    padding: 8px;
-    cursor: pointer;
-    text-align: center;
-    width: 70px;
-    transition: all 0.2s ease;
-    border: 2px solid transparent;
-    font-size: 11px;
-  }
-
-  .goal-card:hover {
-    transform: scale(1.05);
-    background: #e5e7eb;
-  }
-
-  .goal-card.selected {
-    border: 2px solid #22c55e;
-    background: #dcfce7;
-  }
-
-  .goal-card img {
-    width: 30px;
-    height: 30px;
-    object-fit: cover;
-    margin-bottom: 4px;
-  }
-
-  .goal-selected {
-    margin-top: 6px;
-    font-size: 11px;
-    color: #16a34a;
-  }
-
-.reward-preset {
+.goal-card {
+  background: #fff;
+  border-radius: 10px;
+  padding: 6px;
   cursor: pointer;
   text-align: center;
-  padding: 6px;
-  border-radius: 8px;
+  width: 68px;
   transition: all 0.2s ease;
+  border: 2px solid transparent;
+  font-size: 11px;
 }
-.reward-preset:hover {
-  background: #f3f4f6;
+
+.goal-card:hover {
   transform: scale(1.05);
+  background: #e5e7eb;
+}
+
+.goal-card.selected {
+  border: 2px solid #22c55e;
+  background: #dcfce7;
+}
+
+.goal-card img {
+  width: 32px;
+  height: 32px;
+  object-fit: cover;
+  margin-bottom: 4px;
+  border-radius: 6px;
+}
+
+.goal-selected {
+  margin-top: 6px;
+  font-size: 11px;
+  color: #16a34a;
+}
+
+.add-goal-btn {
+  margin-top: 8px;
+  font-size: 11px;
+  background: #f59e0b;
+  color: white;
+  border: none;
+  padding: 4px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  width: 100%;
+}
+
+.add-goal-btn:hover {
+  background: #d97706;
 }
 </style>
 
-<!-- 🎁 Add Reward Modal -->
-<div id="reward-modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); align-items:center; justify-content:center; z-index:999;">
-  <div style="background:white; padding:20px; border-radius:12px; width:320px;">
-    <h3 id="modal-title">Add Reward</h3>
+<!-- 🎯 Add Custom Goal Modal -->
+<div id="goal-modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); align-items:center; justify-content:center; z-index:999;">
+  <div style="background:white; padding:20px; border-radius:12px; width:300px;">
+    <h3 id="goal-modal-title">Add Custom Goal</h3>
 
-    <form method="POST" action="/add-reward-type/" enctype="multipart/form-data">
+    <form method="POST" action="/add-main-reward/" enctype="multipart/form-data" id="goal-form">
       {% csrf_token %}
-      <input type="hidden" name="child_id" id="modal-child-id">
+      <input type="hidden" name="child_id" id="goal-modal-child-id">
 
-      <input type="text" name="name" placeholder="Reward name" required style="width:100%; margin-bottom:10px;">
+      <input type="text" name="name" id="goal-name-input" placeholder="e.g. Trip to Legoland" required
+             style="width:100%; padding:8px; border-radius:8px; border:1px solid #ccc; margin-bottom:10px; box-sizing:border-box;">
 
-      <!-- ⭐ Quick reward presets (free users too) -->
-      <div style="margin-bottom:10px;">
-        <div style="font-size:12px; margin-bottom:6px; font-weight:600;">Quick rewards</div>
-        <div style="display:flex; gap:8px; justify-content:center;">
-          <div class="reward-preset" data-name="Ice Cream" data-img="{% static 'game/images/icecream.png' %}">
-            <img src="{% static 'game/images/icecream.png' %}" style="width:40px;height:40px;object-fit:contain;border-radius:8px;">
-            <div style="font-size:11px;">Ice Cream</div>
-          </div>
-
-          <div class="reward-preset" data-name="Movie Night" data-img="{% static 'game/images/movie.png' %}">
-            <img src="{% static 'game/images/movie.png' %}" style="width:40px;height:40px;object-fit:contain;border-radius:8px;">
-            <div style="font-size:11px;">Movie Night</div>
-          </div>
-
-          <div class="reward-preset" data-name="Screen Time" data-img="{% static 'game/images/screentime.png' %}">
-            <img src="{% static 'game/images/screentime.png' %}" style="width:40px;height:40px;object-fit:contain;border-radius:8px;">
-            <div style="font-size:11px;">Screen Time</div>
-          </div>
-
-          <div class="reward-preset" data-name="Trip to Park" data-img="{% static 'game/images/park.png' %}">
-            <img src="{% static 'game/images/park.png' %}" style="width:40px;height:40px;object-fit:contain;border-radius:8px;">
-            <div style="font-size:11px;">Park</div>
-          </div>
-
-          <div class="reward-preset" data-name="New Toy" data-img="{% static 'game/images/toy.png' %}">
-            <img src="{% static 'game/images/toy.png' %}" style="width:40px;height:40px;object-fit:contain;border-radius:8px;">
-            <div style="font-size:11px;">Toy</div>
-          </div>
-
-          <div class="reward-preset" data-name="Sweet Treat" data-img="{% static 'game/images/treat.png' %}">
-            <img src="{% static 'game/images/treat.png' %}" style="width:40px;height:40px;object-fit:contain;border-radius:8px;">
-            <div style="font-size:11px;">Treat</div>
-          </div>
-        </div>
-      </div>
-
-      {% if request.user.is_premium %}
-        <label style="font-size:12px; display:block; margin-bottom:4px;">🖼️ Upload image (Premium)</label>
-        <input type="file" name="image" accept="image/*" id="reward-image-input" style="margin-bottom:10px; width:100%;">
-
-        <img id="reward-image-preview" style="display:none; width:60px; height:60px; object-fit:cover; border-radius:8px; margin:auto; margin-bottom:10px;" />
+      {% if is_premium %}
+        <label style="font-size:12px; display:block; margin-bottom:4px;">🖼️ Upload image (optional)</label>
+        <input type="file" name="image" accept="image/*" id="goal-image-input" style="margin-bottom:10px; width:100%;">
+        <img id="goal-image-preview" style="display:none; width:60px; height:60px; object-fit:cover; border-radius:8px; margin:auto; margin-bottom:10px;" />
       {% else %}
-        <div style="background:#f1f5f9; border-radius:10px; padding:10px; margin-bottom:10px; text-align:center; font-size:12px;">
-          🔒 Image upload is a premium feature<br>
-          <a href="/upgrade/" style="display:inline-block; margin-top:6px; background:#3b82f6; color:white; padding:6px 10px; border-radius:6px; text-decoration:none; font-weight:600;">
-            ⭐ Upgrade to unlock
-          </a>
+        <div style="background:#f1f5f9; border-radius:10px; padding:8px; margin-bottom:10px; text-align:center; font-size:12px;">
+          🎁 Free plan uses a standard image<br>
+          <a href="/upgrade/" style="font-size:11px; color:#3b82f6;">⭐ Upgrade to add your own image</a>
         </div>
       {% endif %}
 
-      <button type="submit" style="width:100%; background:#22c55e; color:white; border:none; padding:8px; border-radius:8px;">
-        Save Reward
+      <button type="submit" style="width:100%; background:#22c55e; color:white; border:none; padding:8px; border-radius:8px; cursor:pointer;">
+        Save Goal
       </button>
     </form>
 
-    <button onclick="closeRewardModal()" style="margin-top:10px; width:100%;">Cancel</button>
+    <button onclick="closeGoalModal()" style="margin-top:10px; width:100%; padding:6px; border-radius:8px; cursor:pointer;">Cancel</button>
   </div>
 </div>
 
 <script>
-function openRewardModal(childId, childName){
-  document.getElementById('reward-modal').style.display = 'flex';
-  document.getElementById('modal-child-id').value = childId;
-  document.getElementById('modal-title').innerText = 'Add reward for ' + childName;
+function openGoalModal(childId, childName) {
+  document.getElementById('goal-modal').style.display = 'flex';
+  document.getElementById('goal-modal-child-id').value = childId;
+  document.getElementById('goal-modal-title').innerText = 'Custom goal for ' + childName;
 }
 
-function closeRewardModal(){
-  document.getElementById('reward-modal').style.display = 'none';
+function closeGoalModal() {
+  document.getElementById('goal-modal').style.display = 'none';
 }
-
-// ⚡ Instant remove child (no reload)
-document.querySelectorAll(".remove-child-form").forEach(form => {
-  form.addEventListener("submit", function(e){
-    e.preventDefault();
-
-    const childCard = form.closest(".child-card");
-
-    fetch(form.action, {
-      method: "POST",
-      headers: {
-        "X-CSRFToken": form.querySelector("[name=csrfmiddlewaretoken]").value,
-        "X-Requested-With": "XMLHttpRequest"
-      }
-    })
-    .then(res => {
-      if(!res.ok) throw new Error("Failed");
-      return res.json().catch(() => ({}));
-    })
-    .then(() => {
-      if(childCard){
-        childCard.style.transition = "opacity 0.2s ease";
-        childCard.style.opacity = "0";
-        setTimeout(() => childCard.remove(), 200);
-      }
-    })
-    .catch(() => {
-      alert("Failed to remove child");
-    });
-  });
-});
 
 // 🎯 Select goal via cards (AJAX)
 document.addEventListener("click", async (e) => {
@@ -534,24 +366,54 @@ document.addEventListener("click", async (e) => {
 
     card.classList.add("selected");
 
+    // Update goal-selected text
+    const goalSelected = card.closest(".goal-section").querySelector(".goal-selected");
+    if (goalSelected) {
+      goalSelected.innerText = "✅ " + card.querySelector("div:last-child").innerText;
+    }
+
   } catch {
     alert("Failed to set goal");
   }
 });
-// 🖼️ Image preview for reward upload
-const imgInput = document.getElementById("reward-image-input");
-if (imgInput) {
-  imgInput.addEventListener("change", function () {
+
+// ⚡ Instant remove child
+document.querySelectorAll(".remove-child-form").forEach(form => {
+  form.addEventListener("submit", function(e) {
+    e.preventDefault();
+    const childCard = form.closest(".child-card");
+
+    fetch(form.action, {
+      method: "POST",
+      headers: {
+        "X-CSRFToken": form.querySelector("[name=csrfmiddlewaretoken]").value,
+        "X-Requested-With": "XMLHttpRequest"
+      }
+    })
+    .then(res => {
+      if (!res.ok) throw new Error("Failed");
+      return res.json().catch(() => ({}));
+    })
+    .then(() => {
+      if (childCard) {
+        childCard.style.transition = "opacity 0.2s ease";
+        childCard.style.opacity = "0";
+        setTimeout(() => childCard.remove(), 200);
+      }
+    })
+    .catch(() => alert("Failed to remove child"));
+  });
+});
+
+// 🖼️ Image preview for goal upload (premium only)
+const goalImgInput = document.getElementById("goal-image-input");
+if (goalImgInput) {
+  goalImgInput.addEventListener("change", function() {
     const file = this.files[0];
-    const preview = document.getElementById("reward-image-preview");
-
-    if (!file) {
-      preview.style.display = "none";
-      return;
-    }
-
+    const preview = document.getElementById("goal-image-preview");
+    if (!file) { preview.style.display = "none"; return; }
     const reader = new FileReader();
-    reader.onload = function (e) {
+    reader.onload = e => {
       preview.src = e.target.result;
       preview.style.display = "block";
     };
@@ -559,12 +421,43 @@ if (imgInput) {
   });
 }
 
-// ⭐ Quick reward preset click
-const nameInput = document.querySelector('input[name="name"]');
-document.querySelectorAll(".reward-preset").forEach(el => {
-  el.addEventListener("click", () => {
-    nameInput.value = el.dataset.name;
-  });
+// 🎯 After adding custom goal, set it as selected for the child
+document.getElementById("goal-form").addEventListener("submit", async function(e) {
+  e.preventDefault();
+  const form = e.target;
+  const formData = new FormData(form);
+  const childId = document.getElementById("goal-modal-child-id").value;
+
+  try {
+    const res = await fetch("/add-main-reward/", {
+      method: "POST",
+      headers: {
+        "X-CSRFToken": document.querySelector('[name=csrfmiddlewaretoken]').value
+      },
+      body: formData
+    });
+
+    const data = await res.json();
+
+    if (data.success) {
+      // Set the new reward as the child's goal
+      await fetch("/set-main-reward/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+          "X-CSRFToken": document.querySelector('[name=csrfmiddlewaretoken]').value
+        },
+        body: `child_id=${childId}&reward_id=${data.id}`
+      });
+
+      closeGoalModal();
+      window.location.reload(); // reload to show new goal card
+    } else {
+      alert(data.error || "Failed to save goal");
+    }
+  } catch {
+    alert("Something went wrong");
+  }
 });
 </script>
 
