@@ -11,7 +11,7 @@ import json
 from django.contrib.auth.views import PasswordResetView
 from django.db.models import Q
 
-from .models import Family, Child, Roll, Reward, Chest, RewardType
+from .models import Family, Child, Roll, Reward, Chest, RewardType, MainReward
 
 
 PARENT_AUTH_TIMEOUT = 300
@@ -71,11 +71,7 @@ def home(request):
         family = get_family(request.user)
         children = family.children.all()
 
-    # add rolls_available for badge usage
     children_list = list(children)
-    for c in children_list:
-        # properties handled on model; no manual assignment needed
-        pass
 
     return render(request, "game/home.html", {
         "children": children_list
@@ -118,7 +114,6 @@ def dashboard(request):
 
     for c in children:
         c.unopened_chests = c.chests.filter(is_opened=False)
-        # do NOT assign to c.unopened_chests_count or c.rolls_available (they are @property on the model)
 
     return render(request, "game/parentDashboard.html", {
         "children": children
@@ -131,10 +126,6 @@ def child_view(request, child_id):
     child = get_object_or_404(Child, id=child_id, family=family)
 
     chests = child.chests.filter(is_opened=False)
-    rolls_available = None  # rolls only update after chest is opened (handled via open_chest API)
-
-    # Pass child.rolls_available so the template can use it
-    # child.rolls_available = rolls_available
 
     return render(request, "game/child.html", {
         "child": child,
@@ -183,11 +174,9 @@ def add_child(request):
                 }
             })
 
-        # fallback (non-AJAX)
         return redirect("setup_page")
 
 
-# New function to give a chest directly to a child
 @login_required
 @require_POST
 def give_chest(request):
@@ -201,14 +190,12 @@ def give_chest(request):
     if not child:
         return JsonResponse({"success": False}, status=400)
 
-    # Accept multiple possible field names from frontend
     tier = (
         request.POST.get("tier")
         or request.POST.get("chest_type")
         or request.POST.get("rolls")
         or "bronze"
     )
-    print("DEBUG add_reward raw tier:", tier)
 
     tier_map = {
         "1": "bronze",
@@ -220,7 +207,6 @@ def give_chest(request):
     }
 
     tier_name = tier_map.get(str(tier).lower(), "bronze")
-    print("DEBUG add_reward mapped tier_name:", tier_name)
 
     # Enforce free tier restriction
     if not getattr(request.user, "is_premium", False):
@@ -258,14 +244,12 @@ def add_reward(request):
     if not reason:
         return JsonResponse({"success": False, "error": "Missing reason"}, status=400)
 
-    # Accept multiple possible field names from frontend
     tier = (
         request.POST.get("tier")
         or request.POST.get("chest_type")
         or request.POST.get("rolls")
         or "bronze"
     )
-    print("DEBUG give_chest raw tier:", tier)
 
     tier_map = {
         "1": "bronze",
@@ -277,7 +261,6 @@ def add_reward(request):
     }
 
     tier_name = tier_map.get(str(tier).lower(), "bronze")
-    print("DEBUG give_chest mapped tier_name:", tier_name)
 
     # Enforce free tier restriction
     if not getattr(request.user, "is_premium", False):
@@ -301,7 +284,6 @@ def add_reward(request):
 @require_POST
 def open_chest(request, chest_id=None):
     family = get_family(request.user)
-    # Support both URL param and POST body
     if chest_id is None:
         chest_id = request.POST.get("chest_id")
 
@@ -311,25 +293,21 @@ def open_chest(request, chest_id=None):
             child__family=family
         ).first()
 
-        # ❌ Chest not found
         if not chest:
             return JsonResponse({
                 "success": False,
                 "error": "Chest not found"
             }, status=400)
 
-        # ✅ Already opened (prevent double-click issues)
         if chest.is_opened:
             return JsonResponse({
                 "success": True,
                 "already_opened": True
             })
 
-        # ✅ Mark as opened
         chest.is_opened = True
         chest.save()
 
-        # 🎯 Determine rolls from tier
         if chest.tier == "gold":
             rolls_to_award = 3
         elif chest.tier == "silver":
@@ -337,14 +315,12 @@ def open_chest(request, chest_id=None):
         else:
             rolls_to_award = 1
 
-        # 🎁 Create rewards
         rewards = [
             Reward(child=chest.child)
             for _ in range(rolls_to_award)
         ]
         Reward.objects.bulk_create(rewards)
 
-    # 🔢 Count remaining rolls
     total_rolls = Reward.objects.filter(
         child=chest.child,
         is_used=False
@@ -358,13 +334,6 @@ def open_chest(request, chest_id=None):
     })
 
 
-# =============================================================
-# FIX: roll() now returns a `children` array in the response.
-# This gives game.js the colour + name data it needs to render
-# the token correctly after each roll, without a page refresh.
-# Previously the token was created as a plain dot with no colour
-# because window.__lastChildren was never populated from /roll/.
-# =============================================================
 @login_required
 @require_POST
 def roll(request):
@@ -386,14 +355,11 @@ def roll(request):
 
     roll_value = random.randint(1, 6)
 
-    start_position = child.position
     new_position = child.position + roll_value
 
-    # Cap at board size — don't overshoot square 64
     if new_position > 64:
         new_position = 64
 
-    # Snakes & ladders mapping
     snakes = {
         62: 44,
         55: 41,
@@ -411,16 +377,13 @@ def roll(request):
     jump_from = None
     jump_to = None
 
-    # Apply movement first
     child.position = new_position
 
-    # Check ladder
     if new_position in ladders:
         jump_from = new_position
         jump_to = ladders[new_position]
         child.position = jump_to
 
-    # Check snake
     elif new_position in snakes:
         jump_from = new_position
         jump_to = snakes[new_position]
@@ -436,8 +399,6 @@ def roll(request):
 
     remaining = Reward.objects.filter(child=child, is_used=False).count()
 
-    # FIX: build children array so JS can colour tokens correctly
-    # Include all children in the family so multi-child boards stay in sync
     all_children = Child.objects.filter(family=family)
     children_data = [
         {
@@ -449,7 +410,7 @@ def roll(request):
         for c in all_children
     ]
 
-    # 🎁 Main reward trigger when reaching square 64 (pre-selected goal)
+    # 🎁 Main reward trigger when reaching square 64
     reward_data = None
     if child.position == 64 and getattr(child, "main_reward", None):
         reward_obj = child.main_reward
@@ -467,7 +428,7 @@ def roll(request):
         "jump": jump_to is not None,
         "from": jump_from,
         "children": children_data,
-        "reward": reward_data,   # 🎁 send reward to frontend
+        "reward": reward_data,
     })
 
 
@@ -500,10 +461,6 @@ def remove_child(request, child_id):
     return JsonResponse({"success": True})
 
 
-# =============================================================
-# FIX: reset_board() now returns children array so JS can
-# re-render all tokens at position 0 without a page reload.
-# =============================================================
 @login_required
 @require_POST
 def reset_board(request):
@@ -518,7 +475,6 @@ def reset_board(request):
     Chest.objects.filter(child__family=family).delete()
     Reward.objects.filter(child__family=family).delete()
 
-    # FIX: return children so JS updateTokensUI can reset board visually
     children_data = [
         {
             "id": c.id,
@@ -549,7 +505,6 @@ def signup(request):
     return render(request, "game/signup.html", get_children_context(request))
 
 
-# New function to change the parent's PIN
 @login_required
 def change_pin(request):
     family = get_family(request.user)
@@ -565,14 +520,11 @@ def change_pin(request):
     return render(request, "game/change_pin.html")
 
 
-# Simple test endpoint for monitoring
 @login_required
 def sentry_test(request):
     return JsonResponse({"status": "ok"})
 
 
-
-# New function to check parent authentication via AJAX
 @login_required
 def ping_auth(request):
     if is_parent_authenticated(request):
@@ -580,7 +532,6 @@ def ping_auth(request):
     return JsonResponse({"authenticated": False}, status=401)
 
 
-# 🔥 New endpoint: return current roll state for a child
 @login_required
 def get_child_state(request):
     family = get_family(request.user)
@@ -601,32 +552,29 @@ def get_child_state(request):
     })
 
 
-
-
-# ⚙️ Setup page for parents
+# ⚙️ Setup page
 @login_required
 def setup_page(request):
     family = get_family(request.user)
-
     children = list(family.children.all())
+    is_premium = getattr(request.user, "is_premium", False)
 
-    # add rolls_available for badge usage
-    for c in children:
-        # properties handled on model; no manual assignment needed
-        pass
-
-    # 🔥 Show rewards per child + defaults
-    rewards = RewardType.objects.filter(
-        Q(child__in=children) | Q(is_default=True)
-    ).distinct()
+    # 🎯 Main rewards: presets always visible, family custom rewards for paid tier
+    if is_premium:
+        main_rewards = MainReward.objects.filter(
+            Q(is_preset=True) | Q(family=family)
+        )
+    else:
+        main_rewards = MainReward.objects.filter(is_preset=True)
 
     return render(request, "game/setup.html", {
         "children": children,
-        "rewards": rewards,
+        "main_rewards": main_rewards,
+        "is_premium": is_premium,
     })
 
 
-# 🎁 Add reward type for a specific child
+# 🎁 Add reward type for a specific child (chest reasons)
 @login_required
 def add_reward_type(request):
     if request.method == "POST":
@@ -635,6 +583,7 @@ def add_reward_type(request):
         child_id = request.POST.get("child_id")
         name = request.POST.get("name")
         image = request.FILES.get("image")
+
         # 🔒 Enforce premium for image uploads
         if not getattr(request.user, "is_premium", False):
             image = None
@@ -651,8 +600,8 @@ def add_reward_type(request):
 
     return redirect("setup_page")
 
- 
-# 🎯 Set main reward (goal) for a child
+
+# 🎯 Set main reward (square 64 goal) for a child
 @login_required
 def set_main_reward(request):
     if request.method == "POST":
@@ -661,19 +610,60 @@ def set_main_reward(request):
         child_id = request.POST.get("child_id")
         reward_id = request.POST.get("reward_id")
 
-        # prevent empty selection crash
         if not child_id or not reward_id:
-            return redirect("setup_page")
+            return JsonResponse({"success": False}, status=400)
 
         child = Child.objects.filter(id=child_id, family=family).first()
-        reward = RewardType.objects.filter(id=reward_id).first()
+
+        # Free tier: only presets allowed
+        is_premium = getattr(request.user, "is_premium", False)
+        if is_premium:
+            reward = MainReward.objects.filter(
+                Q(is_preset=True) | Q(family=family),
+                id=reward_id
+            ).first()
+        else:
+            reward = MainReward.objects.filter(id=reward_id, is_preset=True).first()
 
         if child and reward:
             child.main_reward = reward
             child.save()
+            return JsonResponse({"success": True})
 
-    return redirect("setup_page")
+        return JsonResponse({"success": False}, status=400)
 
-# Custom password reset view
+    return JsonResponse({"success": False}, status=405)
+
+
+# 🎯 Add custom main reward (paid tier only)
+@login_required
+@require_POST
+def add_main_reward(request):
+    if not getattr(request.user, "is_premium", False):
+        return JsonResponse({"success": False, "error": "Premium only"}, status=403)
+
+    family = get_family(request.user)
+    name = request.POST.get("name")
+    image = request.FILES.get("image")
+
+    if not name:
+        return JsonResponse({"success": False, "error": "Name required"}, status=400)
+
+    reward = MainReward.objects.create(
+        name=name,
+        image=image,
+        is_preset=False,
+        family=family
+    )
+
+    return JsonResponse({
+        "success": True,
+        "id": reward.id,
+        "name": reward.name,
+        "image": reward.image.url if reward.image else None
+    })
+
+
 class CustomPasswordResetView(PasswordResetView):
     template_name = "registration/password_reset_form.html"
+

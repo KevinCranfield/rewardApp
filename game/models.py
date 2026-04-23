@@ -10,6 +10,22 @@ class Family(models.Model):
         return f"{self.owner.username}'s family"
 
 
+class MainReward(models.Model):
+    name = models.CharField(max_length=100)
+    image = models.ImageField(upload_to='main_rewards/', blank=True, null=True)
+    is_preset = models.BooleanField(default=False)  # True = built-in presets
+    family = models.ForeignKey(
+        'Family',
+        null=True,
+        blank=True,
+        on_delete=models.CASCADE,
+        related_name='main_rewards'
+    )
+
+    def __str__(self):
+        return self.name
+
+
 class Child(models.Model):
 
     COLOUR_CHOICES = [
@@ -30,7 +46,7 @@ class Child(models.Model):
 
     # 🎯 Main reward (goal when reaching square 64)
     main_reward = models.ForeignKey(
-        'RewardType',
+        'MainReward',
         null=True,
         blank=True,
         on_delete=models.SET_NULL,
@@ -118,12 +134,10 @@ class Reward(models.Model):
         return f"{self.child.name} - {self.reason}"
 
 
-# RewardType model
 class RewardType(models.Model):
     name = models.CharField(max_length=100)
     image = models.ImageField(upload_to="rewards/", blank=True, null=True)
 
-    # 🔥 NEW: tie reward to a specific child (optional for defaults)
     child = models.ForeignKey(
         'Child',
         null=True,
