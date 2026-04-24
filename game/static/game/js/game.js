@@ -91,10 +91,10 @@ function triggerWinOverlay(childId){
 
 // 🐍 Snakes & 🪜 Ladders
 const snakes = {
-    62: 44,
-    55: 41,
-    27: 10,
-    33: 18,
+    59: 45,
+    50: 33,
+    40: 23,
+    30: 14,
 };
 
 const ladders = {
@@ -1927,8 +1927,8 @@ function fixBoardLayout(){
         // Convert to "row from bottom"
         const rowFromBottom = (GRID - 1) - row;
 
-        // Zig-zag based on bottom-up logic
-        if(rowFromBottom % 2 === 1){
+        // Flip direction so 1 starts bottom-left (not bottom-right)
+        if(rowFromBottom % 2 === 0){
             rowItems.reverse();
         }
 
