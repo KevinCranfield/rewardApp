@@ -165,17 +165,21 @@ function playSound(name){
 }
 
 function getSquareCenter(num){
-    const el = document.querySelector(`[data-square='${num}']`);
-    const board = document.querySelector(".board");
+    // 🔥 FIX: map square index to grid instead of pixel DOM (responsive-safe)
+    const SIZE = 800;
+    const GRID = 8;
+    const cell = SIZE / GRID;
 
-    if(!el || !board) return null;
+    const n = parseInt(num);
+    const row = Math.floor((n - 1) / GRID);
+    const colRaw = (n - 1) % GRID;
 
-    const elRect = el.getBoundingClientRect();
-    const boardRect = board.getBoundingClientRect();
+    // zig-zag board (snakes & ladders style)
+    const col = row % 2 === 0 ? colRaw : (GRID - 1 - colRaw);
 
     return {
-        x: (elRect.left - boardRect.left) + (elRect.width / 2),
-        y: (elRect.top - boardRect.top) + (elRect.height / 2)
+        x: col * cell + cell / 2,
+        y: (GRID - 1 - row) * cell + cell / 2
     };
 }
 
@@ -657,11 +661,10 @@ function drawConnections(){
     const board = document.querySelector(".board");
     if(!svg || !board) return;
 
-    const rect = board.getBoundingClientRect();
-    const width = rect.width;
-    const height = rect.height;
+    // 🔥 FIX: use stable coordinate system (prevents mobile misalignment)
+    const SIZE = 800; // virtual board size (8x8 grid → 100 per cell)
 
-    svg.setAttribute("viewBox", `0 0 ${width} ${height}`);
+    svg.setAttribute("viewBox", `0 0 ${SIZE} ${SIZE}`);
     svg.setAttribute("width", "100%");
     svg.setAttribute("height", "100%");
     svg.setAttribute("preserveAspectRatio", "none");
