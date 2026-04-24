@@ -174,9 +174,14 @@ function getSquareCenter(num) {
     // Row counting from bottom (0 = bottom row)
     const rowFromBottom = Math.floor((n - 1) / GRID);
 
-    // ✅ FIX: DOM is rendered LEFT → RIGHT for ALL rows
-    // (no zig-zag in HTML grid)
-    const col = (n - 1) % GRID;
+    // ✅ FIX: handle zig-zag board layout
+    // Even rows (from bottom) go left → right
+    // Odd rows go right → left
+    let col = (n - 1) % GRID;
+
+    if(rowFromBottom % 2 === 1){
+        col = (GRID - 1) - col;
+    }
 
     // Convert to DOM row (top = 0)
     const row = (GRID - 1) - rowFromBottom;
