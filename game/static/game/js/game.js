@@ -177,8 +177,7 @@ function getSquareCenter(num) {
     // Column within the row
     let col = (n - 1) % GRID;
 
-    // 🔥 FIX: proper snakes & ladders zig-zag
-    // Every OTHER row reverses (1,3,5,7...)
+    // 🔥 FIX: zig-zag numbering (alternate row direction)
     if(rowFromBottom % 2 === 1){
         col = (GRID - 1) - col;
     }
