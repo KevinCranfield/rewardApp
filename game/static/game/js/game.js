@@ -174,14 +174,14 @@ function getSquareCenter(num) {
     // Row counting from bottom (0 = bottom row)
     const rowFromBottom = Math.floor((n - 1) / GRID);
 
-    // 🔥 FIX: enforce correct zig-zag rows
-    // EVEN rows (0,2,4,6) = LEFT → RIGHT
-    // ODD rows  (1,3,5,7) = RIGHT → LEFT
+    // 🔥 FIX: enforce correct zig-zag rows (REVERSED to match DOM order)
+    // EVEN rows (0,2,4,6) = RIGHT → LEFT
+    // ODD rows  (1,3,5,7) = LEFT → RIGHT
     let col;
     if(rowFromBottom % 2 === 0){
-        col = (n - 1) % GRID; // left → right
-    } else {
         col = (GRID - 1) - ((n - 1) % GRID); // right → left
+    } else {
+        col = (n - 1) % GRID; // left → right
     }
 
     // Convert to DOM row (top = 0)
