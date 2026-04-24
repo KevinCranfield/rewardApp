@@ -1929,14 +1929,17 @@ function fixBoardLayout(){
     // IMPORTANT: your numbering is from BOTTOM row (1–8),
     // but DOM rows are TOP → DOWN, so we must reverse row index logic
     for(let row = 0; row < GRID; row++){
+        // Ensure we always process rows from TOP (DOM) but map correctly to bottom numbering
         const start = row * GRID;
         const rowItems = squares.slice(start, start + GRID);
 
         // Convert to "row from bottom"
         const rowFromBottom = (GRID - 1) - row;
 
-        // Flip direction so 1 starts bottom-left (not bottom-right)
-        if(rowFromBottom % 2 === 0){
+        // Correct zig-zag:
+        // bottom row (1–8) = left → right (NO reverse)
+        // next row (9–16) = right → left (reverse)
+        if(rowFromBottom % 2 === 1){
             rowItems.reverse();
         }
 
