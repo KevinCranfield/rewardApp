@@ -333,6 +333,7 @@ button, a {
         inset 0 3px 8px rgba(255,255,255,.5),
         inset 0 -10px 25px rgba(0,0,0,.18);
     outline:2px solid rgba(255,255,255,.25);
+    overflow: hidden;
 }
 
 .board{
@@ -450,6 +451,7 @@ button, a {
     inset:0;
     pointer-events:none;
     z-index:1;
+    pointer-events: none;
 }
 
 /* =========================
@@ -1891,6 +1893,7 @@ body.child-view {
 
 .child-view .board-wrapper {
     width: 100vw;
+    height: 100vh;
     max-width: 100vw;
     margin: 0;
     padding: 0;
@@ -1899,11 +1902,12 @@ body.child-view {
     align-items: center;
     position: relative;
     z-index: 1;
+    overflow: hidden;
     background: linear-gradient(
         to right,
-        transparent 70%,
-        rgba(59,130,246,0.25) 85%,
-        rgba(37,99,235,0.35) 100%
+        transparent 60%,
+        rgba(59,130,246,0.2) 80%,
+        rgba(37,99,235,0.3) 100%
     );
 }
 
@@ -1917,9 +1921,19 @@ body.child-view {
 }
 
 .child-view .board {
-    width: min(92vw, 92vh);
-    height: min(92vw, 92vh);
+    width: min(96vw, 96vh);
+    height: min(96vw, 96vh);
+    max-width: 520px;
+    max-height: 520px;
     margin: 0 auto;
+}
+
+/* Ensure board always centered and not cut off on iPhone */
+@media (max-width: 600px) {
+    .child-view .board {
+        width: 94vw;
+        height: 94vw;
+    }
 }
 
 body.child-view::after {
@@ -3084,4 +3098,40 @@ body {
     font-size: 11px;
     color: #6b7280;
     font-weight: 600;
+}
+
+/* =========================
+   MOBILE POLISH FIXES
+========================= */
+
+/* Prevent horizontal scroll everywhere */
+html, body {
+    overflow-x: hidden;
+}
+
+/* Fix iOS viewport height issues */
+.child-view {
+    min-height: 100dvh;
+}
+
+/* Smooth scaling for board */
+.child-view .board {
+    transition: transform .2s ease;
+}
+
+/* Slight zoom out on very small screens */
+@media (max-width: 380px) {
+    .child-view .board {
+        transform: scale(0.92);
+    }
+}
+
+/* Improve touch feel */
+button, .chest, .nav-item {
+    touch-action: manipulation;
+}
+
+/* Fix safe area (iPhone notch) */
+body {
+    padding-bottom: env(safe-area-inset-bottom);
 }

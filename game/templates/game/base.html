@@ -263,29 +263,50 @@ window.addEventListener("load", () => {
 
 <!-- Service worker with safe update notification (no mid-session reload) -->
 <script>
-if('serviceWorker' in navigator){
-    navigator.serviceWorker.register('/static/game/js/sw.js').then(reg => {
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register("/static/game/js/sw.js").then(reg => {
 
-        setInterval(() => { reg.update(); }, 60000);
+    // Check for updates periodically
+    setInterval(() => { reg.update(); }, 60000);
 
-        reg.onupdatefound = () => {
-            const newWorker = reg.installing;
-            newWorker.onstatechange = () => {
-                if(newWorker.state === 'installed' && navigator.serviceWorker.controller){
-                    // Show toast instead of forcing a reload mid-session
-                    const toast = document.getElementById("toast");
-                    if(toast){
-                        toast.textContent = "🔄 Update available — tap to refresh";
-                        toast.classList.remove("hidden");
-                        toast.style.opacity = "1";
-                        toast.style.cursor = "pointer";
-                        toast.onclick = () => window.location.reload();
-                    }
-                }
-            };
-        };
+    reg.addEventListener("updatefound", () => {
+      const newWorker = reg.installing;
 
+      newWorker.addEventListener("statechange", () => {
+        if (newWorker.state === "installed" && navigator.serviceWorker.controller) {
+          showUpdateToast(reg);
+        }
+      });
     });
+
+  });
+
+  // Reload when new service worker takes control
+  navigator.serviceWorker.addEventListener("controllerchange", () => {
+    window.location.reload();
+  });
+}
+
+function showUpdateToast(reg) {
+  const toast = document.getElementById("toast");
+  if (!toast) return;
+
+  toast.innerHTML = `
+    🚀 New update available 
+    <button style="margin-left:10px; background:#22c55e; border:none; color:white; padding:4px 8px; border-radius:6px; cursor:pointer;">
+      Update
+    </button>
+  `;
+
+  toast.classList.remove("hidden");
+  toast.style.opacity = "1";
+
+  const btn = toast.querySelector("button");
+  btn.onclick = () => {
+    if (reg.waiting) {
+      reg.waiting.postMessage("SKIP_WAITING");
+    }
+  };
 }
 </script>
 
