@@ -165,11 +165,7 @@ function playSound(name){
 }
 
 function getSquareCenter(num) {
-    const board = document.querySelector(".board");
-    if (!board) return null;
-
-    const boardRect = board.getBoundingClientRect();
-    const SIZE = boardRect.width;   // actual rendered size
+    const SIZE = 800; // match SVG
     const GRID = 8;
     const cell = SIZE / GRID;
 
