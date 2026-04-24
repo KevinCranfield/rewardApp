@@ -165,20 +165,19 @@ function playSound(name){
 }
 
 function getSquareCenter(num) {
-    const SIZE = 800; // match SVG
+    const SIZE = 800;
     const GRID = 8;
     const cell = SIZE / GRID;
 
     const n = parseInt(num);
-    const rowFromBottom = Math.floor((n - 1) / GRID);   // 0 = bottom row
-    const colRaw = (n - 1) % GRID;
 
-    // Boustrophedon: even rows (0,2,4,6) go left→right, odd rows go right→left
-    const col = (rowFromBottom % 2 === 0)
-        ? colRaw
-        : (GRID - 1) - colRaw;
+    // Row counting from bottom (your numbering)
+    const rowFromBottom = Math.floor((n - 1) / GRID);
 
-    // Row in DOM: row 0 from bottom = last row in grid (index 7)
+    // Your board is LEFT → RIGHT every row (no zig-zag)
+    const col = (n - 1) % GRID;
+
+    // Convert to DOM row (top = 0)
     const row = (GRID - 1) - rowFromBottom;
 
     return {
