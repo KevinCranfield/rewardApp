@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'game',
     'axes',
+    'django_ratelimit',
 ]
 
 # Authentication backends (required for django-axes)
