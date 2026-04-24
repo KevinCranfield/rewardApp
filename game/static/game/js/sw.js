@@ -1,4 +1,4 @@
-const CACHE_NAME = "reward-game-v3"; // 🔁 bump this on each deploy
+const CACHE_NAME = "reward-game-" + Date.now(); // 🔥 auto-bust cache on each deploy
 
 // Install - activate immediately
 self.addEventListener("install", event => {
@@ -26,9 +26,9 @@ self.addEventListener("fetch", event => {
   event.respondWith(
     fetch(event.request)
       .then(response => {
-        // Cache successful responses
         const url = new URL(event.request.url);
 
+        // Only cache static GET requests
         if (
           event.request.method === "GET" &&
           response.status === 200 &&
@@ -39,9 +39,12 @@ self.addEventListener("fetch", event => {
             cache.put(event.request, responseClone);
           });
         }
+
         return response;
       })
-      .catch(() => caches.match(event.request))
+      .catch(() => {
+        return caches.match(event.request);
+      })
   );
 });
 
