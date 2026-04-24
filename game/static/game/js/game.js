@@ -1915,3 +1915,39 @@ document.addEventListener("DOMContentLoaded", () => {
    1→8 left→right
    9→16 right→left
 ========================= */
+
+function fixBoardLayout(){
+    const board = document.querySelector(".board");
+    if(!board) return;
+
+    const squares = Array.from(board.querySelectorAll(".square"));
+    if(squares.length !== 64) return;
+
+    const GRID = 8;
+    const reordered = [];
+
+    // IMPORTANT: your numbering is from BOTTOM row (1–8),
+    // but DOM rows are TOP → DOWN, so we must reverse row index logic
+    for(let row = 0; row < GRID; row++){
+        const start = row * GRID;
+        const rowItems = squares.slice(start, start + GRID);
+
+        // Convert to "row from bottom"
+        const rowFromBottom = (GRID - 1) - row;
+
+        // Flip direction so 1 starts bottom-left (not bottom-right)
+        if(rowFromBottom % 2 === 0){
+            rowItems.reverse();
+        }
+
+        reordered.push(...rowItems);
+    }
+
+    // Re-append in correct visual order
+    reordered.forEach(el => board.appendChild(el));
+}
+
+// Run after DOM ready
+document.addEventListener("DOMContentLoaded", () => {
+    fixBoardLayout();
+});
