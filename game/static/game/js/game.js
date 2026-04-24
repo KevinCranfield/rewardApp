@@ -279,6 +279,14 @@ function roll(childId){
         }
 
         console.log("ROLL:", data);
+        // 🧪 DEBUG MOVE block
+        console.log("🧪 DEBUG MOVE:", {
+            current,
+            from: data.from,
+            position: data.position,
+            jump: data.jump,
+            dice: data.dice
+        });
         console.log("Rolls remaining:", data.rolls_remaining);
 
         showDice(data.dice, () => {
