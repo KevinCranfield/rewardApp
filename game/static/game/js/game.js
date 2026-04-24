@@ -1858,3 +1858,45 @@ document.addEventListener("DOMContentLoaded", () => {
         reader.readAsDataURL(file);
     });
 });
+
+// =========================
+// Hide "Your Chests" section if no chests exist
+// =========================
+document.addEventListener("DOMContentLoaded", () => {
+    // 🔥 Hide "Your Chests" section if no chests exist
+    const chests = document.querySelectorAll(".chest");
+
+    if(chests.length === 0){
+        // Try common container patterns
+        const section =
+            document.querySelector("#chest-section") ||
+            document.querySelector(".chest-section") ||
+            document.querySelector(".your-chests") ||
+            document.querySelector("h2, h3");
+
+        // Safer: find heading containing "Your Chests"
+        let header = Array.from(document.querySelectorAll("h1,h2,h3"))
+            .find(el => el.textContent.includes("Your Chests"));
+
+        if(header){
+            const container = header.closest("div");
+            if(container){
+                container.style.display = "none";
+            } else {
+                header.style.display = "none";
+            }
+        }
+    }
+});
+
+// =========================
+// Swap 🎁 → 🧰 in "Your Chests" header if present
+// =========================
+document.addEventListener("DOMContentLoaded", () => {
+    const header = Array.from(document.querySelectorAll("h1,h2,h3"))
+        .find(el => el.textContent.includes("Your Chests"));
+
+    if(header){
+        header.innerHTML = header.innerHTML.replace("🎁", "🧰");
+    }
+});
