@@ -164,23 +164,26 @@ function playSound(name){
     }
 }
 
-function getSquareCenter(num){
-    // 🔥 FIX: map square index to grid instead of pixel DOM (responsive-safe)
-    const SIZE = 800;
+function getSquareCenter(num) {
+    const board = document.querySelector(".board");
+    if (!board) return null;
+
+    const boardRect = board.getBoundingClientRect();
+    const SIZE = boardRect.width;   // actual rendered size
     const GRID = 8;
     const cell = SIZE / GRID;
 
     const n = parseInt(num);
-
-    // 🔥 FIX: DOM grid starts at TOP-LEFT, numbers start at BOTTOM-LEFT
-    // so we flip the row index
-    const rowFromBottom = Math.floor((n - 1) / GRID);
-    const row = (GRID - 1) - rowFromBottom;
-
+    const rowFromBottom = Math.floor((n - 1) / GRID);   // 0 = bottom row
     const colRaw = (n - 1) % GRID;
 
-    // 🔥 FIX: board numbers run left→right but origin mismatch flips X
-    const col = (GRID - 1) - colRaw;
+    // Boustrophedon: even rows (0,2,4,6) go left→right, odd rows go right→left
+    const col = (rowFromBottom % 2 === 0)
+        ? colRaw
+        : (GRID - 1) - colRaw;
+
+    // Row in DOM: row 0 from bottom = last row in grid (index 7)
+    const row = (GRID - 1) - rowFromBottom;
 
     return {
         x: col * cell + cell / 2,
