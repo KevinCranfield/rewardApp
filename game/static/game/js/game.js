@@ -171,12 +171,13 @@ function getSquareCenter(num) {
 
     const n = parseInt(num);
 
+    // Row counting from bottom (simple left → right layout)
     const rowFromBottom = Math.floor((n - 1) / GRID);
-    // Zig-zag board (every other row reverses direction)
-    let col = (n - 1) % GRID;
-    if(rowFromBottom % 2 === 1){
-        col = (GRID - 1) - col;
-    }
+
+    // Always left → right (matches DOM grid)
+    const col = (n - 1) % GRID;
+
+    // Convert to DOM row (top = 0)
     const row = (GRID - 1) - rowFromBottom;
 
     return {
