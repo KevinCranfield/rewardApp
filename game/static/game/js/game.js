@@ -179,8 +179,8 @@ function getSquareCenter(num){
 
     const colRaw = (n - 1) % GRID;
 
-    // zig-zag board (snakes & ladders style)
-    const col = colRaw; // no zig-zag — matches current board numbering
+    // 🔥 FIX: board numbers run left→right but origin mismatch flips X
+    const col = (GRID - 1) - colRaw;
 
     return {
         x: col * cell + cell / 2,
