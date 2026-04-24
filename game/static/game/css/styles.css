@@ -1909,9 +1909,7 @@ body.child-view {
     max-width: 100vw;
     margin: 0;
     padding: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    display: block;
     position: relative;
     z-index: 1;
     overflow: hidden;
@@ -1933,11 +1931,11 @@ body.child-view {
 }
 
 .child-view .board {
-    width: min(94vw, 94vh);
-    height: min(94vw, 94vh);
-    max-width: 520px;
-    max-height: 520px;
-    margin: 0 auto;
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    max-height: none;
+    margin: 0;
     transform-origin: center;
 }
 
