@@ -172,7 +172,11 @@ function getSquareCenter(num) {
     const n = parseInt(num);
 
     const rowFromBottom = Math.floor((n - 1) / GRID);
-    const col = (n - 1) % GRID;
+    // Zig-zag board (every other row reverses direction)
+    let col = (n - 1) % GRID;
+    if(rowFromBottom % 2 === 1){
+        col = (GRID - 1) - col;
+    }
     const row = (GRID - 1) - rowFromBottom;
 
     return {
