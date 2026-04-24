@@ -20,6 +20,7 @@
 
         <form method="post" novalidate>
             {% csrf_token %}
+            <input type="text" name="email_confirm" style="display:none;" tabindex="-1" autocomplete="off">
 
             <label class="auth-label">Username</label>
             <input type="text" name="username" required>

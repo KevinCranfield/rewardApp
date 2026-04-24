@@ -490,16 +490,28 @@ def reset_board(request):
     })
 
 
+from django_ratelimit.decorators import ratelimit
+from django.contrib.auth.models import User
+
+@ratelimit(key='ip', rate='5/m', block=True)
 def signup(request):
     if request.method == "POST":
         username = request.POST.get("username")
         password = request.POST.get("password")
 
+        # 🛑 Honeypot field (bots fill this, humans don’t)
+        if request.POST.get("email_confirm"):
+            return JsonResponse({"success": False}, status=400)
+
         if username and password:
-            from django.contrib.auth.models import User
+            if User.objects.filter(username=username).exists():
+                return render(request, "game/signup.html", {"error": "Username taken", **get_children_context(request)})
+
             user = User.objects.create_user(username=username, password=password)
             login(request, user, backend='django.contrib.auth.backends.ModelBackend')
             return redirect("setup_page")
+
+        return render(request, "game/signup.html", {"error": "Invalid data", **get_children_context(request)})
 
     return render(request, "game/signup.html", get_children_context(request))
 
