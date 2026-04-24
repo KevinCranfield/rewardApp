@@ -461,7 +461,10 @@ button, a {
     z-index:1;
     pointer-events:none;
     outline: 3px solid blue;
-    display:block;
+
+    /* CRITICAL FIX */
+    max-width:100%;
+    max-height:100%;
 }
 
 
@@ -1919,6 +1922,7 @@ body.child-view {
         rgba(59,130,246,0.2) 80%,
         rgba(37,99,235,0.3) 100%
     );
+    position: relative;
 }
 
 .child-view .board-wrapper::after {
@@ -1937,6 +1941,8 @@ body.child-view {
     max-height: none;
     margin: 0;
     transform-origin: center;
+    position: relative;
+    z-index: 2;
 }
 
 /* Ensure board always centered and not cut off on iPhone */
