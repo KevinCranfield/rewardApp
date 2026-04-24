@@ -350,6 +350,7 @@ button, a {
     position:relative;
     display:grid;
     overflow:hidden;
+    outline: 3px solid red;
 }
 
 .square{
@@ -457,6 +458,7 @@ button, a {
     height:100%;
     z-index:1;
     pointer-events:none;
+    outline: 3px solid blue;
 }
 
 .board-wrapper > .board + .board-overlay{
@@ -473,6 +475,7 @@ button, a {
     position:absolute;
     top:0;
     left:0;
+    outline: 2px dashed cyan;
 }
 
 /* =========================
