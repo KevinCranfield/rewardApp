@@ -23,27 +23,35 @@ self.addEventListener("activate", event => {
 
 // Fetch - network first, fallback to cache
 self.addEventListener("fetch", event => {
-  event.respondWith(
-    fetch(event.request)
-      .then(response => {
-        const url = new URL(event.request.url);
+  const request = event.request;
 
-        // Only cache static GET requests
+  // Only handle GET requests
+  if (request.method !== "GET") return;
+
+  const url = new URL(request.url);
+
+  // Only handle same-origin requests
+  if (url.origin !== self.location.origin) return;
+
+  event.respondWith(
+    fetch(request)
+      .then(response => {
+        // Cache only successful static responses
         if (
-          event.request.method === "GET" &&
+          response &&
           response.status === 200 &&
           url.pathname.startsWith("/static/")
         ) {
           const responseClone = response.clone();
           caches.open(CACHE_NAME).then(cache => {
-            cache.put(event.request, responseClone);
+            cache.put(request, responseClone);
           });
         }
 
         return response;
       })
       .catch(() => {
-        return caches.match(event.request);
+        return caches.match(request);
       })
   );
 });
