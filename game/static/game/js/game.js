@@ -177,9 +177,9 @@ function getSquareCenter(num) {
     // Column within the row
     let col = (n - 1) % GRID;
 
-    // 🔥 FIX: zig-zag layout (Snakes & Ladders style)
-    // Odd rows (2nd, 4th, etc from bottom) go RIGHT → LEFT
-    if(rowFromBottom % 2 === 1){
+    // 🔥 FIX: match YOUR board exactly:
+    // ONLY rows 9–16 (rowFromBottom === 1) go RIGHT → LEFT
+    if(rowFromBottom === 1){
         col = (GRID - 1) - col;
     }
 
