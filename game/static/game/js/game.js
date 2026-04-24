@@ -1891,6 +1891,7 @@ document.addEventListener("DOMContentLoaded", () => {
 // =========================
 // Swap 🎁 → 🧰 in "Your Chests" header if present
 // =========================
+
 document.addEventListener("DOMContentLoaded", () => {
     const header = Array.from(document.querySelectorAll("h1,h2,h3"))
         .find(el => el.textContent.includes("Your Chests"));
@@ -1898,4 +1899,42 @@ document.addEventListener("DOMContentLoaded", () => {
     if(header){
         header.innerHTML = header.innerHTML.replace("🎁", "🧰");
     }
+});
+
+/* =========================
+   FIX: VISUAL ZIG-ZAG BOARD ORDER
+   Ensures rows alternate direction so:
+   1→8 left→right
+   9→16 right→left
+========================= */
+
+function fixBoardLayout(){
+    const board = document.querySelector(".board");
+    if(!board) return;
+
+    const squares = Array.from(board.querySelectorAll(".square"));
+    if(squares.length !== 64) return;
+
+    const GRID = 8;
+    const reordered = [];
+
+    for(let row = 0; row < GRID; row++){
+        const start = row * GRID;
+        const rowItems = squares.slice(start, start + GRID);
+
+        // Reverse every second row (row index 1,3,5,7 from TOP)
+        if(row % 2 === 1){
+            rowItems.reverse();
+        }
+
+        reordered.push(...rowItems);
+    }
+
+    // Re-append in correct order
+    reordered.forEach(el => board.appendChild(el));
+}
+
+// Run after DOM ready
+document.addEventListener("DOMContentLoaded", () => {
+    fixBoardLayout();
 });
