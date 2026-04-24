@@ -165,24 +165,17 @@ function playSound(name){
 }
 
 function getSquareCenter(num) {
-    const SIZE = 800;
-    const GRID = 8;
-    const cell = SIZE / GRID;
+    const square = document.querySelector(`[data-square='${num}']`);
+    const board = document.querySelector(".board");
 
-    const n = parseInt(num);
+    if(!square || !board) return null;
 
-    // Row counting from bottom (your numbering)
-    const rowFromBottom = Math.floor((n - 1) / GRID);
-
-    // Your board is LEFT → RIGHT every row (no zig-zag)
-    const col = (n - 1) % GRID;
-
-    // Convert to DOM row (top = 0)
-    const row = (GRID - 1) - rowFromBottom;
+    const sqRect = square.getBoundingClientRect();
+    const boardRect = board.getBoundingClientRect();
 
     return {
-        x: col * cell + cell / 2,
-        y: row * cell + cell / 2
+        x: (sqRect.left - boardRect.left) + (sqRect.width / 2),
+        y: (sqRect.top - boardRect.top) + (sqRect.height / 2)
     };
 }
 
@@ -670,7 +663,7 @@ function drawConnections(){
     svg.setAttribute("viewBox", `0 0 ${SIZE} ${SIZE}`);
     svg.setAttribute("width", "100%");
     svg.setAttribute("height", "100%");
-    svg.setAttribute("preserveAspectRatio", "none");
+    svg.setAttribute("preserveAspectRatio", "xMidYMid meet");
     svg.style.position = "absolute";
     svg.style.inset = 0;
     svg.innerHTML = "";
