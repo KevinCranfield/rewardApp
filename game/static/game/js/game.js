@@ -165,17 +165,19 @@ function playSound(name){
 }
 
 function getSquareCenter(num) {
-    const square = document.querySelector(`[data-square='${num}']`);
-    const board = document.querySelector(".board");
+    const SIZE = 800;
+    const GRID = 8;
+    const cell = SIZE / GRID;
 
-    if(!square || !board) return null;
+    const n = parseInt(num);
 
-    const sqRect = square.getBoundingClientRect();
-    const boardRect = board.getBoundingClientRect();
+    const rowFromBottom = Math.floor((n - 1) / GRID);
+    const col = (n - 1) % GRID;
+    const row = (GRID - 1) - rowFromBottom;
 
     return {
-        x: (sqRect.left - boardRect.left) + (sqRect.width / 2),
-        y: (sqRect.top - boardRect.top) + (sqRect.height / 2)
+        x: col * cell + cell / 2,
+        y: row * cell + cell / 2
     };
 }
 
@@ -663,7 +665,7 @@ function drawConnections(){
     svg.setAttribute("viewBox", `0 0 ${SIZE} ${SIZE}`);
     svg.setAttribute("width", "100%");
     svg.setAttribute("height", "100%");
-    svg.setAttribute("preserveAspectRatio", "xMidYMid meet");
+    svg.setAttribute("preserveAspectRatio", "none");
     svg.style.position = "absolute";
     svg.style.inset = 0;
     svg.innerHTML = "";
