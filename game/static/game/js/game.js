@@ -171,7 +171,12 @@ function getSquareCenter(num){
     const cell = SIZE / GRID;
 
     const n = parseInt(num);
-    const row = Math.floor((n - 1) / GRID);
+
+    // 🔥 FIX: DOM grid starts at TOP-LEFT, numbers start at BOTTOM-LEFT
+    // so we flip the row index
+    const rowFromBottom = Math.floor((n - 1) / GRID);
+    const row = (GRID - 1) - rowFromBottom;
+
     const colRaw = (n - 1) % GRID;
 
     // zig-zag board (snakes & ladders style)
@@ -179,7 +184,7 @@ function getSquareCenter(num){
 
     return {
         x: col * cell + cell / 2,
-        y: (GRID - 1 - row) * cell + cell / 2
+        y: row * cell + cell / 2
     };
 }
 
