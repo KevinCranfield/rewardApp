@@ -30,9 +30,9 @@
 
   <!-- 🎁 Chests -->
   <div class="chests" style="text-align:center; margin:20px 0;">
-    <h3>🎁 Your Chests</h3>
-
     {% if chests %}
+      <h3>🎁 Your Chests</h3>
+
       <div class="chest-list" style="display:flex; gap:10px; justify-content:center; flex-wrap:wrap;">
         {% for chest in chests %}
           <div
@@ -44,10 +44,6 @@
             <div class="chest-lid"></div>
             <div class="chest-base"></div>
             <div class="chest-glow"></div>
-
-            <div class="chest-label" style="position:absolute; bottom:-18px; width:100%; text-align:center; font-size:12px;">
-              +{{ chest.rolls_awarded }} roll{{ chest.rolls_awarded|pluralize }}
-            </div>
           </div>
         {% endfor %}
       </div>
@@ -306,6 +302,37 @@ function openChest(chestId){
         if(chestEl){
             chestEl.style.transform = "scale(1.2)";
             setTimeout(() => chestEl.remove(), 300);
+        }
+
+        // 🎉 NEW: +roll celebration popup
+        if(data.rolls_added){
+            const popup = document.createElement("div");
+            popup.innerText = `+${data.rolls_added} roll${data.rolls_added === 1 ? '' : 's'}`;
+            popup.style.position = "fixed";
+            popup.style.top = "50%";
+            popup.style.left = "50%";
+            popup.style.transform = "translate(-50%, -50%) scale(0.5)";
+            popup.style.background = "#22c55e";
+            popup.style.color = "white";
+            popup.style.padding = "20px 30px";
+            popup.style.borderRadius = "16px";
+            popup.style.fontSize = "22px";
+            popup.style.fontWeight = "bold";
+            popup.style.zIndex = "9999";
+            popup.style.boxShadow = "0 10px 30px rgba(0,0,0,0.3)";
+            popup.style.transition = "all 0.4s ease";
+
+            document.body.appendChild(popup);
+
+            requestAnimationFrame(() => {
+                popup.style.transform = "translate(-50%, -50%) scale(1)";
+            });
+
+            setTimeout(() => {
+                popup.style.opacity = "0";
+                popup.style.transform = "translate(-50%, -60%) scale(0.8)";
+                setTimeout(() => popup.remove(), 300);
+            }, 1200);
         }
 
         const rollStatus = document.querySelector(".roll-status");

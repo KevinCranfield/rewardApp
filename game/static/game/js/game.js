@@ -1918,19 +1918,24 @@ function fixBoardLayout(){
     const GRID = 8;
     const reordered = [];
 
+    // IMPORTANT: your numbering is from BOTTOM row (1–8),
+    // but DOM rows are TOP → DOWN, so we must reverse row index logic
     for(let row = 0; row < GRID; row++){
         const start = row * GRID;
         const rowItems = squares.slice(start, start + GRID);
 
-        // Reverse every second row (row index 1,3,5,7 from TOP)
-        if(row % 2 === 1){
+        // Convert to "row from bottom"
+        const rowFromBottom = (GRID - 1) - row;
+
+        // Zig-zag based on bottom-up logic
+        if(rowFromBottom % 2 === 1){
             rowItems.reverse();
         }
 
         reordered.push(...rowItems);
     }
 
-    // Re-append in correct order
+    // Re-append in correct visual order
     reordered.forEach(el => board.appendChild(el));
 }
 
