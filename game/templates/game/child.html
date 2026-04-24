@@ -86,32 +86,61 @@
     <div class="board" id="game-board">
         {% if squares %}
             {% for row in squares %}
-                {% for num in row %}
-                    <div class="square" data-square="{{ num }}">
-                        <span class="square-number">{{ num }}</span>
-                        <div class="token-container">
-                            {% if child.position == num %}
-                                <div
-                                    class="token"
-                                    id="token-{{ child.id }}"
-                                    style="
-                                        background: {{ child.colour }};
-                                        width: 28px;
-                                        height: 28px;
-                                        border-radius: 50%;
-                                        display: flex;
-                                        align-items: center;
-                                        justify-content: center;
-                                        color: white;
-                                        font-weight: bold;
-                                    "
-                                >
-                                    {{ child.name|slice:":1" }}
-                                </div>
-                            {% endif %}
+                {% if forloop.counter0|divisibleby:2 %}
+                    {% for num in row %}
+                        <div class="square" data-square="{{ num }}">
+                            <span class="square-number">{{ num }}</span>
+                            <div class="token-container">
+                                {% if child.position == num %}
+                                    <div
+                                        class="token"
+                                        id="token-{{ child.id }}"
+                                        style="
+                                            background: {{ child.colour }};
+                                            width: 28px;
+                                            height: 28px;
+                                            border-radius: 50%;
+                                            display: flex;
+                                            align-items: center;
+                                            justify-content: center;
+                                            color: white;
+                                            font-weight: bold;
+                                        "
+                                    >
+                                        {{ child.name|slice:":1" }}
+                                    </div>
+                                {% endif %}
+                            </div>
                         </div>
-                    </div>
-                {% endfor %}
+                    {% endfor %}
+                {% else %}
+                    {% for num in row reversed %}
+                        <div class="square" data-square="{{ num }}">
+                            <span class="square-number">{{ num }}</span>
+                            <div class="token-container">
+                                {% if child.position == num %}
+                                    <div
+                                        class="token"
+                                        id="token-{{ child.id }}"
+                                        style="
+                                            background: {{ child.colour }};
+                                            width: 28px;
+                                            height: 28px;
+                                            border-radius: 50%;
+                                            display: flex;
+                                            align-items: center;
+                                            justify-content: center;
+                                            color: white;
+                                            font-weight: bold;
+                                        "
+                                    >
+                                        {{ child.name|slice:":1" }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% endif %}
             {% endfor %}
         {% endif %}
     </div>

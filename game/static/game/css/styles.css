@@ -3143,7 +3143,10 @@ html, body {
 button, .chest, .nav-item {
     touch-action: manipulation;
 }
-p
+ 
+body {
+    padding-bottom: env(safe-area-inset-bottom);
+}
 /* Fix safe area (iPhone notch) */
 body {
     padding-bottom: env(safe-area-inset-bottom);

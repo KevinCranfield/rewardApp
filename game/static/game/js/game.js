@@ -171,11 +171,17 @@ function getSquareCenter(num) {
 
     const n = parseInt(num);
 
-    // Row counting from bottom (simple left → right layout)
+    // Row counting from bottom
     const rowFromBottom = Math.floor((n - 1) / GRID);
 
-    // Always left → right (matches DOM grid)
-    const col = (n - 1) % GRID;
+    // Column within the row
+    let col = (n - 1) % GRID;
+
+    // 🔥 FIX: zig-zag layout (Snakes & Ladders style)
+    // Odd rows (2nd, 4th, etc from bottom) go RIGHT → LEFT
+    if(rowFromBottom % 2 === 1){
+        col = (GRID - 1) - col;
+    }
 
     // Convert to DOM row (top = 0)
     const row = (GRID - 1) - rowFromBottom;
