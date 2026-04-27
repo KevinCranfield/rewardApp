@@ -1,0 +1,23 @@
+{% extends "game/base.html" %}
+
+{% block content %}
+
+<div style="max-width:400px;margin:auto;text-align:center;padding:40px;">
+    <h1>🚀 Upgrade to Premium</h1>
+
+    {% if is_premium %}
+        <p>You are already Premium 🎉</p>
+    {% else %}
+        <p>Unlock extra features:</p>
+
+        <ul style="text-align:left;">
+            <li>⭐ Custom rewards</li>
+            <li>👨‍👩‍👧 More children</li>
+            <li>🎁 Better chests</li>
+        </ul>
+
+        <button>Upgrade (coming soon)</button>
+    {% endif %}
+</div>
+
+{% endblock %}

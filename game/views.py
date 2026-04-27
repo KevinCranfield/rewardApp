@@ -603,6 +603,13 @@ def setup_page(request):
     })
 
 
+# 🚀 Upgrade page
+@login_required
+def upgrade(request):
+    return render(request, "game/upgrade.html", {
+        "is_premium": getattr(request.user, "is_premium", False)
+    })
+
 # 🎁 Add reward type for a specific child (chest reasons)
 @login_required
 @require_POST
