@@ -24,7 +24,7 @@ def rate_limit(key, seconds=1):
 from django.contrib.auth.views import PasswordResetView
 from django.db.models import Q
 
-from .models import Family, Child, Roll, Reward, Chest, RewardType, MainReward
+from .models import Family, Child, Roll, Reward, Chest, RewardType, MainReward, PremiumCode
 
 
 PARENT_AUTH_TIMEOUT = 300
@@ -603,12 +603,51 @@ def setup_page(request):
     })
 
 
+
 # 🚀 Upgrade page
 @login_required
 def upgrade(request):
     return render(request, "game/upgrade.html", {
         "is_premium": getattr(request.user, "is_premium", False)
     })
+
+
+# 🔐 Redeem premium code
+@login_required
+@require_POST
+@transaction.atomic
+def redeem_code(request):
+    family = get_family(request.user)
+
+    # Optional rate limit (same pattern as others)
+    if not rate_limit(f"redeem_{request.user.id}", 1):
+        return JsonResponse({"error": "Too many requests"}, status=429)
+
+    code_input = (request.POST.get("code") or "").strip().upper()
+
+    if not code_input:
+        return JsonResponse({"success": False, "error": "Code required"}, status=400)
+
+    # Lock the row to prevent double-use race conditions
+    try:
+        code = PremiumCode.objects.select_for_update().get(code=code_input)
+    except PremiumCode.DoesNotExist:
+        return JsonResponse({"success": False, "error": "Invalid code"}, status=400)
+
+    if code.is_used:
+        return JsonResponse({"success": False, "error": "Code already used"}, status=400)
+
+    # Mark code as used
+    code.is_used = True
+    code.used_by = request.user
+    code.used_at = timezone.now()
+    code.save()
+
+    # Upgrade user
+    request.user.is_premium = True
+    request.user.save()
+
+    return JsonResponse({"success": True})
 
 # 🎁 Add reward type for a specific child (chest reasons)
 @login_required

@@ -16,7 +16,33 @@
             <li>🎁 Better chests</li>
         </ul>
 
-        <button>Upgrade (coming soon)</button>
+        <input id="codeInput" placeholder="Enter premium code" style="padding:10px;margin-top:10px;width:100%;max-width:250px;">
+        <br><br>
+        <button onclick="redeemCode()">Redeem Code</button>
+
+        <script>
+        function redeemCode() {
+            const code = document.getElementById("codeInput").value;
+
+            fetch("/redeem-code/", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded",
+                    "X-CSRFToken": getCSRFToken()
+                },
+                body: `code=${encodeURIComponent(code)}`
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    alert("🎉 Premium unlocked!");
+                    location.reload();
+                } else {
+                    alert(data.error || "Invalid code");
+                }
+            });
+        }
+        </script>
     {% endif %}
 </div>
 

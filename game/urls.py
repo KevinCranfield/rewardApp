@@ -24,6 +24,7 @@ urlpatterns = [
     path("give-chest/", views.give_chest, name="give_chest"),
     path("open-chest/<int:chest_id>/", views.open_chest, name="open_chest"),
     path("upgrade/", views.upgrade, name="upgrade"),
+    path("redeem-code/", views.redeem_code, name="redeem_code"),
 
     # 🔐 AUTH
     path("login/", views.login_view, name="login"),
