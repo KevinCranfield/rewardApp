@@ -6,7 +6,20 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login, logout
 from django.utils import timezone
 import random
-import json
+
+from django.core.cache import cache
+import time
+
+
+# Simple per-user rate limit helper (1 request per second by default)
+def rate_limit(key, seconds=1):
+    now = time.time()
+    last = cache.get(key)
+    if last and now - last < seconds:
+        return False
+    cache.set(key, now, timeout=seconds)
+    return True
+
 
 from django.contrib.auth.views import PasswordResetView
 from django.db.models import Q
@@ -279,20 +292,22 @@ def add_reward(request):
 @require_POST
 def open_chest(request, chest_id=None):
     family = get_family(request.user)
+    if not rate_limit(f"chest_{request.user.id}", 1):
+        return JsonResponse({"error": "Too many requests"}, status=429)
     if chest_id is None:
         chest_id = request.POST.get("chest_id")
 
+    try:
+        chest_id = int(chest_id)
+    except (TypeError, ValueError):
+        return JsonResponse({"error": "Invalid chest_id"}, status=400)
+
     with transaction.atomic():
-        chest = Chest.objects.select_for_update().filter(
+        chest = get_object_or_404(
+            Chest.objects.select_for_update(),
             id=chest_id,
             child__family=family
-        ).first()
-
-        if not chest:
-            return JsonResponse({
-                "success": False,
-                "error": "Chest not found"
-            }, status=400)
+        )
 
         if chest.is_opened:
             return JsonResponse({
@@ -330,14 +345,20 @@ def open_chest(request, chest_id=None):
 
 
 @login_required
+@transaction.atomic
 @require_POST
 def roll(request):
     family = get_family(request.user)
+    if not rate_limit(f"roll_{request.user.id}", 1):
+        return JsonResponse({"error": "Too many requests"}, status=429)
     child_id = request.POST.get("child_id")
 
     child = get_object_or_404(Child, id=child_id, family=family)
 
-    reward = Reward.objects.filter(child=child, is_used=False).first()
+    reward = Reward.objects.select_for_update().filter(
+        child=child,
+        is_used=False
+    ).order_by("id").first()
 
     if not reward:
         return JsonResponse({"success": False}, status=400)
@@ -537,11 +558,15 @@ def ping_auth(request):
         return JsonResponse({"authenticated": True})
     return JsonResponse({"authenticated": False}, status=401)
 
-
 @login_required
+@require_POST
 def get_child_state(request):
     family = get_family(request.user)
-    child_id = request.GET.get("child_id")
+
+    try:
+        child_id = int(request.POST.get("child_id"))
+    except (TypeError, ValueError):
+        return JsonResponse({"error": "Invalid child_id"}, status=400)
 
     child = get_object_or_404(Child, id=child_id, family=family)
 
@@ -553,6 +578,7 @@ def get_child_state(request):
     return JsonResponse({
         "rolls_remaining": rolls_remaining
     })
+
 
 
 # ⚙️ Setup page
@@ -579,63 +605,82 @@ def setup_page(request):
 
 # 🎁 Add reward type for a specific child (chest reasons)
 @login_required
+@require_POST
 def add_reward_type(request):
-    if request.method == "POST":
-        family = get_family(request.user)
+    family = get_family(request.user)
 
-        child_id = request.POST.get("child_id")
-        name = request.POST.get("name")
-        image = request.FILES.get("image")
+    child_id = request.POST.get("child_id")
+    name = request.POST.get("name")
+    image = request.FILES.get("image")
 
-        # 🔒 Enforce premium for image uploads
-        if not getattr(request.user, "is_premium", False):
-            image = None
+    # 🔒 Enforce premium for image uploads
+    if not getattr(request.user, "is_premium", False):
+        image = None
 
-        child = Child.objects.filter(id=child_id, family=family).first()
+    try:
+        child_id = int(child_id)
+    except (TypeError, ValueError):
+        return redirect("setup_page")
 
-        if child and name:
-            RewardType.objects.create(
-                name=name,
-                image=image,
-                child=child,
-                user=request.user
-            )
+    child = get_object_or_404(Child, id=child_id, family=family)
+
+    if name:
+        RewardType.objects.create(
+            name=name,
+            image=image,
+            child=child,
+            user=request.user
+        )
 
     return redirect("setup_page")
 
 
 # 🎯 Set main reward (square 64 goal) for a child
 @login_required
+@require_POST
 def set_main_reward(request):
-    if request.method == "POST":
-        family = get_family(request.user)
+    family = get_family(request.user)
 
-        child_id = request.POST.get("child_id")
-        reward_id = request.POST.get("reward_id")
+    child_id = request.POST.get("child_id")
+    reward_id = request.POST.get("reward_id")
 
-        if not child_id or not reward_id:
-            return JsonResponse({"success": False}, status=400)
-
-        child = Child.objects.filter(id=child_id, family=family).first()
-
-        # Free tier: only presets allowed
-        is_premium = getattr(request.user, "is_premium", False)
-        if is_premium:
-            reward = MainReward.objects.filter(
-                Q(is_preset=True) | Q(family=family),
-                id=reward_id
-            ).first()
-        else:
-            reward = MainReward.objects.filter(id=reward_id, is_preset=True).first()
-
-        if child and reward:
-            child.main_reward = reward
-            child.save()
-            return JsonResponse({"success": True})
-
+    if not child_id or not reward_id:
         return JsonResponse({"success": False}, status=400)
 
-    return JsonResponse({"success": False}, status=405)
+    try:
+        child_id = int(child_id)
+    except (TypeError, ValueError):
+        return JsonResponse({"success": False}, status=400)
+
+    child = get_object_or_404(Child, id=child_id, family=family)
+
+    # Free tier: only presets allowed
+    is_premium = getattr(request.user, "is_premium", False)
+    if is_premium:
+        try:
+            reward_id = int(reward_id)
+        except (TypeError, ValueError):
+            return JsonResponse({"success": False}, status=400)
+
+        reward = get_object_or_404(
+            MainReward,
+            Q(is_preset=True) | Q(family=family),
+            id=reward_id
+        )
+    else:
+        try:
+            reward_id = int(reward_id)
+        except (TypeError, ValueError):
+            return JsonResponse({"success": False}, status=400)
+
+        reward = get_object_or_404(MainReward, id=reward_id, is_preset=True)
+
+    if reward:
+        child.main_reward = reward
+        child.save()
+        return JsonResponse({"success": True})
+
+    return JsonResponse({"success": False}, status=400)
 
 
 # 🎯 Add custom main reward (paid tier only)
