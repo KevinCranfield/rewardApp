@@ -34,21 +34,33 @@ function fixBoardNumbering(){
     const squares = Array.from(board.querySelectorAll(".square"));
     if(squares.length !== 64) return;
 
-    board.innerHTML = "";
+    const GRID = 8;
+    let num = 1;
 
-    let index = 0;
+    for(let row = 0; row < GRID; row++){
+        // take the visual row (top→bottom in DOM)
+        const rowSquares = squares.slice(row * GRID, row * GRID + GRID);
 
-    for(let row = 0; row < 8; row++){
-        let rowSquares = squares.slice(index, index + 8);
+        // 🔥 zig-zag numbering: reverse every OTHER row (from bottom perspective)
+        // DOM rows are top→bottom, but numbering is bottom→top
+        const rowFromBottom = GRID - 1 - row;
+        const ordered = (rowFromBottom % 2 === 0)
+            ? rowSquares            // left → right
+            : [...rowSquares].reverse(); // right → left
 
-        // 🔥 reverse every OTHER row (zig-zag)
-        if(row % 2 === 1){
-            rowSquares.reverse();
-        }
+        ordered.forEach(square => {
+            square.dataset.square = num;
 
-        rowSquares.forEach(sq => board.appendChild(sq));
-        index += 8;
+            const label = square.querySelector(".square-number");
+            if(label){
+                label.textContent = num;
+            }
+
+            num++;
+        });
     }
+
+    console.log("✅ Board numbering fixed (zig-zag)");
 }
 
 
