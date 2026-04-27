@@ -24,7 +24,32 @@
 console.log("🔥 GAME JS VERSION: REMOVE CHILD + NAV FIX LIVE v2.2");
 
 
+
 const BOARD_SIZE = 64;
+
+function fixBoardNumbering(){
+    const board = document.querySelector(".board");
+    if(!board) return;
+
+    const squares = Array.from(board.querySelectorAll(".square"));
+    if(squares.length !== 64) return;
+
+    board.innerHTML = "";
+
+    let index = 0;
+
+    for(let row = 0; row < 8; row++){
+        let rowSquares = squares.slice(index, index + 8);
+
+        // 🔥 reverse every OTHER row (zig-zag)
+        if(row % 2 === 1){
+            rowSquares.reverse();
+        }
+
+        rowSquares.forEach(sq => board.appendChild(sq));
+        index += 8;
+    }
+}
 
 
 
@@ -1044,6 +1069,7 @@ function burstConfetti(count = 40){
 
 // Single load listener for board drawing only (splash handled in base.html)
 window.addEventListener("load", () => {
+    fixBoardNumbering();
     // FIX 16: debounce ResizeObserver — token moves subtly shift layout and
     // were triggering continuous SVG redraws on slow devices
     let roDebounce;
