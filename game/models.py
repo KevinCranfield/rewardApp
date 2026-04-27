@@ -151,3 +151,15 @@ class RewardType(models.Model):
 
     def __str__(self):
         return self.name
+
+
+# 🔐 Premium unlock codes
+class PremiumCode(models.Model):
+    code = models.CharField(max_length=50, unique=True)
+    is_used = models.BooleanField(default=False)
+    used_by = models.ForeignKey(User, null=True, blank=True, on_delete=models.SET_NULL)
+    used_at = models.DateTimeField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.code
