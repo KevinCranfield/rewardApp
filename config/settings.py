@@ -134,6 +134,21 @@ USE_I18N = True
 
 USE_TZ = True
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+# --- Additional production hardening ---
+SESSION_COOKIE_AGE = 3600  # 1 hour sessions
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+
+# Prevent MIME sniffing / enforce safer defaults
+SECURE_CROSS_ORIGIN_OPENER_POLICY = "same-origin"
+SECURE_CROSS_ORIGIN_RESOURCE_POLICY = "same-origin"
+
+# Limit upload size (basic DoS protection)
+DATA_UPLOAD_MAX_MEMORY_SIZE = 2621440  # 2.5MB
+FILE_UPLOAD_MAX_MEMORY_SIZE = 2621440
+
+# Ensure cookies are not sent over insecure connections
+CSRF_COOKIE_NAME = "csrftoken"
+SESSION_COOKIE_NAME = "sessionid"
 SECURE_SSL_REDIRECT = True
 SESSION_COOKIE_SECURE = True
 SESSION_COOKIE_SAMESITE = "Lax"
