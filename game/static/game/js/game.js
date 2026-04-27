@@ -171,20 +171,15 @@ function getSquareCenter(num) {
 
     const n = parseInt(num);
 
-    // Row counting from bottom (0 = bottom row)
     const rowFromBottom = Math.floor((n - 1) / GRID);
+    const colIndex = (n - 1) % GRID;
 
-    // ✅ FIX: handle zig-zag board layout
-    // Even rows (from bottom) go left → right
-    // Odd rows go right → left
-    let col = (n - 1) % GRID;
+    // Zig-zag: even rows L→R, odd rows R→L
+    const col = (rowFromBottom % 2 === 0)
+        ? colIndex
+        : (GRID - 1 - colIndex);
 
-    if(rowFromBottom % 2 === 1){
-        col = (GRID - 1) - col;
-    }
-
-    // Convert to DOM row (top = 0)
-    const row = (GRID - 1) - rowFromBottom;
+    const row = GRID - 1 - rowFromBottom;
 
     return {
         x: col * cell + cell / 2,
@@ -478,12 +473,21 @@ function animateMovement(childId, start, end){
 
     let step = start === 0 ? 1 : start + 1;
 
+    // 🔥 SAFETY FIX: ensure step always progresses correctly
+    if (step < 1) step = 1;
+
     function move(){
         // FIX 11: re-fetch token each step — if updateTokensUI ran mid-walk, we get the fresh element
         const liveToken = document.getElementById(tokenId);
         if(!liveToken){
             // Token was removed externally — stop animation cleanly
             if(rollButton && rollButton.dataset.rollsRemaining > 0) rollButton.disabled = false;
+            return;
+        }
+
+        // 🔥 GUARD: prevent step > BOARD_SIZE
+        if (step > BOARD_SIZE) {
+            if (rollButton) rollButton.disabled = false;
             return;
         }
 
