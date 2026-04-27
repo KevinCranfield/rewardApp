@@ -181,13 +181,11 @@ def add_child(request):
 def give_chest(request):
     family = get_family(request.user)
 
-    child = Child.objects.filter(
+    child = get_object_or_404(
+        Child,
         id=request.POST.get("child_id"),
         family=family
-    ).first()
-
-    if not child:
-        return JsonResponse({"success": False}, status=400)
+    )
 
     tier = (
         request.POST.get("tier")
@@ -230,13 +228,11 @@ def give_chest(request):
 def add_reward(request):
     family = get_family(request.user)
 
-    child = Child.objects.filter(
+    child = get_object_or_404(
+        Child,
         id=request.POST.get("child_id"),
         family=family
-    ).first()
-
-    if not child:
-        return JsonResponse({"success": False, "error": "Invalid child"}, status=400)
+    )
 
     reason = request.POST.get("reason")
 
@@ -339,10 +335,7 @@ def roll(request):
     family = get_family(request.user)
     child_id = request.POST.get("child_id")
 
-    child = Child.objects.filter(id=child_id, family=family).first()
-
-    if not child:
-        return JsonResponse({"success": False}, status=400)
+    child = get_object_or_404(Child, id=child_id, family=family)
 
     reward = Reward.objects.filter(child=child, is_used=False).first()
 
@@ -353,6 +346,7 @@ def roll(request):
     reward.save()
 
     roll_value = random.randint(1, 6)
+    old_position = child.position
 
     new_position = child.position + roll_value
 
@@ -428,6 +422,7 @@ def roll(request):
         "from": jump_from,
         "children": children_data,
         "reward": reward_data,
+        "start": old_position,
     })
 
 
@@ -548,10 +543,7 @@ def get_child_state(request):
     family = get_family(request.user)
     child_id = request.GET.get("child_id")
 
-    child = Child.objects.filter(id=child_id, family=family).first()
-
-    if not child:
-        return JsonResponse({"error": "Child not found"}, status=404)
+    child = get_object_or_404(Child, id=child_id, family=family)
 
     rolls_remaining = Reward.objects.filter(
         child=child,
