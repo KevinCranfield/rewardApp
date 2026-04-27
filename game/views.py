@@ -9,6 +9,17 @@ import random
 
 from django.contrib.auth.views import PasswordResetView
 from django.db.models import Q
+from django.core.cache import cache
+import time
+def rate_limit(key, seconds=1):
+    now = time.time()
+    last = cache.get(key)
+
+    if last and now - last < seconds:
+        return False
+
+    cache.set(key, now, timeout=seconds)
+    return True
 
 from .models import Family, Child, Roll, Reward, Chest, RewardType, MainReward
 
@@ -115,6 +126,15 @@ def dashboard(request):
 
 
 @login_required
+def setup_page(request):
+    family = get_family(request.user)
+
+    return render(request, "game/setup.html", {
+        "children": family.children.all()
+    })
+
+
+@login_required
 def child_view(request, child_id):
     family = get_family(request.user)
     child = get_object_or_404(Child, id=child_id, family=family)
@@ -130,9 +150,12 @@ def child_view(request, child_id):
 
 
 @login_required
+@transaction.atomic
 @require_POST
 def roll(request):
     family = get_family(request.user)
+    if not rate_limit(f"roll_{request.user.id}", 1):
+        return JsonResponse({"error": "Too many requests"}, status=429)
 
     try:
         child_id = int(request.POST.get("child_id"))
@@ -141,7 +164,7 @@ def roll(request):
 
     child = get_object_or_404(Child, id=child_id, family=family)
 
-    reward = Reward.objects.filter(child=child, is_used=False).first()
+    reward = Reward.objects.select_for_update().filter(child=child, is_used=False).first()
     if not reward:
         return JsonResponse({"success": False}, status=400)
 
@@ -205,6 +228,8 @@ def roll(request):
 @require_POST
 def open_chest(request, chest_id=None):
     family = get_family(request.user)
+    if not rate_limit(f"chest_{request.user.id}", 1):
+        return JsonResponse({"error": "Too many requests"}, status=429)
 
     if chest_id is None:
         chest_id = request.POST.get("chest_id")
@@ -238,6 +263,7 @@ def open_chest(request, chest_id=None):
 
 
 @login_required
+@require_POST
 def get_child_state(request):
     family = get_family(request.user)
 
@@ -254,9 +280,12 @@ def get_child_state(request):
 
 
 @login_required
+@require_POST
 def add_reward_type(request):
     if request.method == "POST":
         family = get_family(request.user)
+        if not rate_limit(f"reward_{request.user.id}", 1):
+            return redirect("setup_page")
 
         try:
             child_id = int(request.POST.get("child_id"))
@@ -280,6 +309,7 @@ def add_reward_type(request):
 
 
 @login_required
+@require_POST
 def set_main_reward(request):
     if request.method == "POST":
         family = get_family(request.user)
@@ -302,7 +332,7 @@ def set_main_reward(request):
             id=reward_id
         )
 
-        if child and reward:
+        if reward:
             child.main_reward = reward
             child.save()
             return JsonResponse({"success": True})
