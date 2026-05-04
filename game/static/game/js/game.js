@@ -25,7 +25,11 @@ console.log("🔥 GAME JS VERSION: REMOVE CHILD + NAV FIX LIVE v2.2");
 
 
 
+
 const BOARD_SIZE = 64;
+
+// 🔒 Prevent rapid multi-rolls per child
+window.__rolling = {};
 
 function fixBoardNumbering(){
     const board = document.querySelector(".board");
@@ -213,6 +217,11 @@ function getSquareCenter(num) {
 }
 
 function roll(childId){
+    // 🔒 block if already rolling for this child
+    if(window.__rolling[childId]){
+        console.warn("Blocked roll — animation in progress");
+        return;
+    }
     unlockSounds();
 
     const button = document.querySelector(`.roll-btn[data-child="${childId}"]`);
@@ -243,6 +252,7 @@ function roll(childId){
     }
 
     if(button) button.disabled = true;
+    window.__rolling[childId] = true;
     playSound('click');
     if(navigator.vibrate){
         navigator.vibrate(30);
@@ -294,6 +304,7 @@ function roll(childId){
                 button.disabled = true;
             }
 
+            window.__rolling[childId] = false;
             showToast("⚠️ No rolls available");
             return;
         }
@@ -440,11 +451,10 @@ function roll(childId){
         // 🔥 If backend returns no movement (e.g. rolls = 0), do NOT animate
         if(!data.position){
             console.warn("No movement data — likely 0 rolls");
-
+            window.__rolling[childId] = false;
             if(button){
                 button.disabled = true;
             }
-
             return;
         }
 
@@ -453,12 +463,14 @@ function roll(childId){
 
         if(current === data.position){
             console.warn("No movement");
+            window.__rolling[childId] = false;
             if(button) button.disabled = false;
             return;
         }
     })
     .catch(err => {
         console.error(err);
+        window.__rolling[childId] = false;
         showToast("⚠️ Network error");
         if(button) button.disabled = false;
     });
@@ -513,6 +525,7 @@ function animateMovement(childId, start, end){
         // 🔥 GUARD: prevent step > BOARD_SIZE
         if (step > BOARD_SIZE) {
             if (rollButton) rollButton.disabled = false;
+            window.__rolling[childId] = false;
             return;
         }
 
@@ -521,6 +534,8 @@ function animateMovement(childId, start, end){
                 liveToken.classList.add("winner");
                 if(rollButton) rollButton.disabled = false;
                 triggerWinOverlay(childId);
+                // 🔓 unlock roll when movement finishes
+                window.__rolling[childId] = false;
                 return;
             }
 
@@ -532,6 +547,8 @@ function animateMovement(childId, start, end){
             if(window.__lastChildren){
                 updateTokensUI(window.__lastChildren);
             }
+            // 🔓 unlock roll when movement finishes
+            window.__rolling[childId] = false;
             return;
         }
 
@@ -626,6 +643,7 @@ function animateLadder(childId, start, end){
                 );
                 updateTokensUI(window.__lastChildren);
             }
+            window.__rolling[childId] = false;
         }
     }
 
@@ -687,6 +705,7 @@ function animateSnake(childId, start, end){
                 );
                 updateTokensUI(window.__lastChildren);
             }
+            window.__rolling[childId] = false;
         }
     }
 
