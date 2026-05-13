@@ -1,4 +1,97 @@
+{% extends "game/base.html" %}
+{% load static %}
+
+{% block title %}Reward Game — Motivate kids with fun rewards{% endblock %}
+
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'game/css/home.css' %}">
 <link rel="stylesheet" href="{% static 'game/css/guest.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<div class="container home-screen">
+
+{% if request.user.is_authenticated %}
+
+    <!-- WELCOME -->
+    <div class="welcome">
+        <h2 class="welcome-title updated">👋 Welcome back {% if request.user.username %}, {{ request.user.username }}{% endif %}</h2>
+    </div>
+
+    <!-- GAME LIST -->
+    <div class="game-list">
+
+        {% if children %}
+            {% for child in children %}
+            <a href="/child/{{ child.id }}/" class="game-card">
+
+                <div class="game-card-header">
+                    <div class="color-dot" style="background: {{ child.colour }}"></div>
+                    <h3>{{ child.name }}'s Game</h3>
+                </div>
+
+                <div class="game-card-body">
+                    <span>Continue playing</span>
+                    <span class="continue-btn">Play</span>
+                </div>
+
+            </a>
+            {% endfor %}
+
+        {% else %}
+            <div class="empty-state">
+                <p>🎮 No games yet!</p>
+                <p>Head to the dashboard to add your first child and get started.</p>
+                <a href="/dashboard/" class="cta-btn">⚙️ Go to Dashboard</a>
+            </div>
+        {% endif %}
+
+    </div>
+
+    {% if children %}
+    <div class="quick-actions">
+        <a href="/dashboard/" class="action-btn">⚙️ Dashboard (Add Rolls)</a>
+    </div>
+    {% endif %}
+
+</div>
+
+{% else %}
+
+<div class="guest-home">
+
+    <h2>🎯 Reward Game</h2>
+
+    <p>
+        Motivate kids with fun rewards! 🎉<br><br>
+        👨‍👩‍👧 Parents set the rewards<br>
+        🎮 Kids roll the dice to progress<br>
+        🪜 Climb ladders, dodge snakes<br>
+        🏆 Reach the end to win!<br><br>
+        Free to use. Get started in seconds 👇
+    </p>
+
+    <a href="/signup/" class="cta-btn">
+        🚀 Create Account
+    </a>
+
+    <a href="/login/" class="cta-secondary">
+        Already have an account? Login
+    </a>
+
+    <div class="onboard-card">
+        <h3>How it works</h3>
+        <ol class="how-it-works">
+            <li>👶 Add a child to your account</li>
+            <li>🎁 Give rolls as rewards for good behaviour</li>
+            <li>🎲 Your child rolls the dice to move their piece</li>
+            <li>🏁 First to square 64 wins!</li>
+        </ol>
+    </div>
+
+</div>
+
+{% endif %}
+
 {% endblock %}
