@@ -37,14 +37,14 @@
                     Chests waiting: {{ child.unopened_chests_count }}
                 </div>
 
-                <div class="reward-section">
+                <div class="reward-section premium-reward-section">
                     <div class="helper-steps">
                         <strong>🎯 How it works:</strong><br>
                         1. Select a reason OR type your own<br>
                         2. Choose a chest (Bronze / Silver / Gold)<br>
                         3. Child opens the chest 🎁
                     </div>
-                    <form method="POST" action="{% url 'add_reward' %}" class="reward-form">
+                    <form method="POST" action="{% url 'add_reward' %}" class="reward-form premium-reward-form">
                         {% csrf_token %}
                         <input type="hidden" name="child_id" value="{{ child.id }}">
                         <input type="hidden" name="chest_type" value="">
@@ -60,7 +60,7 @@
 
                         <input type="text" name="custom_text" class="reward-input" placeholder="Or type your own reason (e.g. Brushed teeth)">
 
-                        <div class="reward-buttons">
+                        <div class="reward-buttons premium-chest-buttons">
                             <button type="submit" name="tier" value="1" class="reward-btn bronze-btn" onclick="this.form.chest_type.value='bronze'">
                                 🟤 Bronze Chest (+1 Roll)
                             </button>
@@ -83,7 +83,7 @@
                     </form>
                 </div>
 
-                <div class="reward-history">
+                <div class="reward-history premium-history">
                     {% if child.unopened_chests_count > 0 %}
                         {% for reward in child.all_rewards|slice:":5" %}
                             <div class="reward-item">
@@ -122,11 +122,11 @@
     <!-- =========================
          QUICK ACTIONS
     ========================= -->
-    <div class="section-card dashboard-actions">
+    <div class="section-card dashboard-actions premium-actions-card">
 
         <h2>⚡ Quick Actions</h2>
 
-        <div class="action-buttons">
+        <div class="action-buttons premium-action-buttons">
             <button class="add-toggle-btn" onclick="togglePinSection()">🔐 Change PIN</button>
             <button class="danger-btn" id="resetBoardBtn">🔄 Reset Board</button>
         </div>
