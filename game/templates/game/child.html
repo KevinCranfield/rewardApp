@@ -9,6 +9,7 @@
 {% block content %}
 
 <div class="child-view" data-child-id="{{ child.id }}">
+<div class="child-layout">
 
   <h2>{{ child.name }}'s Game</h2>
 
@@ -59,6 +60,7 @@
 
   <!-- 🏆 Main Reward Goal -->
   {% if main_reward %}
+  <div class="reward-panel">
   <div class="main-reward-banner">
     <div class="main-reward-label">🏆 Reach square 64 to win...</div>
     {% if main_reward.image %}
@@ -80,9 +82,12 @@
     {% endif %}
     <div class="main-reward-name">{{ main_reward.name }}</div>
   </div>
+  </div>
   {% endif %}
 
   <!-- 🎮 FULL BOARD -->
+  </div>
+  <div class="board-panel">
   <div class="board-wrapper">
     <div class="board" id="game-board">
         {% if squares %}
@@ -127,6 +132,7 @@
     </div>
     <svg class="board-overlay"></svg>
   </div>
+  </div>
 
 </div>
 
@@ -135,7 +141,7 @@
   <div class="reward-card" onclick="event.stopPropagation()">
     <img id="reward-image" src="" />
     <div id="reward-name"></div>
-    <button onclick="document.getElementById('reward-display').classList.add('hidden')" style="margin-top:10px;">Close</button>
+    <button class="reward-close-btn" onclick="document.getElementById('reward-display').classList.add('hidden')">Close</button>
   </div>
 </div>
 
