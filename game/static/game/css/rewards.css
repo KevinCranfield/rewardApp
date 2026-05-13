@@ -410,6 +410,26 @@
     100% { opacity: 0; transform: translateY(-40px) scale(1); }
 }
 
+.main-reward,
+.reward-display,
+.reward-preview{
+    width:100%;
+    max-width:220px;
+    margin:0 auto 16px;
+    overflow:hidden;
+    border-radius:24px;
+}
+
+.main-reward img,
+.reward-display img,
+.reward-preview img{
+    width:100%;
+    max-width:220px;
+    max-height:220px;
+    object-fit:contain;
+    display:block;
+    margin:auto;
+}
 
 
 
