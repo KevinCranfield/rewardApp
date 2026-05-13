@@ -84,11 +84,12 @@
     height:180px !important;
     max-width:180px !important;
     max-height:180px !important;
-    object-fit:cover !important;
+    object-fit:contain !important;
     border-radius:28px;
     display:block;
     margin:0 auto;
     background:white;
+    background:linear-gradient(145deg,#fff1f7,#ffffff);
     padding:10px;
     box-shadow:
         0 10px 24px rgba(0,0,0,.12),
