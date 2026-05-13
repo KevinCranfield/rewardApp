@@ -1,6 +1,10 @@
 {% extends "game/base.html" %}
 {% load static %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'game/css/auth.css' %}">
+{% endblock %}
+
 {% block title %}Login — Reward Game{% endblock %}
 
 {% block content %}

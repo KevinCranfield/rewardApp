@@ -1,0 +1,181 @@
+/* =========================
+   AUTH PAGES
+========================= */
+
+.auth-wrapper{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    min-height:70vh;
+}
+
+.auth-card{
+    width:100%;
+    max-width:400px;
+    background:linear-gradient(145deg,#ffffff,#f8fafc);
+    padding:30px;
+    border-radius:24px;
+    box-shadow:
+        0 25px 60px rgba(0,0,0,.15),
+        inset 0 2px 4px rgba(255,255,255,.5);
+    display:flex;
+    flex-direction:column;
+    gap:16px;
+    text-align:center;
+    animation:fadeSlide .3s ease;
+}
+
+.auth-card form{
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+}
+
+.auth-row{
+    display:flex;
+    gap:10px;
+}
+
+.auth-row input{ flex:1; }
+
+.auth-card input{
+    padding:14px;
+    border-radius:14px;
+    border:1px solid #e5e7eb;
+    font-size:15px;
+    background:#f9fafb;
+    transition:all .2s ease;
+}
+
+.auth-card input:focus{
+    outline:none;
+    border-color:#6366f1;
+    background:white;
+    box-shadow:0 0 0 3px rgba(99,102,241,.15);
+}
+
+/* password inputs sit inside .password-wrap — no centering needed */
+.auth-card input[name="password"],
+.auth-card input[name="confirm_password"]{
+    max-width:100%;
+    margin:0;
+}
+
+.auth-card button{
+    width:200px;
+    margin:10px auto 0 auto;
+    padding:14px;
+    border:none;
+    border-radius:16px;
+    background:linear-gradient(135deg,#6366f1,#4338ca);
+    color:white;
+    font-size:15px;
+    font-weight:600;
+    cursor:pointer;
+    box-shadow:0 12px 24px rgba(99,102,241,.35);
+    transition:all .2s ease;
+}
+
+.auth-card button:hover{ transform:translateY(-2px) scale(1.02); }
+
+.auth-sub{ margin-bottom:10px; }
+
+.auth-logo{
+    width:70px;
+    margin:auto;
+    border-radius:18px;
+    box-shadow:
+        0 10px 25px rgba(0,0,0,.2),
+        inset 0 2px 4px rgba(255,255,255,.4);
+}
+
+.auth-footer{
+    margin-top:10px;
+    font-size:14px;
+}
+
+.auth-footer a{
+    color:#4f46e5;
+    font-weight:600;
+    text-decoration:none;
+}
+
+.auth-error{
+    background:#fee2e2;
+    color:#b91c1c;
+    padding:10px;
+    border-radius:10px;
+}
+
+.auth-hint{
+    font-size:12px;
+    color:#6b7280;
+    margin-top:-8px;
+    margin-bottom:6px;
+}
+
+/* =========================
+   PIN
+========================= */
+
+.pin-input{
+    text-align:center;
+    letter-spacing:10px;
+    font-size:22px;
+    font-weight:600;
+    padding:16px;
+    border-radius:16px;
+    background:#f9fafb;
+    border:1px solid #e5e7eb;
+    max-width:220px;
+    margin:0 auto;
+    transition:all .2s ease;
+}
+
+.pin-input:focus{
+    outline:none;
+    border-color:#6366f1;
+    background:white;
+    box-shadow:0 0 0 4px rgba(99,102,241,.15);
+}
+
+.pin-title{ font-size:20px; font-weight:700; }
+.pin-sub{ font-size:13px; color:#6b7280; margin-top:-6px; }
+.pin-card{ max-width:320px; }
+
+.pin-button{
+    width:180px;
+    margin:10px auto 0 auto;
+    padding:14px;
+    border:none;
+    border-radius:14px;
+    background:linear-gradient(135deg,#6366f1,#4338ca);
+    color:white;
+    font-weight:600;
+    cursor:pointer;
+    box-shadow:0 10px 20px rgba(99,102,241,.3);
+    transition:all .2s ease;
+}
+
+.pin-button:hover{ transform:translateY(-2px); }
+.pin-settings{ transition:all .3s ease; }
+.password-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.password-wrap input {
+    flex: 1;
+    padding-right: 44px;
+    max-width: 100%;
+    margin: 0;
+}
+
+.show-pw-btn:hover {
+    opacity: 0.7;
+}
+
+.show-pw-btn:active {
+    transform: none;
+}

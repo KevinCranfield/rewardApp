@@ -7,6 +7,8 @@
     <link rel="icon" type="image/png" sizes="32x32" href="{% static 'game/icons/icon-192.png' %}">
     <link rel="apple-touch-icon" sizes="180x180" href="{% static 'game/icons/icon-192.png' %}">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <link rel="stylesheet" href="{% static 'game/css/base.css' %}">
+    {% block extra_css %}{% endblock %}
     <link rel="stylesheet" href="{% static 'game/css/styles.css' %}">
     <meta name="theme-color" content="#facc15">
     <link rel="manifest" href="{% static 'game/manifest.json' %}">
