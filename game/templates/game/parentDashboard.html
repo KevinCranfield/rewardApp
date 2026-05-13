@@ -3,6 +3,13 @@
 
 {% block title %}Dashboard — Reward Game{% endblock %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'game/css/children.css' %}">
+<link rel="stylesheet" href="{% static 'game/css/rewards.css' %}">
+<link rel="stylesheet" href="{% static 'game/css/board.css' %}">
+<link rel="stylesheet" href="{% static 'game/css/chests.css' %}">
+{% endblock %}
+
 {% block content %}
 
 <div class="container">

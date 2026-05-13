@@ -1,6 +1,13 @@
 {% extends "game/base.html" %}
 {% load static %}
 
+{% block title %}Setup Reward Game{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'game/css/children.css' %}">
+<link rel="stylesheet" href="{% static 'game/css/rewards.css' %}">
+{% endblock %}
+
 {% block content %}
 
 <div class="setup-container">
@@ -99,7 +106,7 @@
             <a href="/child/{{ child.id }}/" class="start-game-btn">🎮 Play</a>
           {% endif %}
 
-          <form method="POST" action="/remove-child/{{ child.id }}/" class="remove-child-form" data-child-id="{{ child.id }}" style="display:inline;">
+          <form method="POST" action="/remove-child/{{ child.id }}/" class="remove-child-form" data-child-id="{{ child.id }}" class="inline-form">
             {% csrf_token %}
             <button type="submit" class="remove-child">Remove</button>
           </form>
@@ -112,195 +119,9 @@
 
 </div>
 
-<style>
-.setup-container {
-  max-width: 900px;
-  margin: auto;
-  padding: 20px;
-}
-
-.setup-section {
-  margin-top: 30px;
-}
-
-.child-form {
-  display: flex;
-  gap: 10px;
-  margin-bottom: 20px;
-  align-items: center;
-}
-
-.child-input {
-  padding: 8px;
-  border-radius: 8px;
-  border: 1px solid #ccc;
-  flex: 1;
-}
-
-.child-colour {
-  width: 40px;
-  height: 40px;
-  border: none;
-  border-radius: 8px;
-}
-
-.child-btn {
-  background: #22c55e;
-  color: white;
-  border: none;
-  padding: 8px 12px;
-  border-radius: 8px;
-  cursor: pointer;
-}
-
-.child-btn:hover {
-  background: #16a34a;
-}
-
-.children-grid {
-  display: flex;
-  gap: 15px;
-  flex-wrap: wrap;
-}
-
-.child-card {
-  background: #f3f4f6;
-  padding: 15px;
-  border-radius: 12px;
-  text-align: center;
-  width: 180px;
-  min-height: 220px;
-}
-
-.child-avatar {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  margin: auto;
-}
-
-.child-name {
-  font-weight: 600;
-  margin-top: 6px;
-  margin-bottom: 4px;
-}
-
-.remove-child {
-  color: red;
-  font-size: 12px;
-  background: none;
-  border: none;
-  cursor: pointer;
-  margin-top: 8px;
-}
-
-.upgrade-banner {
-  background: #fee2e2;
-  padding: 10px;
-  border-radius: 10px;
-  margin-bottom: 20px;
-}
-
-.onboarding-box {
-  background: #eef2ff;
-  padding: 10px;
-  border-radius: 10px;
-  margin-bottom: 15px;
-  font-size: 13px;
-}
-
-.onboarding-box ol {
-  margin: 5px 0 0 15px;
-}
-
-.start-game-btn {
-  display: block;
-  margin-top: 8px;
-  background: #3b82f6;
-  color: white;
-  padding: 6px;
-  border-radius: 8px;
-  text-decoration: none;
-  font-size: 12px;
-}
-
-.start-game-btn:hover {
-  background: #2563eb;
-}
-
-.goal-section {
-  margin-top: 10px;
-}
-
-.goal-title {
-  font-weight: 600;
-  margin-bottom: 8px;
-  font-size: 13px;
-}
-
-.goal-options {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  justify-content: center;
-}
-
-.goal-card {
-  background: #fff;
-  border-radius: 10px;
-  padding: 6px;
-  cursor: pointer;
-  text-align: center;
-  width: 68px;
-  transition: all 0.2s ease;
-  border: 2px solid transparent;
-  font-size: 11px;
-}
-
-.goal-card:hover {
-  transform: scale(1.05);
-  background: #e5e7eb;
-}
-
-.goal-card.selected {
-  border: 2px solid #22c55e;
-  background: #dcfce7;
-}
-
-.goal-card img {
-  width: 32px;
-  height: 32px;
-  object-fit: cover;
-  margin-bottom: 4px;
-  border-radius: 6px;
-}
-
-.goal-selected {
-  margin-top: 6px;
-  font-size: 11px;
-  color: #16a34a;
-}
-
-.add-goal-btn {
-  margin-top: 8px;
-  font-size: 11px;
-  background: #f59e0b;
-  color: white;
-  border: none;
-  padding: 4px 8px;
-  border-radius: 6px;
-  cursor: pointer;
-  width: 100%;
-}
-
-.add-goal-btn:hover {
-  background: #d97706;
-}
-</style>
-
 <!-- 🎯 Add Custom Goal Modal -->
-<div id="goal-modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); align-items:center; justify-content:center; z-index:999;">
-  <div style="background:white; padding:20px; border-radius:12px; width:300px;">
+<div id="goal-modal" class="goal-modal hidden flex-center">
+  <div class="goal-modal-card">
     <h3 id="goal-modal-title">Add Custom Goal</h3>
 
     <form method="POST" action="/add-main-reward/" enctype="multipart/form-data" id="goal-form">
@@ -308,37 +129,41 @@
       <input type="hidden" name="child_id" id="goal-modal-child-id">
 
       <input type="text" name="name" id="goal-name-input" placeholder="e.g. Trip to Legoland" required
-             style="width:100%; padding:8px; border-radius:8px; border:1px solid #ccc; margin-bottom:10px; box-sizing:border-box;">
+             class="goal-input">
 
       {% if is_premium %}
-        <label style="font-size:12px; display:block; margin-bottom:4px;">🖼️ Upload image (optional)</label>
-        <input type="file" name="image" accept="image/*" id="goal-image-input" style="margin-bottom:10px; width:100%;">
-        <img id="goal-image-preview" style="display:none; width:60px; height:60px; object-fit:cover; border-radius:8px; margin:auto; margin-bottom:10px;" />
+        <label class="goal-upload-label">🖼️ Upload image (optional)</label>
+        <input type="file" name="image" accept="image/*" id="goal-image-input" class="goal-upload-input">
+        <img id="goal-image-preview" class="goal-image-preview hidden" />
       {% else %}
-        <div style="background:#f1f5f9; border-radius:10px; padding:8px; margin-bottom:10px; text-align:center; font-size:12px;">
+        <div class="goal-upgrade-box">
           🎁 Free plan uses a standard image<br>
-          <a href="/upgrade/" style="font-size:11px; color:#3b82f6;">⭐ Upgrade to add your own image</a>
+          <a href="/upgrade/" class="goal-upgrade-link">⭐ Upgrade to add your own image</a>
         </div>
       {% endif %}
 
-      <button type="submit" style="width:100%; background:#22c55e; color:white; border:none; padding:8px; border-radius:8px; cursor:pointer;">
+      <button type="submit" class="goal-save-btn">
         Save Goal
       </button>
     </form>
 
-    <button onclick="closeGoalModal()" style="margin-top:10px; width:100%; padding:6px; border-radius:8px; cursor:pointer;">Cancel</button>
+    <button onclick="closeGoalModal()" class="goal-cancel-btn">Cancel</button>
   </div>
 </div>
 
 <script>
 function openGoalModal(childId, childName) {
-  document.getElementById('goal-modal').style.display = 'flex';
+  const modal = document.getElementById('goal-modal');
+  modal.classList.remove('hidden');
+  modal.style.display = 'flex';
   document.getElementById('goal-modal-child-id').value = childId;
   document.getElementById('goal-modal-title').innerText = 'Custom goal for ' + childName;
 }
 
 function closeGoalModal() {
-  document.getElementById('goal-modal').style.display = 'none';
+  const modal = document.getElementById('goal-modal');
+  modal.classList.add('hidden');
+  modal.style.display = 'none';
 }
 
 // 🎯 Select goal via cards (AJAX)

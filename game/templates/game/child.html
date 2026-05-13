@@ -1,5 +1,10 @@
 {% extends "game/base.html" %}
 {% load static %}
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'game/css/board.css' %}">
+<link rel="stylesheet" href="{% static 'game/css/rewards.css' %}">
+<link rel="stylesheet" href="{% static 'game/css/chests.css' %}">
+{% endblock %}
 
 {% block content %}
 
@@ -8,7 +13,7 @@
   <h2>{{ child.name }}'s Game</h2>
 
   <!-- 🎯 Roll button -->
-  <div style="text-align:center; margin:20px 0;">
+  <div class="text-center" style="margin:20px 0;">
     <button
       onclick="roll({{ child.id }})"
       class="big-roll roll-btn {% if rolls_available == 0 %}disabled{% endif %}"
@@ -29,17 +34,17 @@
   </div>
 
   <!-- 🎁 Chests -->
-  <div class="chests" style="text-align:center; margin:20px 0;">
+  <div class="chests text-center" style="margin:20px 0;">
     {% if chests %}
       <h3>🎁 Your Chests</h3>
 
-      <div class="chest-list" style="display:flex; gap:10px; justify-content:center; flex-wrap:wrap;">
+      <div class="chest-list flex-center" style="gap:10px; flex-wrap:wrap;">
         {% for chest in chests %}
           <div
             class="chest chest-{{ chest.tier }}"
             data-chest-id="{{ chest.id }}"
             data-tier="{{ chest.tier }}"
-            style="width:120px; height:90px; position:relative; cursor:pointer;"
+            style="width:120px; height:90px;"
           >
             <div class="chest-lid"></div>
             <div class="chest-base"></div>
@@ -91,17 +96,7 @@
                                     <div
                                         class="token"
                                         id="token-{{ child.id }}"
-                                        style="
-                                            background: {{ child.colour }};
-                                            width: 28px;
-                                            height: 28px;
-                                            border-radius: 50%;
-                                            display: flex;
-                                            align-items: center;
-                                            justify-content: center;
-                                            color: white;
-                                            font-weight: bold;
-                                        "
+                                        style="background: {{ child.colour }};"
                                     >
                                         {{ child.name|slice:":1" }}
                                     </div>
@@ -118,17 +113,7 @@
                                     <div
                                         class="token"
                                         id="token-{{ child.id }}"
-                                        style="
-                                            background: {{ child.colour }};
-                                            width: 28px;
-                                            height: 28px;
-                                            border-radius: 50%;
-                                            display: flex;
-                                            align-items: center;
-                                            justify-content: center;
-                                            color: white;
-                                            font-weight: bold;
-                                        "
+                                        style="background: {{ child.colour }};"
                                     >
                                         {{ child.name|slice:":1" }}
                                     </div>
@@ -153,125 +138,6 @@
     <button onclick="document.getElementById('reward-display').classList.add('hidden')" style="margin-top:10px;">Close</button>
   </div>
 </div>
-
-<style>
-.main-reward-banner {
-  text-align: center;
-  margin: 16px 0 20px;
-  padding: 14px;
-  background: #fffbeb;
-  border-radius: 14px;
-  border: 2px dashed #f59e0b;
-}
-
-.main-reward-label {
-  font-size: 12px;
-  color: #92400e;
-  font-weight: 600;
-  margin-bottom: 10px;
-}
-
-.main-reward-img {
-  width: 80px;
-  height: 80px;
-  object-fit: cover;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-}
-
-.main-reward-name {
-  margin-top: 8px;
-  font-size: 16px;
-  font-weight: 700;
-  color: #78350f;
-}
-
-/* 🎁 Chest 3D fix */
-.chest {
-  perspective: 600px;
-}
-
-.chest-lid {
-  transform-origin: bottom;
-  transition: transform 0.4s ease;
-}
-
-.chest-base {
-  position: absolute;
-  bottom: 0;
-  width: 100%;
-  height: 60%;
-  border-radius: 0 0 12px 12px;
-}
-
-.chest-lid {
-  position: absolute;
-  top: 0;
-  width: 100%;
-  height: 40%;
-  border-radius: 12px 12px 0 0;
-}
-
-.chest-bronze .chest-base { background: linear-gradient(#cd7f32, #8b4513); }
-.chest-bronze .chest-lid  { background: linear-gradient(#e6a15a, #b87333); }
-.chest-silver .chest-base { background: linear-gradient(#ccc, #888); }
-.chest-silver .chest-lid  { background: linear-gradient(#eee, #aaa); }
-.chest-gold .chest-base   { background: linear-gradient(#ffd700, #c9a000); }
-.chest-gold .chest-lid    { background: linear-gradient(#fff176, #fbc02d); }
-
-.chest-glow {
-  position: absolute;
-  inset: 0;
-  border-radius: 12px;
-  opacity: 0;
-  box-shadow: 0 0 20px rgba(255,215,0,0.6);
-  transition: opacity 0.3s ease;
-}
-
-.chest:hover .chest-glow {
-  opacity: 1;
-}
-
-.reward-display {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-}
-
-.reward-card {
-  background: white;
-  padding: 20px;
-  border-radius: 16px;
-  text-align: center;
-  animation: rewardPop 0.5s ease;
-}
-
-.reward-card img {
-  width: 120px;
-  height: 120px;
-  object-fit: cover;
-}
-
-#reward-name {
-  margin-top: 10px;
-  font-size: 18px;
-  font-weight: bold;
-}
-
-@keyframes rewardPop {
-  0% { transform: scale(0.5); opacity: 0; }
-  70% { transform: scale(1.1); }
-  100% { transform: scale(1); opacity: 1; }
-}
-
-.hidden {
-  display: none;
-}
-</style>
 
 <script>
 function getCSRFToken(){

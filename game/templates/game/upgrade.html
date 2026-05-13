@@ -1,162 +1,14 @@
 {% extends "game/base.html" %}
 
+{% load static %}
+
+{% block title %}Upgrade to Premium — Reward Game{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'game/css/upgrade.css' %}">
+{% endblock %}
+
 {% block content %}
-
-<style>
-.upgrade-page {
-    min-height: calc(100vh - 140px);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 30px 20px 120px;
-    background:
-        radial-gradient(circle at top, rgba(255,255,255,0.18), transparent 40%),
-        linear-gradient(180deg, #78c9ff 0%, #57aef5 100%);
-}
-
-.upgrade-card {
-    width: 100%;
-    max-width: 520px;
-    background: rgba(255,255,255,0.96);
-    border-radius: 28px;
-    padding: 40px 32px;
-    text-align: center;
-    box-shadow: 0 18px 40px rgba(0,0,0,0.18);
-    border: 3px solid rgba(255,255,255,0.7);
-}
-
-.upgrade-badge {
-    width: 82px;
-    height: 82px;
-    margin: 0 auto 18px;
-    border-radius: 24px;
-    background: linear-gradient(135deg, #6d5dfc, #8d7dff);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 2.5rem;
-    box-shadow: 0 10px 20px rgba(109,93,252,0.35);
-}
-
-.upgrade-title {
-    font-size: clamp(2rem, 5vw, 3rem);
-    margin-bottom: 10px;
-    color: #111827;
-    font-weight: 900;
-    line-height: 1.1;
-}
-
-.upgrade-subtitle {
-    color: #4b5563;
-    font-size: 1.05rem;
-    margin-bottom: 28px;
-}
-
-.feature-list {
-    display: grid;
-    gap: 14px;
-    margin: 30px 0;
-}
-
-.feature-item {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    padding: 16px 18px;
-    background: #f3f8ff;
-    border-radius: 18px;
-    text-align: left;
-    border: 2px solid rgba(87,174,245,0.12);
-}
-
-.feature-icon {
-    width: 48px;
-    height: 48px;
-    border-radius: 14px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.4rem;
-    background: linear-gradient(135deg, #ffe082, #ffca28);
-    flex-shrink: 0;
-}
-
-.feature-item:nth-child(2) .feature-icon {
-    background: linear-gradient(135deg, #c4b5fd, #8b5cf6);
-}
-
-.feature-item:nth-child(3) .feature-icon {
-    background: linear-gradient(135deg, #fca5a5, #ef4444);
-}
-
-.feature-title {
-    font-weight: 800;
-    color: #111827;
-    margin-bottom: 4px;
-}
-
-.feature-text {
-    color: #6b7280;
-    font-size: 0.92rem;
-}
-
-.code-input {
-    width: 100%;
-    padding: 16px 18px;
-    border-radius: 16px;
-    border: 2px solid #dbeafe;
-    font-size: 1rem;
-    outline: none;
-    transition: all 0.2s ease;
-    box-sizing: border-box;
-}
-
-.code-input:focus {
-    border-color: #6d5dfc;
-    box-shadow: 0 0 0 4px rgba(109,93,252,0.15);
-}
-
-.redeem-btn {
-    width: 100%;
-    margin-top: 16px;
-    border: none;
-    border-radius: 18px;
-    padding: 16px;
-    font-size: 1rem;
-    font-weight: 800;
-    color: white;
-    cursor: pointer;
-    background: linear-gradient(135deg, #6d5dfc, #4f46e5);
-    box-shadow: 0 10px 20px rgba(79,70,229,0.28);
-    transition: transform 0.15s ease, box-shadow 0.15s ease;
-}
-
-.redeem-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 14px 24px rgba(79,70,229,0.35);
-}
-
-.premium-active {
-    background: linear-gradient(135deg, #34d399, #10b981);
-    color: white;
-    border-radius: 22px;
-    padding: 20px;
-    margin-top: 20px;
-    font-weight: 700;
-    font-size: 1.1rem;
-}
-
-@media (max-width: 600px) {
-    .upgrade-card {
-        padding: 32px 22px;
-        border-radius: 24px;
-    }
-
-    .feature-item {
-        padding: 14px;
-    }
-}
-</style>
 
 <div class="upgrade-page">
     <div class="upgrade-card">
@@ -208,13 +60,17 @@
             placeholder="Enter premium code"
         >
 
-        <button class="redeem-btn" onclick="redeemCode()">
+        <button class="redeem-btn" type="button" onclick="redeemCode()">
             Unlock Premium
         </button>
 
         <script>
         function redeemCode() {
-            const code = document.getElementById("codeInput").value;
+            const code = document.getElementById("codeInput").value.trim();
+            if(!code){
+                alert("Please enter a premium code");
+                return;
+            }
 
             fetch("/redeem-code/", {
                 method: "POST",

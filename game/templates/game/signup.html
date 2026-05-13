@@ -2,6 +2,9 @@
 {% load static %}
 
 {% block title %}Sign Up — Reward Game{% endblock %}
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'game/css/auth.css' %}">
+{% endblock %}
 
 {% block content %}
 
@@ -20,7 +23,7 @@
 
         <form method="post" novalidate>
             {% csrf_token %}
-            <input type="text" name="email_confirm" style="display:none;" tabindex="-1" autocomplete="off">
+            <input type="text" name="email_confirm" class="hidden" tabindex="-1" autocomplete="off">
 
             <label class="auth-label">Username</label>
             <input type="text" name="username" required>
@@ -29,7 +32,10 @@
             <input type="email" name="email" required>
 
             <label class="auth-label">Password</label>
-            <input type="password" name="password" required>
+            <div class="password-wrap">
+                <input type="password" name="password" id="signup-password" required>
+                <button type="button" class="show-pw-btn" onclick="togglePassword('signup-password', this)">👁</button>
+            </div>
 
             <button type="submit">Create Account</button>
         </form>
@@ -37,5 +43,19 @@
     </div>
 
 </div>
+
+<script>
+function togglePassword(id, btn){
+    const input = document.getElementById(id);
+
+    if(input.type === 'password'){
+        input.type = 'text';
+        btn.textContent = '🙈';
+    }else{
+        input.type = 'password';
+        btn.textContent = '👁';
+    }
+}
+</script>
 
 {% endblock %}

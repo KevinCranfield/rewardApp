@@ -1,6 +1,12 @@
 {% extends "game/base.html" %}
 {% load static %}
 
+{% block title %}Enter PIN — Reward Game{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'game/css/auth.css' %}">
+{% endblock %}
+
 {% block content %}
 
 <div class="auth-wrapper">
@@ -28,7 +34,7 @@
                 autocomplete="off"
                 inputmode="numeric"
                 pattern="[0-9]*"
-                style="text-align:center; letter-spacing:6px; font-size:18px;"
+                class="pin-input"
             >
 
             <button type="submit">Unlock</button>
