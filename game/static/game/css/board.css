@@ -494,3 +494,144 @@
         width:90%;
     }
 }
+
+
+/* =========================
+   CHILD VIEW
+========================= */
+
+.child-view .app-header { display: none; }
+
+html { height: 100%; }
+
+body.child-view {
+    background: radial-gradient(circle at center, #7ec5e3 0%, #4f9fc0 100%);
+    overflow-x: hidden;
+    overflow-y: hidden;
+    margin: 0;
+    padding: 0;
+}
+
+.child-view .container {
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 0 !important;
+    padding-bottom: 80px !important;
+    margin: 0;
+}
+
+.child-view .board-wrapper {
+    width: 100vw;
+
+    /* FIX: force square so overlay matches board */
+    aspect-ratio: 1 / 1;
+    height: auto;
+
+    max-height: 100vh;
+    margin: auto;
+
+    padding: 0;
+    display: block;
+    position: relative;
+    z-index: 1;
+    overflow: hidden;
+    background: linear-gradient(
+        to right,
+        transparent 60%,
+        rgba(59,130,246,0.2) 80%,
+        rgba(37,99,235,0.3) 100%
+    );
+    position: relative;
+}
+
+.child-view .board-wrapper::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: radial-gradient(circle at 95% 50%, rgba(59,130,246,0.35), transparent 60%);
+    opacity: 0.7;
+}
+
+.child-view .board {
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    max-height: none;
+    margin: 0;
+    transform-origin: center;
+    position: relative;
+    z-index: 2;
+}
+
+/* Ensure board always centered and not cut off on iPhone */
+@media (max-width: 600px) {
+    .child-view .board {
+        width: 92vw;
+        height: 92vw;
+    }
+}
+
+body.child-view::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background: radial-gradient(circle, transparent 70%, rgba(0,0,0,0.12));
+    pointer-events: none;
+    z-index: 0;
+}
+
+@media (max-width:600px){
+    .board-wrapper{ width:98vw; padding:8px; }
+}
+
+
+/* Fix iOS viewport height issues */
+.child-view {
+    min-height: 100dvh;
+}
+
+/* Smooth scaling for board */
+.child-view .board {
+    transition: transform .2s ease;
+}
+
+/* Slight zoom out on very small screens */
+@media (max-width: 380px) {
+    .child-view .board {
+        transform: scale(0.92);
+    }
+}
+
+.token.moving{ animation:bounceMove .3s ease; }
+
+
+.dice-roll{ animation:diceSpin .4s ease; }
+
+
+.child-view .roll-status.empty{
+    color:#ffffff !important;
+    background:#dc2626 !important;
+    border:2px solid #b91c1c;
+    box-shadow:0 16px 40px rgba(0,0,0,.5);
+    text-shadow:0 1px 2px rgba(0,0,0,.5);
+}
+
+
+.roll-btn:disabled{
+    background:#e5e7eb;
+    color:#9ca3af;
+    cursor:not-allowed;
+    box-shadow:none;
+    transform:none;
+}
+
+.reward-count{
+    font-size:13px;
+    font-weight:600;
+    color:#2563eb;
+}
