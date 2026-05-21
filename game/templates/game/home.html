@@ -15,8 +15,32 @@
 {% if request.user.is_authenticated %}
 
     <!-- WELCOME -->
-    <div class="welcome">
-        <h2 class="welcome-title updated">👋 Welcome back {% if request.user.username %}, {{ request.user.username }}{% endif %}</h2>
+    <div class="welcome premium-welcome">
+
+        <div class="welcome-text">
+            <div class="welcome-badge">🎮 Family Reward Adventure</div>
+
+            <h2 class="welcome-title updated">
+                👋 Welcome back{% if request.user.username %}, {{ request.user.username }}{% endif %}
+            </h2>
+
+            <p class="welcome-subtitle">
+                Keep the motivation going and continue your reward journey.
+            </p>
+        </div>
+
+        <div class="welcome-stats">
+            <div class="mini-stat">
+                <span class="mini-stat-number">{{ children|length }}</span>
+                <span class="mini-stat-label">Players</span>
+            </div>
+
+            <div class="mini-stat">
+                <span class="mini-stat-number">🎁</span>
+                <span class="mini-stat-label">Rewards</span>
+            </div>
+        </div>
+
     </div>
 
     <!-- GAME LIST -->
@@ -24,16 +48,41 @@
 
         {% if children %}
             {% for child in children %}
-            <a href="/child/{{ child.id }}/" class="game-card">
+            <a href="/child/{{ child.id }}/" class="game-card premium-game-card">
 
-                <div class="game-card-header">
-                    <div class="color-dot" style="background: {{ child.colour }}"></div>
-                    <h3>{{ child.name }}'s Game</h3>
+                <div class="game-card-top">
+
+                    <div class="game-card-header">
+                        <div class="player-avatar" style="background: {{ child.colour }}">
+                            {{ child.name|slice:":1"|upper }}
+                        </div>
+
+                        <div>
+                            <h3>{{ child.name }}'s Adventure</h3>
+                            <p class="game-card-subtitle">Continue the reward journey 🎲</p>
+                        </div>
+                    </div>
+
+                    <div class="game-status-pill">
+                        Active
+                    </div>
+
                 </div>
 
                 <div class="game-card-body">
-                    <span>Continue playing</span>
-                    <span class="continue-btn">Play</span>
+
+                    <div class="game-progress">
+                        <div class="progress-label">
+                            <span>Game Progress</span>
+                            <span>{{ child.position }}/64</span>
+                        </div>
+
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width:{% widthratio child.position 64 100 %}%"></div>
+                        </div>
+                    </div>
+
+                    <span class="continue-btn">▶ Play Now</span>
                 </div>
 
             </a>
@@ -61,16 +110,23 @@
 
 <div class="guest-home">
 
-    <h2>🎯 Reward Game</h2>
+    <div class="hero-glow hero-glow-1"></div>
+    <div class="hero-glow hero-glow-2"></div>
 
-    <p>
-        Motivate kids with fun rewards! 🎉<br><br>
-        👨‍👩‍👧 Parents set the rewards<br>
-        🎮 Kids roll the dice to progress<br>
-        🪜 Climb ladders, dodge snakes<br>
-        🏆 Reach the end to win!<br><br>
-        Free to use. Get started in seconds 👇
+    <div class="hero-badge">🎉 Make Good Behaviour Fun</div>
+
+    <h2 class="guest-title">🎯 Reward Game</h2>
+
+    <p class="guest-subtitle">
+        Turn rewards into a real adventure with dice rolls, treasure chests, snakes and ladders.
     </p>
+
+    <div class="feature-grid">
+        <div class="feature-pill">👨‍👩‍👧 Parent Controlled</div>
+        <div class="feature-pill">🎁 Reward Chests</div>
+        <div class="feature-pill">🎲 Dice Rolling Fun</div>
+        <div class="feature-pill">🏆 Big Goal Rewards</div>
+    </div>
 
     <a href="/signup/" class="cta-btn">
         🚀 Create Account
@@ -80,14 +136,19 @@
         Already have an account? Login
     </a>
 
-    <div class="onboard-card">
+    <div class="onboard-card premium-onboard-card">
+
+        <div class="onboard-icon">🎮</div>
+
         <h3>How it works</h3>
+
         <ol class="how-it-works">
-            <li>👶 Add a child to your account</li>
-            <li>🎁 Give rolls as rewards for good behaviour</li>
-            <li>🎲 Your child rolls the dice to move their piece</li>
-            <li>🏁 First to square 64 wins!</li>
+            <li>👶 Add your child</li>
+            <li>🎁 Give reward chests for good behaviour</li>
+            <li>🎲 Kids roll dice and move across the board</li>
+            <li>🏆 Reach the final square to win the big reward</li>
         </ol>
+
     </div>
 
 </div>
