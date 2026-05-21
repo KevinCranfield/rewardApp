@@ -39,31 +39,29 @@
 
                 {% if children and children.0.main_reward %}
 
-                    {% if children.0.main_reward.image %}
-
+                    {% if children.0.main_reward.image and children.0.main_reward.name != 'Movie Night' %}
                         <img src="{{ children.0.main_reward.image.url }}" class="reward-stat-image">
-
                     {% else %}
 
                         {% with reward_name=children.0.main_reward.name|lower %}
 
                             {% if 'movie' in reward_name %}
-                                <img src="{% static 'game/images/rewards/movie-night.png' %}" class="reward-stat-image">
+                                <img src="{% static 'game/images/movie.png' %}" class="reward-stat-image">
 
-                            {% elif 'ipad' in reward_name or 'tablet' in reward_name %}
-                                <img src="{% static 'game/images/rewards/ipad.png' %}" class="reward-stat-image">
+                            {% elif 'ipad' in reward_name or 'tablet' in reward_name or 'screen' in reward_name %}
+                                <img src="{% static 'game/images/screentime.png' %}" class="reward-stat-image">
 
                             {% elif 'toy' in reward_name %}
-                                <img src="{% static 'game/images/rewards/toy.png' %}" class="reward-stat-image">
+                                <img src="{% static 'game/images/toy.png' %}" class="reward-stat-image">
 
-                            {% elif 'bike' in reward_name %}
-                                <img src="{% static 'game/images/rewards/bike.png' %}" class="reward-stat-image">
+                            {% elif 'park' in reward_name %}
+                                <img src="{% static 'game/images/park.png' %}" class="reward-stat-image">
 
-                            {% elif 'pizza' in reward_name or 'food' in reward_name %}
-                                <img src="{% static 'game/images/rewards/pizza.png' %}" class="reward-stat-image">
+                            {% elif 'icecream' in reward_name or 'ice cream' in reward_name or 'treat' in reward_name %}
+                                <img src="{% static 'game/images/icecream.png' %}" class="reward-stat-image">
 
                             {% else %}
-                                <img src="{% static 'game/images/rewards/present.png' %}" class="reward-stat-image">
+                                <img src="{% static 'game/images/present.png' %}" class="reward-stat-image">
                             {% endif %}
 
                         {% endwith %}
