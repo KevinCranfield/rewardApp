@@ -35,9 +35,27 @@
                 <span class="mini-stat-label">Players</span>
             </div>
 
-            <div class="mini-stat">
-                <span class="mini-stat-number">🎁</span>
-                <span class="mini-stat-label">Rewards</span>
+            <div class="mini-stat reward-stat-card">
+
+                {% if children and children.0.main_reward %}
+
+                    {% if children.0.main_reward.image %}
+                        <img src="{{ children.0.main_reward.image.url }}" class="reward-stat-image">
+                    {% else %}
+                        <span class="mini-stat-number">🎁</span>
+                    {% endif %}
+
+                    <span class="mini-stat-label reward-name">
+                        {{ children.0.main_reward.name }}
+                    </span>
+
+                {% else %}
+
+                    <span class="mini-stat-number">🎁</span>
+                    <span class="mini-stat-label">No Goal Yet</span>
+
+                {% endif %}
+
             </div>
         </div>
 
