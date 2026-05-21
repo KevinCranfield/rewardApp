@@ -383,8 +383,11 @@
     z-index:999;
 }
 
+.hidden{
+    display:none !important;
+}
+
 .flex-center{
-    display:flex;
     align-items:center;
     justify-content:center;
 }
