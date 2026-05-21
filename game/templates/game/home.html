@@ -40,9 +40,34 @@
                 {% if children and children.0.main_reward %}
 
                     {% if children.0.main_reward.image %}
+
                         <img src="{{ children.0.main_reward.image.url }}" class="reward-stat-image">
+
                     {% else %}
-                        <span class="mini-stat-number">🎁</span>
+
+                        {% with reward_name=children.0.main_reward.name|lower %}
+
+                            {% if 'movie' in reward_name %}
+                                <img src="{% static 'game/images/rewards/movie-night.png' %}" class="reward-stat-image">
+
+                            {% elif 'ipad' in reward_name or 'tablet' in reward_name %}
+                                <img src="{% static 'game/images/rewards/ipad.png' %}" class="reward-stat-image">
+
+                            {% elif 'toy' in reward_name %}
+                                <img src="{% static 'game/images/rewards/toy.png' %}" class="reward-stat-image">
+
+                            {% elif 'bike' in reward_name %}
+                                <img src="{% static 'game/images/rewards/bike.png' %}" class="reward-stat-image">
+
+                            {% elif 'pizza' in reward_name or 'food' in reward_name %}
+                                <img src="{% static 'game/images/rewards/pizza.png' %}" class="reward-stat-image">
+
+                            {% else %}
+                                <img src="{% static 'game/images/rewards/present.png' %}" class="reward-stat-image">
+                            {% endif %}
+
+                        {% endwith %}
+
                     {% endif %}
 
                     <span class="mini-stat-label reward-name">
