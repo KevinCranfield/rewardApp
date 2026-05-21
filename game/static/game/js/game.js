@@ -780,15 +780,6 @@ function drawConnections(){
         rail2.setAttribute("class", "ladder-rail");
         svg.appendChild(rail2);
 
-        // DEBUG LABEL
-        const ladderLabel = document.createElementNS("http://www.w3.org/2000/svg", "text");
-        ladderLabel.setAttribute("x", p1.x + 10);
-        ladderLabel.setAttribute("y", p1.y - 10);
-        ladderLabel.setAttribute("fill", "#1e3a8a");
-        ladderLabel.setAttribute("font-size", "14");
-        ladderLabel.setAttribute("font-weight", "bold");
-        ladderLabel.textContent = `↑${end}`;
-        svg.appendChild(ladderLabel);
 
         const rungCount = 6;
         for(let i = 1; i < rungCount; i++){
@@ -885,15 +876,6 @@ function drawConnections(){
         head.setAttribute("fill", "#166534");
         svg.appendChild(head);
 
-        // DEBUG LABEL
-        const snakeLabel = document.createElementNS("http://www.w3.org/2000/svg", "text");
-        snakeLabel.setAttribute("x", p1.x + 10);
-        snakeLabel.setAttribute("y", p1.y - 10);
-        snakeLabel.setAttribute("fill", "#991b1b");
-        snakeLabel.setAttribute("font-size", "14");
-        snakeLabel.setAttribute("font-weight", "bold");
-        snakeLabel.textContent = `↓${end}`;
-        svg.appendChild(snakeLabel);
 
         const eyeOffsetForward = 3;
         const eyeOffsetSide = 2;
