@@ -47,9 +47,12 @@
             <img
               class="premium-chest-img chest-float"
               data-chest-id="{{ chest.id }}"
-              data-tier="{{ chest.tier }}"
-              src="{% static 'game/images/chests/' %}{{ chest.tier }}_closed.png"
+              data-tier="{{ chest.tier|lower }}"
+              src="{% static 'game/images/chests/' %}{{ chest.tier|lower }}_closed.png"
               alt="{{ chest.tier }} chest"
+              loading="eager"
+              draggable="false"
+              onerror="console.log('Missing chest image:', this.src); this.src='/static/game/images/chests/bronze_closed.png';"
             >
 
             <div class="chest-rarity chest-rarity-{{ chest.tier }}">
