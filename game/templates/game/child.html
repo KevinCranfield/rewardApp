@@ -37,32 +37,29 @@
 
   <!-- 🎁 Chests -->
   {% if chests %}
-  <div style="margin:30px 0; text-align:center;">
+  <div class="chests">
 
     <h3>🎁 Your Chests</h3>
 
-    <div style="
-        display:flex;
-        flex-wrap:wrap;
-        justify-content:center;
-        gap:20px;
-        margin-top:20px;
-    ">
+    <div class="chest-list">
 
       {% for chest in chests %}
+
+      <div class="premium-chest-wrap">
 
         <img
           src="/static/game/images/chests/{{ chest.tier|lower }}_closed.png"
           data-chest-id="{{ chest.id }}"
           data-tier="{{ chest.tier|lower }}"
-          class="premium-chest-img"
-          style="
-            width:140px;
-            height:140px;
-            object-fit:contain;
-            cursor:pointer;
-          "
+          class="premium-chest-img chest-float"
+          alt="{{ chest.tier }} chest"
         >
+
+        <div class="chest-rarity chest-rarity-{{ chest.tier|lower }}">
+          {{ chest.tier|upper }}
+        </div>
+
+      </div>
 
       {% endfor %}
 
@@ -70,34 +67,6 @@
 
   </div>
   {% endif %}
-
-  <div style="
-      width:100%;
-      padding:20px;
-      background:#111;
-      border:6px solid lime;
-      text-align:center;
-      margin:20px 0;
-  ">
-
-    <div style="color:white;font-size:28px;font-weight:900;margin-bottom:20px;">
-      HARD TEST CHEST
-    </div>
-
-    <img
-      src="/static/game/images/chests/bronze_closed.png"
-      style="
-        width:180px;
-        height:180px;
-        display:block;
-        margin:0 auto;
-        background:red;
-        border:6px solid yellow;
-        object-fit:contain;
-      "
-    >
-
-  </div>
   <!-- 🏆 Main Reward Goal -->
   {% if main_reward %}
   <div class="reward-panel">
