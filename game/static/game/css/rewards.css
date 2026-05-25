@@ -1,4 +1,25 @@
-/* MAIN REWARD DISPLAY FIX */
+.main-warning-banner{
+    position:relative;
+    background:linear-gradient(145deg,#fff7db,#ffe9a8);
+    border:1px solid rgba(250,204,21,.45);
+    border-radius:20px;
+    padding:16px 18px;
+    text-align:center;
+    color:#92400e;
+    font-size:18px;
+    font-weight:700;
+    box-shadow:0 14px 30px rgba(245,158,11,.18);
+    margin:18px 0;
+    max-width:320px;
+    width:100%;
+}
+
+@media (max-width:768px){
+    .main-warning-banner{
+        padding:16px 18px;
+        font-size:18px;
+    }
+}
 .child-view img{
     max-width:220px;
     max-height:220px;
