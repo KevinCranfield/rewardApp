@@ -10,9 +10,9 @@
     --warning:#f59e0b;
 
     --text:#111827;
-    --muted:#6b7280;
+    --muted:#374151;
 
-    --bg:#7ec5e3;
+    --bg:#dbeafe;
     --card:#ffffff;
 
     --radius:16px;
@@ -287,7 +287,7 @@ button, a {
 ========================= */
 
 .section-card{
-    background:white;
+    background:rgba(255,255,255,0.92);
     padding:24px;
     border-radius:22px;
 
@@ -315,7 +315,7 @@ button, a {
 }
 
 .card{
-    background: white;
+    background:rgba(255,255,255,0.92);
     padding:18px;
     border-radius:18px;
 
