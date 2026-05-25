@@ -186,3 +186,144 @@
         font-size:14px;
     }
 }
+
+/* PREMIUM CHESTS */
+
+.premium-chest-wrap{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:10px;
+    position:relative;
+}
+
+.premium-chest-img{
+    width:140px;
+    max-width:32vw;
+    cursor:pointer;
+    user-select:none;
+    transition:
+        transform .25s ease,
+        filter .25s ease,
+        opacity .25s ease;
+
+    will-change:transform;
+}
+
+.premium-chest-img:hover{
+    transform:scale(1.06);
+}
+
+.premium-chest-img:active{
+    transform:scale(.96);
+}
+
+/* FLOAT */
+
+.chest-float{
+    animation:chestFloat 2.8s ease-in-out infinite;
+}
+
+@keyframes chestFloat{
+    0%,100%{
+        transform:translateY(0px);
+    }
+    50%{
+        transform:translateY(-10px);
+    }
+}
+
+/* OPENING */
+
+.chest-opening{
+    animation:chestShake .45s ease;
+}
+
+@keyframes chestShake{
+    0%{ transform:rotate(0deg) scale(1); }
+    20%{ transform:rotate(-4deg) scale(1.05); }
+    40%{ transform:rotate(4deg) scale(1.08); }
+    60%{ transform:rotate(-3deg) scale(1.06); }
+    80%{ transform:rotate(3deg) scale(1.04); }
+    100%{ transform:rotate(0deg) scale(1); }
+}
+
+/* BURST */
+
+.chest-burst{
+    animation:chestBurst .55s ease;
+}
+
+@keyframes chestBurst{
+    0%{
+        transform:scale(1);
+        filter:brightness(1);
+    }
+
+    50%{
+        transform:scale(1.15);
+        filter:brightness(2.2);
+    }
+
+    100%{
+        transform:scale(1);
+        filter:brightness(1);
+    }
+}
+
+/* RARITY GLOWS */
+
+[data-tier="bronze"]{
+    filter:drop-shadow(0 0 18px rgba(251,146,60,.45));
+}
+
+[data-tier="silver"]{
+    filter:drop-shadow(0 0 22px rgba(148,163,184,.55));
+}
+
+[data-tier="gold"]{
+    filter:drop-shadow(0 0 30px rgba(250,204,21,.85));
+}
+
+/* RARITY LABELS */
+
+.chest-rarity{
+    padding:6px 12px;
+    border-radius:999px;
+    font-size:11px;
+    font-weight:900;
+    letter-spacing:.08em;
+    backdrop-filter:blur(10px);
+    text-transform:uppercase;
+    box-shadow:0 8px 18px rgba(0,0,0,.08);
+}
+
+.chest-rarity-bronze{
+    background:rgba(251,146,60,.16);
+    color:#c2410c;
+}
+
+.chest-rarity-silver{
+    background:rgba(148,163,184,.16);
+    color:#475569;
+}
+
+.chest-rarity-gold{
+    background:rgba(250,204,21,.2);
+    color:#a16207;
+}
+
+/* MOBILE */
+
+@media (max-width:768px){
+
+    .premium-chest-img{
+        width:110px;
+        max-width:28vw;
+    }
+
+    .chest-rarity{
+        font-size:10px;
+        padding:5px 10px;
+    }
+}

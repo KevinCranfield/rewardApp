@@ -39,19 +39,32 @@
     {% if chests %}
       <h3>🎁 Your Chests</h3>
 
-      <div class="chest-list flex-center" style="gap:10px; flex-wrap:wrap;">
-        {% for chest in chests %}
-          <div
-            class="chest chest-{{ chest.tier }}"
-            data-chest-id="{{ chest.id }}"
-            data-tier="{{ chest.tier }}"
-            style="width:120px; height:90px;"
-          >
-            <div class="chest-lid"></div>
-            <div class="chest-base"></div>
-            <div class="chest-glow"></div>
+      <div class="chest-list flex-center" style="gap:18px; flex-wrap:wrap;">
+          {% for chest in chests %}
+
+          <div class="premium-chest-wrap">
+
+            <img
+              class="premium-chest-img chest-float"
+              data-chest-id="{{ chest.id }}"
+              data-tier="{{ chest.tier }}"
+              src="{% static 'game/images/chests/' %}{{ chest.tier }}_closed.png"
+              alt="{{ chest.tier }} chest"
+            >
+
+            <div class="chest-rarity chest-rarity-{{ chest.tier }}">
+              {% if chest.tier == 'gold' %}
+                ✨ LEGENDARY
+              {% elif chest.tier == 'silver' %}
+                ❄️ RARE
+              {% else %}
+                🔥 COMMON
+              {% endif %}
+            </div>
+
           </div>
-        {% endfor %}
+
+          {% endfor %}
       </div>
     {% else %}
       <p>No chests yet</p>
@@ -171,9 +184,35 @@ function openChest(chestId){
         if(navigator.vibrate) navigator.vibrate([80,40,80]);
 
         const chestEl = document.querySelector(`[data-chest-id="${chestId}"]`);
+
         if(chestEl){
-            chestEl.style.transform = "scale(1.2)";
-            setTimeout(() => chestEl.remove(), 300);
+
+            const tier = chestEl.dataset.tier || 'bronze';
+
+            chestEl.classList.remove('chest-float');
+            chestEl.classList.add('chest-opening');
+
+            chestEl.src = `/static/game/images/chests/${tier}_opening.png`;
+
+            setTimeout(() => {
+
+                chestEl.src = `/static/game/images/chests/${tier}_open.png`;
+
+                chestEl.classList.add('chest-burst');
+
+            }, 450);
+
+            setTimeout(() => {
+
+                chestEl.style.opacity = '0';
+                chestEl.style.transform = 'scale(.7)';
+
+                setTimeout(() => {
+                    const wrap = chestEl.closest('.premium-chest-wrap');
+                    if(wrap) wrap.remove();
+                }, 300);
+
+            }, 1500);
         }
 
         // 🎉 NEW: +roll celebration popup
@@ -229,7 +268,7 @@ function openChest(chestId){
     });
 }
 
-document.querySelectorAll('.chest').forEach(btn => {
+document.querySelectorAll('.premium-chest-img').forEach(btn => {
     btn.addEventListener('click', function(){
         const chestId = this.dataset.chestId;
         if(chestId) openChest(chestId);
