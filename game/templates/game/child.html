@@ -36,7 +36,7 @@
   </div>
 
   <!-- 🎁 Chests -->
-  {% if chests %}
+  {% if chests and rolls_available > 0 %}
   <div class="chests">
 
     <h3>🎁 Your Chests</h3>
@@ -66,6 +66,10 @@
 
     </div>
 
+  </div>
+  {% else %}
+  <div class="no-chests-message">
+    🎯 Earn rewards to unlock chests
   </div>
   {% endif %}
   <!-- 🏆 Main Reward Goal -->
@@ -183,11 +187,15 @@ function openChest(chestId){
         const chestEl = document.querySelector(`[data-chest-id="${chestId}"]`);
 
         if(chestEl){
+            const tier = chestEl.dataset.tier || 'bronze';
+
             chestEl.classList.remove('chest-float');
-            chestEl.classList.add('open');
             chestEl.classList.add('chest-opening');
 
+            chestEl.src = `/static/game/images/chests/${tier}_opening.png`;
+
             setTimeout(() => {
+                chestEl.src = `/static/game/images/chests/${tier}_open.png`;
                 chestEl.classList.add('chest-burst');
             }, 450);
 
