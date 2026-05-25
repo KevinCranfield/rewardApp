@@ -152,3 +152,9 @@ img.premium-chest-img{
     min-width:140px !important;
     min-height:160px !important;
 }
+
+
+/* FORCE SHOW CHESTS */
+.chests{
+    display:block !important;
+}
