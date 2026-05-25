@@ -35,70 +35,40 @@
   </div>
 
   <!-- 🎁 Chests -->
-  <div class="chests text-center" style="margin:20px 0; min-height:320px; background:red; border:8px solid yellow; display:flex; flex-direction:column; align-items:center; justify-content:center; overflow:visible; position:relative; z-index:9999;">
-    {% if chests %}
-      <h3>🎁 Your Chests</h3>
-      <div style="font-size:42px;color:white;font-weight:900;margin-bottom:20px;">
-CHEST AREA DEBUG
-</div>
+  {% if chests %}
+  <div style="margin:30px 0; text-align:center;">
 
-      <div class="chest-list flex-center" style="gap:18px; flex-wrap:wrap;">
-          {% for chest in chests %}
+    <h3>🎁 Your Chests</h3>
 
-          <div class="premium-chest-wrap" style="border:4px dashed blue;min-height:180px;padding:10px;display:flex;align-items:center;justify-content:center;flex-direction:column;">
+    <div style="
+        display:flex;
+        flex-wrap:wrap;
+        justify-content:center;
+        gap:20px;
+        margin-top:20px;
+    ">
 
-            <img
-              class="premium-chest-img chest-float"
-              data-chest-id="{{ chest.id }}"
-              data-tier="{{ chest.tier|lower }}"
-              src="/static/game/images/chests/{{ chest.tier|lower }}_closed.png"
-              alt="{{ chest.tier }} chest"
-              loading="eager"
-              draggable="false"
-              style="display:block !important;width:140px !important;height:140px !important;min-width:140px !important;min-height:140px !important;object-fit:contain !important;border:4px solid red !important;background:yellow !important;opacity:1 !important;visibility:visible !important;position:relative !important;z-index:9999 !important;"
-              onerror="this.outerHTML='<div style=&quot;width:140px;height:140px;background:red;color:white;font-size:14px;font-weight:bold;display:flex;align-items:center;justify-content:center;&quot;>IMAGE FAILED</div>'"
-            >
+      {% for chest in chests %}
 
-            <div class="chest-rarity chest-rarity-{{ chest.tier }}">
-              {% if chest.tier == 'gold' %}
-                ✨ LEGENDARY
-              {% elif chest.tier == 'silver' %}
-                ❄️ RARE
-              {% else %}
-                🔥 COMMON
-              {% endif %}
-            </div>
+        <img
+          src="/static/game/images/chests/{{ chest.tier|lower }}_closed.png"
+          data-chest-id="{{ chest.id }}"
+          data-tier="{{ chest.tier|lower }}"
+          class="premium-chest-img"
+          style="
+            width:140px;
+            height:140px;
+            object-fit:contain;
+            cursor:pointer;
+          "
+        >
 
-          </div>
-
-          {% endfor %}
-      </div>
-    {% else %}
-
-    <div class="premium-chest-wrap chest-demo-wrap">
-
-      <img
-        class="premium-chest-img chest-float"
-        src="/static/game/images/chests/bronze_closed.png"
-        alt="Bronze chest"
-        loading="eager"
-        draggable="false"
-        style="display:block;width:140px;height:140px;object-fit:contain;"
-        onerror="this.style.display='none'; this.insertAdjacentHTML('afterend','<div style=&quot;font-size:90px;line-height:1;&quot;>📦</div><div style=&quot;font-size:12px;color:red;font-weight:700;&quot;>bronze_closed.png missing</div>');"
-      >
-
-      <div class="chest-rarity chest-rarity-bronze">
-        🔥 COMMON
-      </div>
-
-      <div style="font-size:13px; font-weight:700; color:#92400e; margin-top:6px;">
-        Earn rewards to unlock chests ✨
-      </div>
+      {% endfor %}
 
     </div>
 
-    {% endif %}
   </div>
+  {% endif %}
 
   <!-- 🏆 Main Reward Goal -->
   {% if main_reward %}
