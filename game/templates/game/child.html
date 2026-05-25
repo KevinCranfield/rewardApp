@@ -45,18 +45,24 @@
 
       {% for chest in chests %}
 
-      <div class="premium-chest-wrap">
+      <div
+        class="chest chest-{{ chest.tier|lower }} chest-float"
+        data-chest-id="{{ chest.id }}"
+        data-tier="{{ chest.tier|lower }}"
+      >
 
-        <img
-          src="/static/game/images/chests/{{ chest.tier|lower }}_closed.png"
-          data-chest-id="{{ chest.id }}"
-          data-tier="{{ chest.tier|lower }}"
-          class="premium-chest-img chest-float"
-          alt="{{ chest.tier }} chest"
-        >
+        <div class="chest-glow"></div>
 
-        <div class="chest-rarity chest-rarity-{{ chest.tier|lower }}">
+        <div class="chest-lid"></div>
+
+        <div class="chest-base"></div>
+
+        <div class="chest-label">
           {{ chest.tier|upper }}
+        </div>
+
+        <div class="chest-tap">
+          TAP
         </div>
 
       </div>
@@ -182,30 +188,20 @@ function openChest(chestId){
         const chestEl = document.querySelector(`[data-chest-id="${chestId}"]`);
 
         if(chestEl){
-
-            const tier = chestEl.dataset.tier || 'bronze';
-
             chestEl.classList.remove('chest-float');
+            chestEl.classList.add('open');
             chestEl.classList.add('chest-opening');
 
-            chestEl.src = `/static/game/images/chests/${tier}_opening.png`;
-
             setTimeout(() => {
-
-                chestEl.src = `/static/game/images/chests/${tier}_open.png`;
-
                 chestEl.classList.add('chest-burst');
-
             }, 450);
 
             setTimeout(() => {
-
                 chestEl.style.opacity = '0';
                 chestEl.style.transform = 'scale(.7)';
 
                 setTimeout(() => {
-                    const wrap = chestEl.closest('.premium-chest-wrap');
-                    if(wrap) wrap.remove();
+                    chestEl.remove();
                 }, 300);
 
             }, 1500);
@@ -264,7 +260,7 @@ function openChest(chestId){
     });
 }
 
-document.querySelectorAll('.premium-chest-img').forEach(btn => {
+document.querySelectorAll('.chest').forEach(btn => {
     btn.addEventListener('click', function(){
         const chestId = this.dataset.chestId;
         if(chestId) openChest(chestId);
