@@ -45,27 +45,22 @@
 
       {% for chest in chests %}
 
-      <div
-        class="chest chest-{{ chest.tier|lower }} chest-float"
-        data-chest-id="{{ chest.id }}"
-        data-tier="{{ chest.tier|lower }}"
-      >
+<div class="premium-chest-wrap">
 
-        <div class="chest-glow"></div>
+  <img
+    class="premium-chest-img chest-float"
+    data-chest-id="{{ chest.id }}"
+    data-tier="{{ chest.tier|lower }}"
+    src="{% static 'game/images/chests/bronze_closed.png' %}"
+    alt="bronze chest"
+    draggable="false"
+  >
 
-        <div class="chest-lid"></div>
+  <div class="chest-rarity chest-rarity-bronze">
+    🔥 COMMON
+  </div>
 
-        <div class="chest-base"></div>
-
-        <div class="chest-label">
-          {{ chest.tier|upper }}
-        </div>
-
-        <div class="chest-tap">
-          TAP
-        </div>
-
-      </div>
+</div>
 
       {% endfor %}
 
@@ -260,7 +255,7 @@ function openChest(chestId){
     });
 }
 
-document.querySelectorAll('.chest').forEach(btn => {
+document.querySelectorAll('.premium-chest-img').forEach(btn => {
     btn.addEventListener('click', function(){
         const chestId = this.dataset.chestId;
         if(chestId) openChest(chestId);
