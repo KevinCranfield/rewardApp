@@ -48,7 +48,7 @@
               class="premium-chest-img chest-float"
               data-chest-id="{{ chest.id }}"
               data-tier="{{ chest.tier|lower }}"
-              src="{% static 'game/images/chests/' %}{{ chest.tier|lower }}_closed.png"
+              src="/static/game/images/chests/{{ chest.tier|lower }}_closed.png"
               alt="{{ chest.tier }} chest"
               loading="eager"
               draggable="false"
@@ -75,10 +75,12 @@
 
       <img
         class="premium-chest-img chest-float"
-        src="{% static 'game/images/chests/bronze_closed.png' %}"
+        src="/static/game/images/chests/bronze_closed.png"
         alt="Bronze chest"
         loading="eager"
         draggable="false"
+        style="display:block;width:140px;height:140px;object-fit:contain;"
+        onerror="this.style.display='none'; this.insertAdjacentHTML('afterend','<div style=&quot;font-size:90px;line-height:1;&quot;>📦</div><div style=&quot;font-size:12px;color:red;font-weight:700;&quot;>bronze_closed.png missing</div>');"
       >
 
       <div class="chest-rarity chest-rarity-bronze">
