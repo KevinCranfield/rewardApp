@@ -1505,15 +1505,6 @@ window.addEventListener("DOMContentLoaded", () => {
 
                     openChest(chestId);
                     console.log("✅ openChest called with:", chestId);
-                    // 🔥 Remove chest from UI instantly after opening
-                    setTimeout(() => {
-                        if(btn && btn.isConnected){
-                            btn.style.transition = "opacity .25s ease, transform .25s ease";
-                            btn.style.opacity = "0";
-                            btn.style.transform = "scale(0.8)";
-                            setTimeout(() => btn.remove(), 250);
-                        }
-                    }, 800);
                     // ⚡ INSTANT SYNC: update roll button on next paint (no fixed delay)
                     const syncRollUI = () => {
                         const childId = document.querySelector(".child-view")?.dataset.childId;
@@ -1653,6 +1644,63 @@ window.openChest = async function(chestId){
             return;
         }
         console.log("CHEST RESPONSE:", data);
+
+        // 🔥 Animate chest states before removal
+        const chestEl = document.querySelector(`.chest[data-chest-id='${chestId}']`)
+            || document.querySelector(`.chest[data-id='${chestId}']`)
+            || document.querySelector(`.premium-chest-img[data-chest-id='${chestId}']`);
+
+        if(chestEl){
+            const img = chestEl.tagName === "IMG"
+                ? chestEl
+                : chestEl.querySelector("img");
+
+            if(img){
+                const closedSrc = img.dataset.closed || img.src;
+                const openingSrc = img.dataset.opening;
+                const openSrc = img.dataset.open;
+
+                // Step 1: opening chest
+                if(openingSrc){
+                    img.src = openingSrc;
+                }
+
+                // Step 2: fully open chest
+                setTimeout(() => {
+                    if(openSrc){
+                        img.src = openSrc;
+                    }
+                }, 700);
+
+                // Step 3: remove chest after animation
+                setTimeout(() => {
+                    chestEl.style.transition = "opacity .35s ease, transform .35s ease";
+                    chestEl.style.opacity = "0";
+                    chestEl.style.transform = "scale(0.85)";
+
+                    setTimeout(() => {
+                        if(chestEl.isConnected){
+                            chestEl.remove();
+                        }
+
+                        // Hide chest section if empty
+                        const remaining = document.querySelectorAll(".chest");
+
+                        if(remaining.length === 0){
+                            const header = Array.from(document.querySelectorAll("h1,h2,h3"))
+                                .find(el => el.textContent.includes("Your Chests"));
+
+                            if(header){
+                                const wrap = header.closest("div") || header.parentElement;
+                                if(wrap){
+                                    wrap.style.display = "none";
+                                }
+                            }
+                        }
+                    }, 350);
+                }, 1600);
+            }
+        }
 
         if(data.success){
             // update rolls immediately from backend truth
