@@ -476,26 +476,72 @@ body{
 
 @media (max-width:768px){
 
+    body{
+        overflow-x:hidden;
+    }
+
     .container{
-        padding:0 14px;
+        padding:0 12px;
+        margin:18px auto 90px;
     }
 
     .section-card{
-        padding:20px;
-        border-radius:24px;
+        padding:18px;
+        border-radius:22px;
+        margin-bottom:20px;
+    }
+
+    .section-card h2{
+        font-size:1.7rem;
+        margin-bottom:18px;
+    }
+
+    .card-grid{
+        grid-template-columns:1fr;
+        gap:18px;
     }
 
     .card{
-        border-radius:22px;
+        border-radius:20px;
+        padding:16px;
+    }
+
+    .child-header strong{
+        font-size:1.15rem;
+    }
+
+    .child-info{
+        font-size:0.95rem;
     }
 
     .premium-chest-buttons{
         grid-template-columns:1fr;
+        gap:10px;
+    }
+
+    .reward-btn{
+        padding:16px;
+        font-size:1rem;
     }
 
     .reward-item{
         flex-direction:column;
         align-items:flex-start;
         gap:6px;
+    }
+
+    .helper-steps{
+        padding:16px;
+        font-size:0.98rem;
+        line-height:1.7;
+    }
+
+    .play-btn{
+        padding:15px;
+        font-size:1rem;
+    }
+
+    .remove-btn{
+        padding:13px;
     }
 }

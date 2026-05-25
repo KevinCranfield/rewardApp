@@ -171,15 +171,52 @@ button, a {
 }
 
 @media (max-width: 600px) {
+
     .navbar {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 10px;
+        padding: 10px 14px;
+        gap: 8px;
+    }
+
+    .nav-left {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .nav-logo {
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
+    }
+
+    .nav-title {
+        font-size: 16px;
     }
 
     .nav-right {
         width: 100%;
-        justify-content: space-between;
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+    }
+
+    .nav-right a,
+    .nav-btn,
+    .nav-user {
+        width: 100%;
+        text-align: center;
+        padding: 10px 12px;
+        border-radius: 12px;
+        background: rgba(255,255,255,0.7);
+    }
+
+    .nav-btn {
+        padding: 12px;
+        font-size: 15px;
+    }
+
+    .nav-user {
+        font-size: 14px;
+        font-weight: 600;
     }
 }
 
