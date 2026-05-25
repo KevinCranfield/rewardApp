@@ -9,9 +9,25 @@
     font-size:18px;
     font-weight:700;
     box-shadow:0 14px 30px rgba(245,158,11,.18);
-    margin:18px 0;
+    margin:12px 0;
     max-width:320px;
     width:100%;
+}
+
+.no-rolls-banner,
+.no-rolls-warning,
+.roll-warning,
+.reward-warning,
+.warning-banner,
+.alert-banner{
+    background:linear-gradient(145deg,#fff7db,#ffe9a8) !important;
+    border:1px solid rgba(250,204,21,.45) !important;
+    color:#92400e !important;
+    border-radius:20px !important;
+    padding:16px 18px !important;
+    box-shadow:0 14px 30px rgba(245,158,11,.18) !important;
+    font-size:18px !important;
+    font-weight:700 !important;
 }
 
 @media (max-width:768px){
