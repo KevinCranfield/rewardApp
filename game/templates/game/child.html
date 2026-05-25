@@ -70,7 +70,27 @@
           {% endfor %}
       </div>
     {% else %}
-      <p>No chests yet</p>
+
+    <div class="premium-chest-wrap chest-demo-wrap">
+
+      <img
+        class="premium-chest-img chest-float"
+        src="{% static 'game/images/chests/bronze_closed.png' %}"
+        alt="Bronze chest"
+        loading="eager"
+        draggable="false"
+      >
+
+      <div class="chest-rarity chest-rarity-bronze">
+        🔥 COMMON
+      </div>
+
+      <div style="font-size:13px; font-weight:700; color:#92400e; margin-top:6px;">
+        Earn rewards to unlock chests ✨
+      </div>
+
+    </div>
+
     {% endif %}
   </div>
 
