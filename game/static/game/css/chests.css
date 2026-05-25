@@ -1,0 +1,122 @@
+/* =========================
+   PREMIUM IMAGE CHESTS
+========================= */
+
+.chests{
+    margin:24px 0;
+    text-align:center;
+}
+
+.chest-list{
+    display:flex;
+    justify-content:center;
+    gap:18px;
+    flex-wrap:wrap;
+    margin-top:16px;
+}
+
+/* CARD */
+.premium-chest-wrap{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:10px;
+}
+
+/* IMAGE */
+.premium-chest-img{
+    width:120px !important;
+    height:120px !important;
+    object-fit:contain !important;
+    display:block !important;
+    cursor:pointer;
+    user-select:none;
+    -webkit-user-drag:none;
+
+    filter:
+        drop-shadow(0 10px 18px rgba(0,0,0,.35));
+
+    transition:
+        transform .25s ease,
+        filter .25s ease;
+}
+
+/* HOVER */
+.premium-chest-img:hover{
+    transform:translateY(-6px) scale(1.05);
+}
+
+/* FLOAT */
+.chest-float{
+    animation:chestFloat 2.4s ease-in-out infinite;
+}
+
+@keyframes chestFloat{
+    0%   { transform:translateY(0px); }
+    50%  { transform:translateY(-8px); }
+    100% { transform:translateY(0px); }
+}
+
+/* OPENING */
+.chest-opening{
+    animation:chestOpen .45s ease;
+}
+
+@keyframes chestOpen{
+    0%   { transform:scale(1) rotate(0deg); }
+    25%  { transform:scale(1.08) rotate(-6deg); }
+    50%  { transform:scale(1.15) rotate(6deg); }
+    100% { transform:scale(1.05); }
+}
+
+/* BURST */
+.chest-burst{
+    animation:chestBurst .4s ease forwards;
+}
+
+@keyframes chestBurst{
+    0%{
+        transform:scale(1);
+        opacity:1;
+    }
+
+    50%{
+        transform:scale(1.25);
+        opacity:1;
+    }
+
+    100%{
+        transform:scale(.7);
+        opacity:0;
+    }
+}
+
+/* RARITY */
+.chest-rarity{
+    font-size:12px;
+    font-weight:800;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+}
+
+.chest-rarity-bronze{
+    color:#b45309;
+}
+
+.chest-rarity-silver{
+    color:#94a3b8;
+}
+
+.chest-rarity-gold{
+    color:#facc15;
+}
+
+/* MOBILE */
+@media (max-width:768px){
+
+    .premium-chest-img{
+        width:95px !important;
+        height:95px !important;
+    }
+
+}
