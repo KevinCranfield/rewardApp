@@ -208,6 +208,11 @@
         opacity .25s ease;
 
     will-change:transform;
+    display:block;
+    opacity:1;
+    min-width:120px;
+    min-height:120px;
+    object-fit:contain;
 }
 
 .premium-chest-img:hover{
