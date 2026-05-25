@@ -6,9 +6,9 @@
 
 body{
     background:
-        radial-gradient(circle at top left, #8fd3ff 0%, transparent 30%),
-        radial-gradient(circle at top right, #c8b6ff 0%, transparent 25%),
-        linear-gradient(180deg,#87d7ff 0%, #74c0e3 100%);
+        radial-gradient(circle at top left, rgba(143,211,255,0.35) 0%, transparent 28%),
+        radial-gradient(circle at top right, rgba(200,182,255,0.22) 0%, transparent 24%),
+        linear-gradient(180deg,#eef6fb 0%, #dceef8 45%, #cbe7f6 100%);
 
     min-height:100vh;
 }
