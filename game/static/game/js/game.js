@@ -1650,37 +1650,49 @@ window.openChest = async function(chestId){
             || document.querySelector(`.chest[data-id='${chestId}']`)
             || document.querySelector(`.premium-chest-img[data-chest-id='${chestId}']`);
 
+        // 🔥 remove the FULL card instead of leaving blank container behind
+        const chestCard = chestEl
+            ? chestEl.closest('.premium-chest-wrap')
+                || chestEl.closest('.premium-chest-card')
+                || chestEl.closest('.chest-card')
+                || chestEl.parentElement
+            : null;
+
         if(chestEl){
             const img = chestEl.tagName === "IMG"
                 ? chestEl
                 : chestEl.querySelector("img");
 
             if(img){
-                const closedSrc = img.dataset.closed || img.src;
                 const openingSrc = img.dataset.opening;
                 const openSrc = img.dataset.open;
 
-                // Step 1: opening chest
+                // Step 1: opening chest image
                 if(openingSrc){
                     img.src = openingSrc;
                 }
 
-                // Step 2: fully open chest
+                // Add burst effect
+                chestEl.classList.add("chest-burst");
+
+                // Step 2: fully open chest image
                 setTimeout(() => {
                     if(openSrc){
                         img.src = openSrc;
                     }
-                }, 700);
+                }, 650);
 
-                // Step 3: remove chest after animation
+                // Step 3: fade + remove ENTIRE card
                 setTimeout(() => {
-                    chestEl.style.transition = "opacity .35s ease, transform .35s ease";
-                    chestEl.style.opacity = "0";
-                    chestEl.style.transform = "scale(0.85)";
+                    const target = chestCard || chestEl;
+
+                    target.style.transition = "opacity .45s ease, transform .45s ease";
+                    target.style.opacity = "0";
+                    target.style.transform = "scale(0.85) translateY(10px)";
 
                     setTimeout(() => {
-                        if(chestEl.isConnected){
-                            chestEl.remove();
+                        if(target.isConnected){
+                            target.remove();
                         }
 
                         // Hide chest section if empty
@@ -1697,8 +1709,8 @@ window.openChest = async function(chestId){
                                 }
                             }
                         }
-                    }, 350);
-                }, 1600);
+                    }, 450);
+                }, 1500);
             }
         }
 
