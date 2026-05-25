@@ -42,7 +42,7 @@
       <div class="chest-list flex-center" style="gap:18px; flex-wrap:wrap;">
           {% for chest in chests %}
 
-          <div class="premium-chest-wrap">
+          <div class="premium-chest-wrap" style="border:4px dashed blue;min-height:180px;padding:10px;display:flex;align-items:center;justify-content:center;flex-direction:column;">
 
             <img
               class="premium-chest-img chest-float"
@@ -52,7 +52,8 @@
               alt="{{ chest.tier }} chest"
               loading="eager"
               draggable="false"
-              onerror="console.log('Missing chest image:', this.src); this.src='/static/game/images/chests/bronze_closed.png';"
+              style="display:block !important;width:140px !important;height:140px !important;min-width:140px !important;min-height:140px !important;object-fit:contain !important;border:4px solid red !important;background:yellow !important;opacity:1 !important;visibility:visible !important;position:relative !important;z-index:9999 !important;"
+              onerror="this.outerHTML='<div style=&quot;width:140px;height:140px;background:red;color:white;font-size:14px;font-weight:bold;display:flex;align-items:center;justify-content:center;&quot;>IMAGE FAILED</div>'"
             >
 
             <div class="chest-rarity chest-rarity-{{ chest.tier }}">
