@@ -19,10 +19,20 @@
 .roll-warning,
 .reward-warning,
 .warning-banner,
-.alert-banner{
+.alert-banner,
+.alert,
+.alert-danger,
+.alert-warning,
+.message,
+.error-message,
+.warning-message,
+.reward-message,
+.roll-message{
     background:linear-gradient(145deg,#fff7db,#ffe9a8) !important;
+    background-color:#ffe9a8 !important;
     border:1px solid rgba(250,204,21,.45) !important;
     color:#92400e !important;
+    border-left:4px solid #facc15 !important;
     border-radius:20px !important;
     padding:16px 18px !important;
     box-shadow:0 14px 30px rgba(245,158,11,.18) !important;
