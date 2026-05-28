@@ -1,5 +1,3 @@
-
-
 /* =========================
    SETUP PAGE
 ========================= */
@@ -188,8 +186,9 @@
 
 .children-grid{
     display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(320px,1fr));
+    grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));
     gap:24px;
+    width:100%;
 }
 
 .child-card{
@@ -210,6 +209,9 @@
     transition:0.25s ease;
     overflow:hidden;
     position:relative;
+    width:100%;
+    max-width:100%;
+    box-sizing:border-box;
 }
 
 .child-card:hover{
@@ -258,10 +260,11 @@
 
 .goal-options{
     display:grid;
-    grid-template-columns:repeat(2,minmax(0,1fr));
-    gap:12px;
+    grid-template-columns:1fr 1fr;
+    gap:10px;
     width:100%;
-    overflow:hidden;
+    max-width:100%;
+    box-sizing:border-box;
 }
 
 .goal-card{
@@ -269,7 +272,7 @@
 
     border-radius:18px;
 
-    padding:14px;
+    padding:10px;
 
     text-align:center;
 
@@ -475,7 +478,12 @@
     }
 
     .goal-options{
-        grid-template-columns:1fr 1fr;
+        grid-template-columns:1fr;
+    }
+
+    .goal-card img{
+        max-width:64px;
+        height:64px;
     }
 
     .child-form{
