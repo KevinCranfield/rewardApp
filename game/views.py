@@ -6,6 +6,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login, logout
 from django.utils import timezone
 import random
+from datetime import timedelta
 
 from django.core.cache import cache
 import time
@@ -645,17 +646,36 @@ def redeem_code(request):
     if code.is_used:
         return JsonResponse({"success": False, "error": "Code already used"}, status=400)
 
+    if code.is_expired:
+        return JsonResponse({
+            "success": False,
+            "error": "Code expired"
+        }, status=400)
+
+    now = timezone.now()
+
     # Mark code as used
     code.is_used = True
-    code.used_by = request.user
-    code.used_at = timezone.now()
+    code.used_by = family
+    code.used_at = now
     code.save()
 
-    # Upgrade family account
-    family.is_premium = True
+    # Grant / extend premium
+    if family.premium_until and family.premium_until > now:
+        family.premium_until = (
+            family.premium_until + timedelta(days=code.premium_days)
+        )
+    else:
+        family.premium_until = (
+            now + timedelta(days=code.premium_days)
+        )
+
     family.save()
 
-    return JsonResponse({"success": True})
+    return JsonResponse({
+        "success": True,
+        "premium_until": family.premium_until.strftime("%Y-%m-%d")
+    })
 
 # 🎁 Add reward type for a specific child (chest reasons)
 @login_required
