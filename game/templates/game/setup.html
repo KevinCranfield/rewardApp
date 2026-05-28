@@ -39,7 +39,16 @@
     <form method="POST" action="/add-child/" class="child-form">
       {% csrf_token %}
       <input class="child-input" type="text" name="name" placeholder="Child name" required>
-      <input class="child-colour" type="color" name="colour" value="#3b82f6">
+      <div class="child-colour-picker" id="colourPicker">
+        <input type="hidden" name="colour" id="selectedColour" value="#3b82f6">
+
+        <div class="child-colour-option selected" data-colour="#3b82f6" style="background:#3b82f6"></div>
+        <div class="child-colour-option" data-colour="#ef4444" style="background:#ef4444"></div>
+        <div class="child-colour-option" data-colour="#22c55e" style="background:#22c55e"></div>
+        <div class="child-colour-option" data-colour="#f59e0b" style="background:#f59e0b"></div>
+        <div class="child-colour-option" data-colour="#8b5cf6" style="background:#8b5cf6"></div>
+        <div class="child-colour-option" data-colour="#ec4899" style="background:#ec4899"></div>
+      </div>
 
       {% if not is_premium and children|length >= 1 %}
         <button class="child-btn" type="button" disabled title="Upgrade to add more children">
@@ -167,6 +176,35 @@ function closeGoalModal() {
   modal.classList.add('hidden');
   modal.style.display = 'none';
 }
+
+// 🎨 Colour picker with used-colour locking
+const colourOptions = document.querySelectorAll('.child-colour-option');
+const selectedColourInput = document.getElementById('selectedColour');
+
+// Collect already-used colours from existing children
+const usedColours = [
+  {% for child in children %}
+    "{{ child.colour }}",
+  {% endfor %}
+];
+
+colourOptions.forEach(option => {
+  const colour = option.dataset.colour;
+
+  // Grey out colours already used
+  if (usedColours.includes(colour) && !option.classList.contains('selected')) {
+    option.classList.add('used');
+  }
+
+  option.addEventListener('click', () => {
+    if (option.classList.contains('used')) return;
+
+    colourOptions.forEach(el => el.classList.remove('selected'));
+
+    option.classList.add('selected');
+    selectedColourInput.value = colour;
+  });
+});
 
 // 🎯 Select goal via cards (AJAX)
 document.addEventListener("click", async (e) => {
