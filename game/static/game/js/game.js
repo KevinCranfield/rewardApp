@@ -320,11 +320,11 @@ function roll(childId){
         });
         console.log("Rolls remaining:", data.rolls_remaining);
 
-// 🔥 Centre board on token before movement starts
-const currentToken = document.getElementById("token-" + childId);
+// 🔥 Centre the BOARD before movement starts
+const board = document.querySelector(".board");
 
-if(currentToken){
-    currentToken.scrollIntoView({
+if(board){
+    board.scrollIntoView({
         behavior: "smooth",
         block: "center",
         inline: "center"
@@ -333,11 +333,11 @@ if(currentToken){
 
 showDice(data.dice, () => {
 
-            // 🔥 Centre board on token BEFORE movement starts
-            const movingToken = document.getElementById("token-" + childId);
+            // 🔥 Re-centre full board before animation starts
+            const boardAgain = document.querySelector(".board");
 
-            if(movingToken){
-                movingToken.scrollIntoView({
+            if(boardAgain){
+                boardAgain.scrollIntoView({
                     behavior: "smooth",
                     block: "center",
                     inline: "center"
@@ -374,7 +374,7 @@ showDice(data.dice, () => {
                         showReward(data.reward);
                     }, duration);
                 }
-            });
+            }, 900);
         });
 
         showToast("🎲 Rolled " + data.dice);
