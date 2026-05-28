@@ -167,10 +167,34 @@ class RewardType(models.Model):
 # 🔐 Premium unlock codes
 class PremiumCode(models.Model):
     code = models.CharField(max_length=50, unique=True)
+
     is_used = models.BooleanField(default=False)
-    used_by = models.ForeignKey(User, null=True, blank=True, on_delete=models.SET_NULL)
+
+    # Family that redeemed the code
+    used_by = models.ForeignKey(
+        Family,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="redeemed_codes"
+    )
+
     used_at = models.DateTimeField(null=True, blank=True)
+
+    # Optional expiry for the code itself
+    expires_at = models.DateTimeField(null=True, blank=True)
+
     created_at = models.DateTimeField(auto_now_add=True)
+
+    # How many premium days this code grants
+    premium_days = models.PositiveIntegerField(default=365)
+
+    @property
+    def is_expired(self):
+        return (
+            self.expires_at is not None
+            and self.expires_at <= timezone.now()
+        )
 
     def __str__(self):
         return self.code
