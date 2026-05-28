@@ -320,34 +320,61 @@ function roll(childId){
         });
         console.log("Rolls remaining:", data.rolls_remaining);
 
-        showDice(data.dice, () => {
-            if(data.jump){
-                // First move to jump start
-                animateMovement(childId, current, data.from);
+// 🔥 Centre board on token before movement starts
+const currentToken = document.getElementById("token-" + childId);
 
-                // Then trigger jump AFTER movement duration (~220ms per step)
-                const steps = Math.abs(data.from - current);
-                const duration = steps * 220 + 200; // buffer
+if(currentToken){
+    currentToken.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+        inline: "center"
+    });
+}
 
-                setTimeout(() => {
-                    animateJump(childId, data.from, data.position);
-                }, duration);
+showDice(data.dice, () => {
 
-            } else {
-                animateMovement(childId, current, data.position);
+            // 🔥 Centre board on token BEFORE movement starts
+            const movingToken = document.getElementById("token-" + childId);
+
+            if(movingToken){
+                movingToken.scrollIntoView({
+                    behavior: "smooth",
+                    block: "center",
+                    inline: "center"
+                });
             }
-            // FIX 12: button re-enable is handled at animation end in animateMovement/animateJump
-            // — removed competing setTimeout here that caused double-roll race condition
 
-            // 🎁 Reward trigger AFTER movement completes
-            if(data.reward){
-                const steps = Math.abs((data.from || current) - data.position);
-                const duration = steps * 220 + 400; // match movement timing
+            // 🔥 Small delay so user actually sees centred board before movement
+            setTimeout(() => {
 
-                setTimeout(() => {
-                    showReward(data.reward);
-                }, duration);
-            }
+                if(data.jump){
+                    // First move to jump start
+                    animateMovement(childId, current, data.from);
+
+                    // Then trigger jump AFTER movement duration (~220ms per step)
+                    const steps = Math.abs(data.from - current);
+                    const duration = steps * 220 + 200;
+
+                    setTimeout(() => {
+                        animateJump(childId, data.from, data.position);
+                    }, duration);
+
+                } else {
+                    animateMovement(childId, current, data.position);
+                }
+                // FIX 12: button re-enable is handled at animation end in animateMovement/animateJump
+                // — removed competing setTimeout here that caused double-roll race condition
+
+                // 🎁 Reward trigger AFTER movement completes
+                if(data.reward){
+                    const steps = Math.abs((data.from || current) - data.position);
+                    const duration = steps * 220 + 400; // match movement timing
+
+                    setTimeout(() => {
+                        showReward(data.reward);
+                    }, duration);
+                }
+            });
         });
 
         showToast("🎲 Rolled " + data.dice);
