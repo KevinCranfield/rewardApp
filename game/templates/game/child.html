@@ -58,8 +58,16 @@
     draggable="false"
   >
 
-  <div class="chest-rarity chest-rarity-bronze">
-    🔥 COMMON
+  <div class="chest-rarity chest-rarity-{{ chest.tier|lower }}">
+    {% if chest.tier|lower == "bronze" %}
+      🔥 COMMON
+    {% elif chest.tier|lower == "silver" %}
+      💎 RARE
+    {% elif chest.tier|lower == "gold" %}
+      👑 EPIC
+    {% else %}
+      🎁 REWARD
+    {% endif %}
   </div>
 
 </div>
@@ -198,12 +206,16 @@ function openChest(chestId){
             }, 450);
 
             setTimeout(() => {
-                chestEl.style.opacity = '0';
-                chestEl.style.transform = 'scale(.7)';
+                const wrap = chestEl.closest('.premium-chest-wrap');
 
-                setTimeout(() => {
-                    chestEl.remove();
-                }, 300);
+                if(wrap){
+                    wrap.style.opacity = '0';
+                    wrap.style.transform = 'scale(.7)';
+
+                    setTimeout(() => {
+                        wrap.remove();
+                    }, 300);
+                }
 
             }, 1500);
         }

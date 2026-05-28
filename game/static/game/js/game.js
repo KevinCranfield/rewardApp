@@ -166,8 +166,14 @@ function initSounds(){
     sounds = {
         dice: new Audio('/static/game/sounds/dice.mp3'),
         win: new Audio('/static/game/sounds/big_win.mp3'),
-        click: new Audio('/static/game/sounds/click.mp3')
+        click: new Audio('/static/game/sounds/click.mp3'),
+        chestOpen: new Audio('/static/game/sounds/chest_open.mp3'),
+        chestReward: new Audio('/static/game/sounds/chest_reward.mp3')
     };
+
+    Object.values(sounds).forEach(sound => {
+        sound.preload = "auto";
+    });
 }
 
 function unlockSounds(){
@@ -1560,6 +1566,7 @@ window.addEventListener("DOMContentLoaded", () => {
                 return;
             }
             btn.classList.add("chest-opening");
+            playSound('chestOpen');
 
             console.log("CLICK CHEST:", chestId);
             if(!chestId){
@@ -1744,6 +1751,113 @@ window.openChest = async function(chestId){
         }
         console.log("CHEST RESPONSE:", data);
 
+        // =============================================
+        // PREMIUM CHEST REWARD FX
+        // =============================================
+
+        const fxChest = document.querySelector(`.chest[data-chest-id='${chestId}']`)
+            || document.querySelector(`.chest[data-id='${chestId}']`)
+            || document.querySelector(`.premium-chest-img[data-chest-id='${chestId}']`);
+
+        if(fxChest){
+
+            const tier = fxChest.dataset.tier
+                || fxChest.dataset.chestTier
+                || "bronze";
+
+            const rewardMap = {
+                bronze: 1,
+                silver: 2,
+                gold: 3
+            };
+
+            const rewardAmount = rewardMap[tier] || 1;
+
+            // STEP 1 — SHAKE
+            fxChest.classList.add("chest-shake");
+
+            // STEP 2 — FLASH BURST
+            const flash = document.createElement("div");
+            flash.className = "reward-flash-burst";
+            fxChest.appendChild(flash);
+
+            // STEP 3 — REWARD POPUP
+            playSound('chestReward');
+            const popup = document.createElement("div");
+            popup.className = "reward-popup-fly";
+
+            popup.innerHTML = tier === "gold"
+                ? `⭐ x${rewardAmount} ROLLS`
+                : `🎲 x${rewardAmount} ROLLS`;
+
+            fxChest.appendChild(popup);
+
+            // STEP 4 — COUNT UP
+            const counter = document.createElement("div");
+            counter.className = "reward-roll-counter";
+
+            counter.innerHTML = tier === "gold"
+                ? "⭐ +0"
+                : "🎲 +0";
+
+            fxChest.appendChild(counter);
+
+            let current = 0;
+
+            const counterInterval = setInterval(() => {
+
+                current++;
+
+                counter.innerHTML = tier === "gold"
+                    ? `⭐ +${current}`
+                    : `🎲 +${current}`;
+
+                counter.classList.add("reward-counter-pulse");
+
+                setTimeout(() => {
+                    counter.classList.remove("reward-counter-pulse");
+                }, 120);
+
+                if(current >= rewardAmount){
+                    clearInterval(counterInterval);
+                }
+
+            }, 380);
+
+            // PREMIUM GOLD EFFECTS
+            if(tier === "gold"){
+                fxChest.classList.add("gold-reward-active");
+
+                try{
+                    burstConfetti(40);
+                }catch(e){}
+            }
+
+            // CLEANUP
+            setTimeout(() => {
+
+                fxChest.classList.remove(
+                    "chest-shake",
+                    "gold-reward-active"
+                );
+
+                if(flash && flash.isConnected){
+                    flash.remove();
+                }
+
+                if(popup && popup.isConnected){
+                    popup.remove();
+                }
+
+                setTimeout(() => {
+                    if(counter && counter.isConnected){
+                        counter.remove();
+                    }
+                }, 700);
+
+            }, 2400);
+        }
+
         // 🔥 Animate chest states before removal
         const chestEl = document.querySelector(`.chest[data-chest-id='${chestId}']`)
             || document.querySelector(`.chest[data-id='${chestId}']`)
@@ -1925,6 +2039,172 @@ function killChestOverlay(){
 window.addEventListener("DOMContentLoaded", () => {
     killChestOverlay();
 });
+
+// =============================================
+// CHEST REWARD FX CSS
+// =============================================
+
+const rewardFX = document.createElement("style");
+
+rewardFX.innerHTML = `
+
+.chest-shake{
+    animation:chestShake .55s ease;
+}
+
+@keyframes chestShake{
+
+    0%{ transform:translateX(0); }
+
+    15%{ transform:translateX(-10px) rotate(-4deg); }
+
+    30%{ transform:translateX(10px) rotate(4deg); }
+
+    45%{ transform:translateX(-8px) rotate(-3deg); }
+
+    60%{ transform:translateX(8px) rotate(3deg); }
+
+    75%{ transform:translateX(-4px) rotate(-2deg); }
+
+    100%{ transform:translateX(0); }
+}
+
+.reward-flash-burst{
+    position:absolute;
+    inset:-10px;
+
+    border-radius:40px;
+
+    background:
+        radial-gradient(
+            circle,
+            rgba(255,255,255,.95) 0%,
+            rgba(255,255,255,0) 72%
+        );
+
+    pointer-events:none;
+
+    z-index:40;
+
+    animation:rewardFlash .65s ease forwards;
+}
+
+@keyframes rewardFlash{
+
+    0%{
+        opacity:0;
+        transform:scale(.4);
+    }
+
+    40%{
+        opacity:1;
+        transform:scale(1.15);
+    }
+
+    100%{
+        opacity:0;
+        transform:scale(1.8);
+    }
+}
+
+.reward-popup-fly{
+    position:absolute;
+
+    left:50%;
+    top:50%;
+
+    transform:translate(-50%, -50%);
+
+    font-size:30px;
+    font-weight:900;
+
+    white-space:nowrap;
+
+    color:#facc15;
+
+    text-shadow:
+        0 0 14px rgba(255,215,0,.95),
+        0 8px 18px rgba(0,0,0,.28);
+
+    pointer-events:none;
+
+    z-index:80;
+
+    animation:rewardFlyUp 1.5s ease forwards;
+}
+
+@keyframes rewardFlyUp{
+
+    0%{
+        opacity:0;
+        transform:translate(-50%, -40%) scale(.5);
+    }
+
+    20%{
+        opacity:1;
+        transform:translate(-50%, -100%) scale(1.18);
+    }
+
+    100%{
+        opacity:0;
+        transform:translate(-50%, -260%) scale(.95);
+    }
+}
+
+.reward-roll-counter{
+    position:absolute;
+
+    bottom:12px;
+    left:50%;
+
+    transform:translateX(-50%);
+
+    background:#2563eb;
+    color:white;
+
+    padding:8px 16px;
+
+    border-radius:999px;
+
+    font-size:22px;
+    font-weight:900;
+
+    box-shadow:
+        0 12px 26px rgba(37,99,235,.35);
+
+    z-index:90;
+
+    pointer-events:none;
+}
+
+.reward-counter-pulse{
+    animation:rewardCounterPulse .16s ease;
+}
+
+@keyframes rewardCounterPulse{
+
+    0%{
+        transform:translateX(-50%) scale(1);
+    }
+
+    50%{
+        transform:translateX(-50%) scale(1.16);
+    }
+
+    100%{
+        transform:translateX(-50%) scale(1);
+    }
+}
+
+.gold-reward-active{
+    filter:
+        brightness(1.12)
+        drop-shadow(0 0 18px rgba(255,215,0,.85));
+}
+
+`;
+
+document.head.appendChild(rewardFX);
 
 /* =========================
    PWA INSTALL PROMPT HANDLER

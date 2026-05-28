@@ -24,10 +24,10 @@
     align-items:center !important;
     justify-content:center !important;
 
-    min-width:170px !important;
-    min-height:210px !important;
+    min-width:145px !important;
+    min-height:175px !important;
 
-    padding:22px 18px;
+    padding:14px 12px;
     border-radius:30px;
 
     background:
@@ -46,7 +46,10 @@
         0 6px 16px rgba(0,0,0,.08),
         inset 0 1px 0 rgba(255,255,255,.85);
 
-    overflow:hidden;
+    overflow:visible;
+
+    will-change:transform, opacity;
+    transform:translateZ(0);
 
     transition:
         transform .25s ease,
@@ -55,13 +58,15 @@
 
 /* IMAGE */
 .premium-chest-img{
-    width:120px !important;
-    height:120px !important;
+    width:98px !important;
+    height:98px !important;
     object-fit:contain !important;
     display:block !important;
     cursor:pointer;
     user-select:none;
     -webkit-user-drag:none;
+    will-change:transform, opacity;
+    transform:translateZ(0);
 
     filter:
         drop-shadow(0 10px 18px rgba(0,0,0,.35));
@@ -167,12 +172,12 @@
 ========================= */
 
 img.premium-chest-img{
-    width:132px !important;
-    height:132px !important;
-    min-width:132px !important;
-    min-height:132px !important;
-    max-width:132px !important;
-    max-height:132px !important;
+    width:108px !important;
+    height:108px !important;
+    min-width:108px !important;
+    min-height:108px !important;
+    max-width:108px !important;
+    max-height:108px !important;
 
     display:block !important;
     object-fit:contain !important;
@@ -191,9 +196,9 @@ img.premium-chest-img{
     z-index:5 !important;
 
     filter:
-        drop-shadow(0 18px 26px rgba(0,0,0,.28))
-        drop-shadow(0 0 18px rgba(251,191,36,.42))
-        drop-shadow(0 0 38px rgba(255,215,0,.22));
+        drop-shadow(0 16px 22px rgba(0,0,0,.30))
+        drop-shadow(0 0 14px rgba(251,191,36,.45))
+        drop-shadow(0 0 32px rgba(255,215,0,.25));
 
     transition:
         transform .25s ease,
@@ -235,4 +240,80 @@ img.premium-chest-img:hover{
         );
 
     pointer-events:none;
+}
+
+/* INDIVIDUAL RARITY CARDS */
+.premium-chest-wrap[data-tier="bronze"]{
+    background:
+        linear-gradient(
+            180deg,
+            rgba(255,244,230,.92) 0%,
+            rgba(255,232,204,.78) 100%
+        );
+}
+
+.premium-chest-wrap[data-tier="silver"]{
+    background:
+        linear-gradient(
+            180deg,
+            rgba(240,247,255,.94) 0%,
+            rgba(219,234,254,.82) 100%
+        );
+
+    box-shadow:
+        0 18px 40px rgba(59,130,246,.16),
+        0 8px 20px rgba(0,0,0,.08);
+}
+
+.premium-chest-wrap[data-tier="gold"]{
+    background:
+        linear-gradient(
+            180deg,
+            rgba(255,251,214,.96) 0%,
+            rgba(253,230,138,.86) 100%
+        );
+
+    box-shadow:
+        0 22px 55px rgba(245,158,11,.30),
+        0 10px 24px rgba(0,0,0,.12);
+}
+
+.premium-chest-wrap[data-tier="gold"] img.premium-chest-img{
+    filter:
+        drop-shadow(0 18px 28px rgba(0,0,0,.30))
+        drop-shadow(0 0 20px rgba(255,215,0,.72))
+        drop-shadow(0 0 42px rgba(255,200,0,.42));
+}
+
+.chest-rarity{
+    margin-top:8px;
+}
+
+/* =========================
+   REWARD FX PERFORMANCE
+========================= */
+
+.reward-popup-fly,
+.reward-roll-counter,
+.reward-flash-burst{
+    pointer-events:none;
+
+    will-change:transform, opacity;
+    transform:translateZ(0);
+}
+
+/* GOLD ACTIVE PULSE */
+.gold-reward-active{
+    animation:goldPulse .7s ease-in-out infinite alternate;
+}
+
+@keyframes goldPulse{
+
+    from{
+        transform:scale(1);
+    }
+
+    to{
+        transform:scale(1.03);
+    }
 }
