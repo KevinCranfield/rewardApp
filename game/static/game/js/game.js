@@ -1589,7 +1589,7 @@ window.addEventListener("DOMContentLoaded", () => {
                         if(lidReset){
                             lidReset.style.transform = "";
                         }
-                    }, 1500);
+                    }, 2800);
                 } catch(err){
                     console.error(err);
                     btn.classList.remove(
@@ -1659,60 +1659,100 @@ window.openChest = async function(chestId){
             : null;
 
         if(chestEl){
-            const img = chestEl.tagName === "IMG"
-                ? chestEl
-                : chestEl.querySelector("img");
+            chestEl.style.opacity = "1";
+            chestEl.style.visibility = "visible";
+    const img = chestEl.tagName === "IMG"
+        ? chestEl
+        : chestEl.querySelector("img");
 
-            if(img){
-                const openingSrc = img.dataset.opening;
-                const openSrc = img.dataset.open;
+    if(img){
+        const openingSrc = img.dataset.opening;
+        const openSrc = img.dataset.open;
 
-                // Step 1: opening chest image
-                if(openingSrc){
-                    img.src = openingSrc;
+        console.log("CHEST IMAGE DATA:", {
+            openingSrc,
+            openSrc,
+            current: img.src
+        });
+
+        // PRELOAD images
+        if(openingSrc){
+            const preloadOpening = new Image();
+            preloadOpening.src = openingSrc;
+        }
+
+        if(openSrc){
+            const preloadOpen = new Image();
+            preloadOpen.src = openSrc;
+        }
+
+        // STEP 1 — opening frame
+        if(openingSrc){
+            img.style.opacity = "0";
+
+            const preloadOpening = new Image();
+            preloadOpening.onload = () => {
+                img.src = openingSrc;
+                img.offsetHeight;
+                img.style.opacity = "1";
+                console.log("OPENING FRAME SHOWN");
+            };
+            preloadOpening.src = openingSrc;
+
+        } else {
+            console.warn("Missing data-opening image");
+        }
+
+        chestEl.classList.add("chest-burst");
+        chestEl.classList.add("opening-active");
+
+        // STEP 2 — opened frame
+        setTimeout(() => {
+            if(openSrc){
+                const preloadOpen = new Image();
+
+                preloadOpen.onload = () => {
+                    img.src = openSrc;
+                    img.offsetHeight;
+                    console.log("OPEN FRAME SHOWN");
+                };
+
+                preloadOpen.src = openSrc;
+            } else {
+                console.warn("Missing data-open image");
+            }
+        }, 900);
+
+        // STEP 3 — fade after visible delay
+        setTimeout(() => {
+            const target = chestCard || chestEl;
+
+            target.style.transition = "opacity .6s ease, transform .6s ease";
+            target.style.opacity = "0";
+            target.style.transform = "scale(0.85) translateY(10px)";
+
+            setTimeout(() => {
+                if(target && target.isConnected){
+                    target.remove();
                 }
 
-                // Add burst effect
-                chestEl.classList.add("chest-burst");
+                const remaining = document.querySelectorAll(".chest");
 
-                // Step 2: fully open chest image
-                setTimeout(() => {
-                    if(openSrc){
-                        img.src = openSrc;
+                if(remaining.length === 0){
+                    const header = Array.from(document.querySelectorAll("h1,h2,h3"))
+                        .find(el => el.textContent.includes("Your Chests"));
+
+                    if(header){
+                        const wrap = header.closest("div") || header.parentElement;
+                        if(wrap){
+                            wrap.style.display = "none";
+                        }
                     }
-                }, 650);
-
-                // Step 3: fade + remove ENTIRE card
-                setTimeout(() => {
-                    const target = chestCard || chestEl;
-
-                    target.style.transition = "opacity .45s ease, transform .45s ease";
-                    target.style.opacity = "0";
-                    target.style.transform = "scale(0.85) translateY(10px)";
-
-                    setTimeout(() => {
-                        if(target.isConnected){
-                            target.remove();
-                        }
-
-                        // Hide chest section if empty
-                        const remaining = document.querySelectorAll(".chest");
-
-                        if(remaining.length === 0){
-                            const header = Array.from(document.querySelectorAll("h1,h2,h3"))
-                                .find(el => el.textContent.includes("Your Chests"));
-
-                            if(header){
-                                const wrap = header.closest("div") || header.parentElement;
-                                if(wrap){
-                                    wrap.style.display = "none";
-                                }
-                            }
-                        }
-                    }, 450);
-                }, 1500);
-            }
-        }
+                }
+            }, 650);
+        }, 2400);
+    }
+}
 
         if(data.success){
             // update rolls immediately from backend truth
