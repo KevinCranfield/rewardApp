@@ -154,7 +154,7 @@ def add_child(request):
         family = get_family(request.user)
 
         # 🔒 FREE PLAN LIMIT: only 1 child allowed
-        if not getattr(request.user, "is_premium", False):
+        if not family.is_premium:
             if family.children.count() >= 1:
                 return JsonResponse({
                     "success": False,
@@ -219,7 +219,7 @@ def give_chest(request):
     tier_name = tier_map.get(str(tier).lower(), "bronze")
 
     # Enforce free tier restriction
-    if not getattr(request.user, "is_premium", False):
+    if not family.is_premium:
         tier_name = "bronze"
 
     chest = Chest.objects.create(
@@ -271,7 +271,7 @@ def add_reward(request):
     tier_name = tier_map.get(str(tier).lower(), "bronze")
 
     # Enforce free tier restriction
-    if not getattr(request.user, "is_premium", False):
+    if not family.is_premium:
         tier_name = "bronze"
 
     chest = Chest.objects.create(
@@ -586,7 +586,7 @@ def get_child_state(request):
 def setup_page(request):
     family = get_family(request.user)
     children = list(family.children.all())
-    is_premium = getattr(request.user, "is_premium", False)
+    is_premium = family.is_premium
 
     # 🎯 Main rewards: presets always visible, family custom rewards for paid tier
     if is_premium:
@@ -607,8 +607,10 @@ def setup_page(request):
 # 🚀 Upgrade page
 @login_required
 def upgrade(request):
+    family = get_family(request.user)
+
     return render(request, "game/upgrade.html", {
-        "is_premium": getattr(request.user, "is_premium", False)
+        "is_premium": family.is_premium
     })
 
 
@@ -643,9 +645,9 @@ def redeem_code(request):
     code.used_at = timezone.now()
     code.save()
 
-    # Upgrade user
-    request.user.is_premium = True
-    request.user.save()
+    # Upgrade family account
+    family.is_premium = True
+    family.save()
 
     return JsonResponse({"success": True})
 
@@ -660,7 +662,7 @@ def add_reward_type(request):
     image = request.FILES.get("image")
 
     # 🔒 Enforce premium for image uploads
-    if not getattr(request.user, "is_premium", False):
+    if not family.is_premium:
         image = None
 
     try:
@@ -701,7 +703,7 @@ def set_main_reward(request):
     child = get_object_or_404(Child, id=child_id, family=family)
 
     # Free tier: only presets allowed
-    is_premium = getattr(request.user, "is_premium", False)
+    is_premium = family.is_premium
     if is_premium:
         try:
             reward_id = int(reward_id)
@@ -733,10 +735,9 @@ def set_main_reward(request):
 @login_required
 @require_POST
 def add_main_reward(request):
-    if not getattr(request.user, "is_premium", False):
-        return JsonResponse({"success": False, "error": "Premium only"}, status=403)
-
     family = get_family(request.user)
+    if not family.is_premium:
+        return JsonResponse({"success": False, "error": "Premium only"}, status=403)
     name = request.POST.get("name")
     image = request.FILES.get("image")
 
