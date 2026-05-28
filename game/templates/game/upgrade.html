@@ -65,6 +65,12 @@
         </button>
 
         <script>
+        function getCSRFToken(){
+            return document.cookie.split(';')
+                .map(c => c.trim())
+                .find(c => c.startsWith('csrftoken='))
+                ?.split('=')[1];
+        }
         function redeemCode() {
             const code = document.getElementById("codeInput").value.trim();
             if(!code){
