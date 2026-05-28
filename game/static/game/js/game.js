@@ -493,6 +493,12 @@ function animateMovement(childId, start, end){
         if(cached?.colour){
             token.style.background = cached.colour;
         }
+        // 🔥 Ensure spawned tokens appear centred immediately
+        token.style.position = "relative";
+        token.style.left = "50%";
+        token.style.top = "50%";
+        token.style.transform = "translate(-50%, -50%)";
+
         token.style.color = "white";
         token.style.display = "flex";
         token.style.alignItems = "center";
@@ -554,7 +560,20 @@ function animateMovement(childId, start, end){
 
         const square = document.querySelector(`[data-square='${step}'] .token-container`);
         if(square){
+            // 🔥 Move token into centre before append animation
+            liveToken.style.position = "relative";
+            liveToken.style.left = "50%";
+            liveToken.style.top = "50%";
+            liveToken.style.transform = "translate(-50%, -50%) scale(1)";
+
             square.appendChild(liveToken);
+
+            // Force centred placement after DOM move
+            requestAnimationFrame(() => {
+                liveToken.style.left = "50%";
+                liveToken.style.top = "50%";
+                liveToken.style.transform = "translate(-50%, -50%) scale(1)";
+            });
         }
 
         step++;
@@ -582,7 +601,14 @@ function updateTokensUI(children){
         if(child.colour){
             token.style.background = child.colour;
         }
-        // Ensure visible styling (fix token not turning coloured properly)
+
+        // 🔥 Ensure token is perfectly centred in square
+        token.style.position = "relative";
+        token.style.left = "50%";
+        token.style.top = "50%";
+        token.style.transform = "translate(-50%, -50%)";
+
+        // Ensure visible styling
         token.style.color = "white";
         token.style.display = "flex";
         token.style.alignItems = "center";
@@ -1666,8 +1692,22 @@ window.openChest = async function(chestId){
         : chestEl.querySelector("img");
 
     if(img){
-        const openingSrc = img.dataset.opening;
-        const openSrc = img.dataset.open;
+        let openingSrc = img.dataset.opening;
+        let openSrc = img.dataset.open;
+
+        // Fallback auto-build if dataset attributes missing
+        if((!openingSrc || !openSrc) && img.dataset.tier){
+            const tier = img.dataset.tier.toLowerCase();
+            openingSrc = `/static/game/images/chests/${tier}_opening.png`;
+            openSrc = `/static/game/images/chests/${tier}_open.png`;
+        }
+
+        // Fallback from parent chest element
+        if((!openingSrc || !openSrc) && chestEl.dataset.tier){
+            const tier = chestEl.dataset.tier.toLowerCase();
+            openingSrc = `/static/game/images/chests/${tier}_opening.png`;
+            openSrc = `/static/game/images/chests/${tier}_open.png`;
+        }
 
         console.log("CHEST IMAGE DATA:", {
             openingSrc,
