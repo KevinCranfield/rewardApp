@@ -1759,6 +1759,14 @@ window.openChest = async function(chestId){
             || document.querySelector(`.chest[data-id='${chestId}']`)
             || document.querySelector(`.premium-chest-img[data-chest-id='${chestId}']`);
 
+        // Use wrapper container for overlays because IMG elements
+        // cannot reliably render appended children.
+        const fxTarget = fxChest
+            ? fxChest.closest('.premium-chest-wrap')
+                || fxChest.closest('.premium-chest-card')
+                || fxChest.parentElement
+            : null;
+
         if(fxChest){
 
             const tier = fxChest.dataset.tier
@@ -1779,7 +1787,7 @@ window.openChest = async function(chestId){
             // STEP 2 — FLASH BURST
             const flash = document.createElement("div");
             flash.className = "reward-flash-burst";
-            fxChest.appendChild(flash);
+            if(fxTarget) fxTarget.appendChild(flash);
 
             // STEP 3 — REWARD POPUP
             playSound('chestReward');
@@ -1790,7 +1798,7 @@ window.openChest = async function(chestId){
                 ? `⭐ x${rewardAmount} ROLLS`
                 : `🎲 x${rewardAmount} ROLLS`;
 
-            fxChest.appendChild(popup);
+            if(fxTarget) fxTarget.appendChild(popup);
 
             // STEP 4 — COUNT UP
             const counter = document.createElement("div");
@@ -1800,7 +1808,7 @@ window.openChest = async function(chestId){
                 ? "⭐ +0"
                 : "🎲 +0";
 
-            fxChest.appendChild(counter);
+            if(fxTarget) fxTarget.appendChild(counter);
 
             let current = 0;
 
@@ -1822,7 +1830,7 @@ window.openChest = async function(chestId){
                     clearInterval(counterInterval);
                 }
 
-            }, 380);
+            }, 220);
 
             // PREMIUM GOLD EFFECTS
             if(tier === "gold"){
@@ -2130,6 +2138,8 @@ rewardFX.innerHTML = `
 
     z-index:80;
 
+    opacity:1 !important;
+
     animation:rewardFlyUp 1.5s ease forwards;
 }
 
@@ -2173,6 +2183,8 @@ rewardFX.innerHTML = `
         0 12px 26px rgba(37,99,235,.35);
 
     z-index:90;
+
+    opacity:1 !important;
 
     pointer-events:none;
 }
