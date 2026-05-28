@@ -25,7 +25,14 @@
     </ol>
   </div>
 
-  {% if not is_premium %}
+  {% if request.user.family.is_premium %}
+  <div class="upgrade-banner premium-active">
+    👑 Premium Active
+    <div class="premium-expiry">
+      Active until {{ request.user.family.premium_until|date:"F j, Y" }}
+    </div>
+  </div>
+  {% else %}
   <div class="upgrade-banner">
     🔒 Free plan: 1 child, bronze chests only —
     <a href="/upgrade/">⭐ Upgrade to Premium</a>
@@ -163,6 +170,9 @@
 </div>
 
 <script>
+// 🔥 Premium status available globally for future JS features
+window.isPremium = {{ request.user.family.is_premium|yesno:"true,false" }};
+
 function openGoalModal(childId, childName) {
   const modal = document.getElementById('goal-modal');
   modal.classList.remove('hidden');
