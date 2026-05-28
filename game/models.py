@@ -1,14 +1,22 @@
 from django.db import models
+
 from django.contrib.auth.models import User
+from django.utils import timezone
 
 
 class Family(models.Model):
     owner = models.OneToOneField(User, on_delete=models.CASCADE)
     parent_pin = models.CharField(max_length=10, default="1234")
 
-    # 🔐 Premium subscription unlock
-    is_premium = models.BooleanField(default=False)
+    # 🔐 Premium subscription expiry
+    premium_until = models.DateTimeField(null=True, blank=True)
 
+    @property
+    def is_premium(self):
+        return (
+            self.premium_until is not None
+            and self.premium_until > timezone.now()
+        )
     def __str__(self):
         return f"{self.owner.username}'s family"
 
