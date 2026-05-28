@@ -521,16 +521,31 @@ def signup(request):
     if request.method == "POST":
         username = request.POST.get("username")
         password = request.POST.get("password")
+        parent_pin = (request.POST.get("parent_pin") or "").strip()
 
         # 🛑 Honeypot field (bots fill this, humans don’t)
         if request.POST.get("email_confirm"):
             return JsonResponse({"success": False}, status=400)
+
+        # Validate 4-digit parent PIN
+        if not parent_pin.isdigit() or len(parent_pin) != 4:
+            return render(request, "game/signup.html", {
+                "error": "Parent PIN must be exactly 4 digits",
+                **get_children_context(request)
+            })
 
         if username and password:
             if User.objects.filter(username=username).exists():
                 return render(request, "game/signup.html", {"error": "Username taken", **get_children_context(request)})
 
             user = User.objects.create_user(username=username, password=password)
+
+            # Create family with parent PIN
+            Family.objects.create(
+                owner=user,
+                parent_pin=parent_pin
+            )
+
             login(request, user, backend='django.contrib.auth.backends.ModelBackend')
             return redirect("setup_page")
 

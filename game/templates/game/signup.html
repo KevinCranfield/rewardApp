@@ -37,6 +37,33 @@
                 <button type="button" class="show-pw-btn" onclick="togglePassword('signup-password', this)">👁</button>
             </div>
 
+            <div class="pin-setup-box">
+                <div class="pin-title">🔐 Create Parent PIN</div>
+                <div class="pin-subtitle">
+                    This protects parent settings and rewards.
+                </div>
+
+                <div class="password-wrap">
+                    <input
+                        type="password"
+                        name="parent_pin"
+                        id="parent-pin"
+                        inputmode="numeric"
+                        pattern="[0-9]{4}"
+                        maxlength="4"
+                        minlength="4"
+                        placeholder="4-digit PIN"
+                        required
+                    >
+
+                    <button
+                        type="button"
+                        class="show-pw-btn"
+                        onclick="togglePassword('parent-pin', this)"
+                    >👁</button>
+                </div>
+            </div>
+
             <button type="submit">Create Account</button>
         </form>
 
@@ -45,6 +72,15 @@
 </div>
 
 <script>
+// Only allow numbers in PIN field
+const pinInput = document.getElementById('parent-pin');
+
+if(pinInput){
+    pinInput.addEventListener('input', () => {
+        pinInput.value = pinInput.value.replace(/\D/g, '').slice(0,4);
+    });
+}
+
 function togglePassword(id, btn){
     const input = document.getElementById(id);
 
