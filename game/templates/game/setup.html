@@ -191,8 +191,9 @@ const usedColours = [
 colourOptions.forEach(option => {
   const colour = option.dataset.colour;
 
-  // Grey out colours already used
-  if (usedColours.includes(colour) && !option.classList.contains('selected')) {
+  // 🔥 Lock colours already used by other children
+  if (usedColours.includes(colour)) {
+    option.classList.remove('selected');
     option.classList.add('used');
   }
 
@@ -205,6 +206,13 @@ colourOptions.forEach(option => {
     selectedColourInput.value = colour;
   });
 });
+// 🔥 Auto-select first available colour
+const firstAvailable = document.querySelector('.child-colour-option:not(.used)');
+
+if(firstAvailable){
+  firstAvailable.classList.add('selected');
+  selectedColourInput.value = firstAvailable.dataset.colour;
+}
 
 // 🎯 Select goal via cards (AJAX)
 document.addEventListener("click", async (e) => {
