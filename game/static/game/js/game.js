@@ -1553,7 +1553,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 // Ensure chest buttons are clickable and trigger open
 window.addEventListener("DOMContentLoaded", () => {
-    document.querySelectorAll(".chest").forEach(btn => {
+    document.querySelectorAll(".premium-chest-img").forEach(btn => {
         btn.addEventListener("click", (e) => {
             e.preventDefault();
             e.stopPropagation();
@@ -1718,9 +1718,8 @@ window.addEventListener("DOMContentLoaded", () => {
 
 /* =========================
    CHEST OPEN SYSTEM
-   NOTE: openChest() is defined in child.html (inline script) because
-   it needs access to showChestReveal(). game.js only provides
-   killChestOverlay() as a utility for cleanup from other contexts.
+   Single source of truth:
+   openChest() now lives in game.js
 ========================= */
 
 // 🔧 PATCH: enforce correct open chest endpoint (fix 404)
@@ -1755,9 +1754,8 @@ window.openChest = async function(chestId){
         // PREMIUM CHEST REWARD FX
         // =============================================
 
-        const fxChest = document.querySelector(`.chest[data-chest-id='${chestId}']`)
-            || document.querySelector(`.chest[data-id='${chestId}']`)
-            || document.querySelector(`.premium-chest-img[data-chest-id='${chestId}']`);
+        const fxChest = document.querySelector(`.premium-chest-img[data-chest-id='${chestId}']`)
+            || document.querySelector(`.premium-chest-img[data-id='${chestId}']`);
 
         // Use wrapper container for overlays because IMG elements
         // cannot reliably render appended children.
@@ -1867,9 +1865,8 @@ window.openChest = async function(chestId){
         }
 
         // 🔥 Animate chest states before removal
-        const chestEl = document.querySelector(`.chest[data-chest-id='${chestId}']`)
-            || document.querySelector(`.chest[data-id='${chestId}']`)
-            || document.querySelector(`.premium-chest-img[data-chest-id='${chestId}']`);
+        const chestEl = document.querySelector(`.premium-chest-img[data-chest-id='${chestId}']`)
+          || document.querySelector(`.premium-chest-img[data-id='${chestId}']`);
 
         // 🔥 remove the FULL card instead of leaving blank container behind
         const chestCard = chestEl
@@ -1971,7 +1968,7 @@ window.openChest = async function(chestId){
                     target.remove();
                 }
 
-                const remaining = document.querySelectorAll(".chest");
+                const remaining = document.querySelectorAll(".premium-chest-img");
 
                 if(remaining.length === 0){
                     const header = Array.from(document.querySelectorAll("h1,h2,h3"))
@@ -1989,6 +1986,20 @@ window.openChest = async function(chestId){
     }
 }
 
+        // 🔥 Sync cached child state with latest backend rolls
+        if(window.__lastChildren){
+            const currentChildId = document.querySelector(".child-view")?.dataset.childId;
+
+            window.__lastChildren = window.__lastChildren.map(c => {
+                if(String(c.id) === String(currentChildId)){
+                    return {
+                        ...c,
+                        rolls_available: data.rolls
+                    };
+                }
+                return c;
+            });
+        }
         if(data.success){
             // update rolls immediately from backend truth
             if(data.rolls !== undefined){
