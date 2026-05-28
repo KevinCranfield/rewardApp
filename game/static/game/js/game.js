@@ -1750,7 +1750,7 @@ window.openChest = async function(chestId){
                     }
                 }
             }, 650);
-        }, 2400);
+        }, 3200);
     }
 }
 
