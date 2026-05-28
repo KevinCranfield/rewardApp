@@ -208,6 +208,8 @@
         0 2px 8px rgba(0,0,0,0.05);
 
     transition:0.25s ease;
+    overflow:hidden;
+    position:relative;
 }
 
 .child-card:hover{
@@ -256,8 +258,10 @@
 
 .goal-options{
     display:grid;
-    grid-template-columns:repeat(2,1fr);
+    grid-template-columns:repeat(2,minmax(0,1fr));
     gap:12px;
+    width:100%;
+    overflow:hidden;
 }
 
 .goal-card{
@@ -276,6 +280,9 @@
     transition:0.2s ease;
 
     box-shadow:0 4px 12px rgba(0,0,0,0.06);
+    min-width:0;
+    overflow:hidden;
+    box-sizing:border-box;
 }
 
 .goal-card:hover{
@@ -289,10 +296,12 @@
 }
 
 .goal-card img{
-    width:72px;
+    width:100%;
+    max-width:72px;
     height:72px;
     object-fit:contain;
-    margin-bottom:8px;
+    margin:0 auto 8px;
+    display:block;
 }
 
 .goal-selected{
