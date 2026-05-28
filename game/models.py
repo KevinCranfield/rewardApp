@@ -6,6 +6,9 @@ class Family(models.Model):
     owner = models.OneToOneField(User, on_delete=models.CASCADE)
     parent_pin = models.CharField(max_length=10, default="1234")
 
+    # 🔐 Premium subscription unlock
+    is_premium = models.BooleanField(default=False)
+
     def __str__(self):
         return f"{self.owner.username}'s family"
 
