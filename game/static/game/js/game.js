@@ -107,15 +107,39 @@ function triggerWinOverlay(childId){
         };
     }
 
+    // 🔥 Always force sound system awake before final win sound
+    unlockSounds();
+    initSounds();
+
     // Only fire effects once — guard prevents repeat calls
     if(!_winOverlayFired) return;
+
     burstConfetti(60);
 
     if(navigator.vibrate){
         navigator.vibrate([100,50,100]);
     }
 
-    playSound("win");
+    // 🔥 Force reliable playback on mobile/PWA
+    try {
+        if(sounds && sounds.win){
+            sounds.win.pause();
+            sounds.win.currentTime = 0;
+            sounds.win.volume = 1;
+
+            const playPromise = sounds.win.play();
+
+            if(playPromise !== undefined){
+                playPromise.catch(err => {
+                    console.warn("Win sound blocked:", err);
+                });
+            }
+        } else {
+            playSound("win");
+        }
+    } catch(err){
+        console.warn("Win sound failed:", err);
+    }
 }
 
 // 🐍 Snakes & 🪜 Ladders
@@ -186,10 +210,32 @@ function showToast(message, duration){
 
 function playSound(name){
     initSounds();
-    if(sounds[name]){
-        sounds[name].pause();
-        sounds[name].currentTime = 0;
-        sounds[name].play().catch(()=>{});
+
+    if(!sounds || !sounds[name]) return;
+
+    try {
+        const audio = sounds[name];
+
+        // 🔥 Clone win sound to avoid interrupted playback bug on mobile
+        if(name === "win"){
+            const clone = audio.cloneNode();
+            clone.volume = 1;
+            clone.play().catch(()=>{});
+            return;
+        }
+
+        audio.pause();
+        audio.currentTime = 0;
+
+        const playPromise = audio.play();
+
+        if(playPromise !== undefined){
+            playPromise.catch(err => {
+                console.warn(`Sound '${name}' blocked:`, err);
+            });
+        }
+    } catch(err){
+        console.warn(`Sound '${name}' failed:`, err);
     }
 }
 
