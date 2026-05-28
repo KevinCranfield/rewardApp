@@ -138,11 +138,17 @@ def child_view(request, child_id):
 
     chests = child.chests.filter(is_opened=False)
 
+    # Remaining unused rolls
+    rolls_available = Reward.objects.filter(
+        child=child,
+        is_used=False
+    ).count()
+
     return render(request, "game/child.html", {
         "child": child,
         "children": list(Child.objects.filter(family=family)),
         "chests": chests,
-        "rolls_available": 0,
+        "rolls_available": rolls_available,
         "squares": build_board(),
         "main_reward": child.main_reward,  # 🎯 pass main reward to template
     })
