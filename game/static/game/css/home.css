@@ -143,6 +143,7 @@
     padding:28px;
 
     text-align:center;
+    margin-top:20px;
 
     box-shadow:
         0 10px 30px rgba(0,0,0,0.08),
@@ -337,5 +338,18 @@
 
     .feature-pill{
         width:100%;
+    }
+    .empty-state{
+        padding:24px 20px;
+        border-radius:24px;
+    }
+
+    .empty-state p:first-child{
+        font-size:1.8rem;
+    }
+
+    .empty-state .cta-btn{
+        width:100%;
+        min-width:0;
     }
 }

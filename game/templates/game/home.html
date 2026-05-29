@@ -29,6 +29,7 @@
             </p>
         </div>
 
+        {% if children %}
         <div class="welcome-stats">
             <div class="mini-stat">
                 <span class="mini-stat-number">{{ children|length }}</span>
@@ -81,6 +82,7 @@
 
             </div>
         </div>
+        {% endif %}
 
     </div>
 
