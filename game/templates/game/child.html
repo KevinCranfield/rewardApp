@@ -56,6 +56,10 @@
     src="{% static 'game/images/chests/' %}{{ chest.tier|lower }}_closed.png"
     alt="{{ chest.tier }} chest"
     draggable="false"
+    width="108"
+    height="108"
+    loading="lazy"
+    decoding="async"
   >
 
   <div class="chest-rarity chest-rarity-{{ chest.tier|lower }}">
@@ -84,19 +88,19 @@
   <div class="main-reward-banner">
     <div class="main-reward-label">🏆 Reach square 64 to win...</div>
     {% if main_reward.image %}
-      <img src="{{ main_reward.image.url }}" class="main-reward-img">
+      <img src="{{ main_reward.image.url }}" class="main-reward-img" width="140" height="140" loading="lazy" decoding="async">
     {% elif main_reward.name == "Ice Cream" %}
-      <img src="{% static 'game/images/icecream.png' %}" class="main-reward-img">
+      <img src="{% static 'game/images/icecream.png' %}" class="main-reward-img" width="140" height="140" loading="lazy" decoding="async">
     {% elif main_reward.name == "Movie Night" %}
-      <img src="{% static 'game/images/movie.png' %}" class="main-reward-img">
+      <img src="{% static 'game/images/movie.png' %}" class="main-reward-img" width="140" height="140" loading="lazy" decoding="async">
     {% elif main_reward.name == "Trip to Park" %}
-      <img src="{% static 'game/images/park.png' %}" class="main-reward-img">
+      <img src="{% static 'game/images/park.png' %}" class="main-reward-img" width="140" height="140" loading="lazy" decoding="async">
     {% elif main_reward.name == "Screen Time" %}
-      <img src="{% static 'game/images/screentime.png' %}" class="main-reward-img">
+      <img src="{% static 'game/images/screentime.png' %}" class="main-reward-img" width="140" height="140" loading="lazy" decoding="async">
     {% elif main_reward.name == "New Toy" %}
-      <img src="{% static 'game/images/toy.png' %}" class="main-reward-img">
+      <img src="{% static 'game/images/toy.png' %}" class="main-reward-img" width="140" height="140" loading="lazy" decoding="async">
     {% elif main_reward.name == "Sweet Treat" %}
-      <img src="{% static 'game/images/treat.png' %}" class="main-reward-img">
+      <img src="{% static 'game/images/treat.png' %}" class="main-reward-img" width="140" height="140" loading="lazy" decoding="async">
     {% else %}
       <div style="font-size:48px;">🎁</div>
     {% endif %}

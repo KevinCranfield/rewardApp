@@ -47,6 +47,7 @@
         inset 0 1px 0 rgba(255,255,255,.85);
 
     overflow:visible;
+    contain:layout paint;
 
     will-change:transform, opacity;
     transform:translateZ(0);
@@ -159,8 +160,15 @@
 @media (max-width:768px){
 
     .premium-chest-img{
-        width:95px !important;
-        height:95px !important;
+        width:84px !important;
+        height:84px !important;
+    }
+
+    img.premium-chest-img{
+        min-width:84px !important;
+        min-height:84px !important;
+        max-width:84px !important;
+        max-height:84px !important;
     }
 
 }
@@ -178,6 +186,9 @@ img.premium-chest-img{
     min-height:108px !important;
     max-width:108px !important;
     max-height:108px !important;
+    aspect-ratio:1 / 1;
+    contain:layout paint;
+    content-visibility:auto;
 
     display:block !important;
     object-fit:contain !important;
