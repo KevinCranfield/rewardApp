@@ -116,7 +116,7 @@
         {% if squares %}
             {% for row in squares %}
                 {% if forloop.counter0|divisibleby:2 %}
-                    {% for num in row reversed %}
+                    {% for num in row %}
                         <div class="square" data-square="{{ num }}">
                             <span class="square-number">{{ num }}</span>
                             <div class="token-container">
@@ -133,7 +133,7 @@
                         </div>
                     {% endfor %}
                 {% else %}
-                    {% for num in row %}
+                    {% for num in row reversed %}
                         <div class="square" data-square="{{ num }}">
                             <span class="square-number">{{ num }}</span>
                             <div class="token-container">
