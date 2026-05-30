@@ -39,26 +39,20 @@ function fixBoardNumbering(){
 }
 
 function getSquareCenter(num) {
-    const SIZE = 800;
-    const GRID = 8;
-    const cell = SIZE / GRID;
+    const square = document.querySelector(`[data-square='${num}']`);
+    const board = document.querySelector('.board');
 
-    const n = parseInt(num);
+    if(!square || !board){
+        return null;
+    }
 
-    const rowFromBottom = Math.floor((n - 1) / GRID);
-    const colIndex = (n - 1) % GRID;
+    const boardRect = board.getBoundingClientRect();
+    const rect = square.getBoundingClientRect();
 
-    // 1 is bottom-right
-    const col = (rowFromBottom % 2 === 0)
-        ? (GRID - 1 - colIndex)
-        : colIndex;
+    const x = ((rect.left - boardRect.left) + rect.width / 2) * (800 / boardRect.width);
+    const y = ((rect.top - boardRect.top) + rect.height / 2) * (800 / boardRect.height);
 
-    const row = GRID - 1 - rowFromBottom;
-
-    return {
-        x: col * cell + cell / 2,
-        y: row * cell + cell / 2
-    };
+    return { x, y };
 }
 
 
