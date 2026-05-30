@@ -38,6 +38,29 @@ function fixBoardNumbering(){
     return;
 }
 
+function getSquareCenter(num) {
+    const SIZE = 800;
+    const GRID = 8;
+    const cell = SIZE / GRID;
+
+    const n = parseInt(num);
+
+    const rowFromBottom = Math.floor((n - 1) / GRID);
+    const colIndex = (n - 1) % GRID;
+
+    // 1 is bottom-right
+    const col = (rowFromBottom % 2 === 0)
+        ? (GRID - 1 - colIndex)
+        : colIndex;
+
+    const row = GRID - 1 - rowFromBottom;
+
+    return {
+        x: col * cell + cell / 2,
+        y: row * cell + cell / 2
+    };
+}
+
 
 
 // FIX 18: guard flag — prevent double confetti/sound if called twice rapidly
@@ -228,28 +251,6 @@ function playSound(name){
     }
 }
 
-function getSquareCenter(num) {
-    const SIZE = 800;
-    const GRID = 8;
-    const cell = SIZE / GRID;
-
-    const n = parseInt(num);
-
-    const rowFromBottom = Math.floor((n - 1) / GRID);
-    const colIndex = (n - 1) % GRID;
-
-    // Zig-zag: even rows L→R, odd rows R→L
-    const col = (rowFromBottom % 2 === 0)
-        ? colIndex
-        : (GRID - 1 - colIndex);
-
-    const row = GRID - 1 - rowFromBottom;
-
-    return {
-        x: col * cell + cell / 2,
-        y: row * cell + cell / 2
-    };
-}
 
 function roll(childId){
     // 🔒 block if already rolling for this child
