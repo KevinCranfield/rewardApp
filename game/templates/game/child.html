@@ -115,41 +115,22 @@
     <div class="board" id="game-board">
         {% if squares %}
             {% for row in squares %}
-                {% if forloop.counter0|divisibleby:2 %}
-                    {% for num in row %}
-                        <div class="square" data-square="{{ num }}">
-                            <span class="square-number">{{ num }}</span>
-                            <div class="token-container">
-                                {% if child.position == num %}
-                                    <div
-                                        class="token"
-                                        id="token-{{ child.id }}"
-                                        style="background: {{ child.colour }};"
-                                    >
-                                        {{ child.name|slice:":1" }}
-                                    </div>
-                                {% endif %}
-                            </div>
+                {% for num in row %}
+                    <div class="square" data-square="{{ num }}">
+                        <span class="square-number">{{ num }}</span>
+                        <div class="token-container">
+                            {% if child.position == num %}
+                                <div
+                                    class="token"
+                                    id="token-{{ child.id }}"
+                                    style="background: {{ child.colour }};"
+                                >
+                                    {{ child.name|slice:":1" }}
+                                </div>
+                            {% endif %}
                         </div>
-                    {% endfor %}
-                {% else %}
-                    {% for num in row reversed %}
-                        <div class="square" data-square="{{ num }}">
-                            <span class="square-number">{{ num }}</span>
-                            <div class="token-container">
-                                {% if child.position == num %}
-                                    <div
-                                        class="token"
-                                        id="token-{{ child.id }}"
-                                        style="background: {{ child.colour }};"
-                                    >
-                                        {{ child.name|slice:":1" }}
-                                    </div>
-                                {% endif %}
-                            </div>
-                        </div>
-                    {% endfor %}
-                {% endif %}
+                    </div>
+                {% endfor %}
             {% endfor %}
         {% endif %}
     </div>
