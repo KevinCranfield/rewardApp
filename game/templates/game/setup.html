@@ -17,12 +17,9 @@
   <h1>🎮 Setup Your Reward Game</h1>
 
   <div class="onboarding-box">
-    👋 Let's get started:
-    <ol>
-      <li>Add your child</li>
-      <li>Pick a goal 🎯</li>
-      <li>Start playing 🎲</li>
-    </ol>
+    <strong>STEP 1</strong> 👶 Add a Child<br>
+    <strong>STEP 2</strong> 🎯 Choose a Goal<br>
+    <strong>STEP 3</strong> 🎮 Start Playing
   </div>
 
   {% if request.user.family.is_premium %}
@@ -130,7 +127,9 @@
           </form>
         </div>
       {% empty %}
-        <p>No children added yet</p>
+        <div class="empty-children-state">
+          👶 Add your first child to begin your reward adventure and start earning rewards!
+        </div>
       {% endfor %}
     </div>
   </div>
