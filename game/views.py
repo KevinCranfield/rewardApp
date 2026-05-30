@@ -431,6 +431,8 @@ def roll(request):
         for c in all_children
     ]
 
+    # 🏆 Explicit win flag for frontend
+    is_winner = (child.position == 64)
     # 🎁 Main reward trigger when reaching square 64
     reward_data = None
     if child.position == 64 and getattr(child, "main_reward", None):
@@ -442,6 +444,7 @@ def roll(request):
 
     return JsonResponse({
         "success": True,
+        "winner": is_winner,
         "dice": roll_value,
         "roll": roll_value,
         "position": child.position,

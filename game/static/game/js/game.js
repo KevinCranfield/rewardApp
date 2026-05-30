@@ -61,6 +61,7 @@ function getSquareCenter(num) {
 let _winOverlayFired = false;
 
 function triggerWinOverlay(childId){
+    console.log('🏆 WIN OVERLAY FIRED', childId);
     const meta = document.getElementById("game-meta");
     const name = meta?.dataset.childName || "Player";
 
@@ -86,8 +87,8 @@ function triggerWinOverlay(childId){
         overlay.style.textAlign = "center";
 
         overlay.innerHTML = `
-            <h1 style="font-size:32px; margin-bottom:10px;">🎉 ${name} WINS!</h1>
-            <p style="margin-bottom:20px;">You reached the finish! 🏁</p>
+            <h1 style="font-size:42px; margin-bottom:10px;">🏆 Congratulations ${name}!</h1>
+            <p style="font-size:22px; margin-bottom:20px;">You reached square 64 and won your prize! 🎁</p>
             <div style="display:flex; gap:12px;">
                 <button id="continue-game" style="padding:12px 18px; border-radius:10px; border:none; background:#22c55e; color:white; font-weight:bold;">Continue</button>
                 <button id="reset-game" style="padding:12px 18px; border-radius:10px; border:none; background:#ef4444; color:white; font-weight:bold;">Restart</button>
@@ -123,12 +124,9 @@ function triggerWinOverlay(childId){
     // 🔥 Force reliable playback on mobile/PWA
     try {
         if(sounds && sounds.win){
-            sounds.win.pause();
-            sounds.win.currentTime = 0;
-            sounds.win.volume = 1;
-
-            const playPromise = sounds.win.play();
-
+            const winClone = sounds.win.cloneNode();
+            winClone.volume = 1;
+            const playPromise = winClone.play();
             if(playPromise !== undefined){
                 playPromise.catch(err => {
                     console.warn("Win sound blocked:", err);
@@ -340,6 +338,16 @@ function roll(childId){
         }
 
         console.log("ROLL:", data);
+        // 🏆 Backend-confirmed winner
+        if(data.winner === true){
+            const moveStart = data.from || current;
+            const moveSteps = Math.abs((data.position || 64) - moveStart);
+            const winDelay = Math.max(1000, moveSteps * 220 + 500);
+
+            setTimeout(() => {
+                triggerWinOverlay(childId);
+            }, winDelay);
+        }
         // 🧪 DEBUG MOVE block
         console.log("🧪 DEBUG MOVE:", {
             current,
@@ -590,6 +598,7 @@ function animateMovement(childId, start, end){
             return;
         }
 
+        // (removed: end >= BOARD_SIZE winner trigger; now handled via backend in roll())
         if(step > end){
             if(end === BOARD_SIZE){
                 liveToken.classList.add("winner");
