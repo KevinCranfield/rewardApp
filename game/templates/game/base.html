@@ -1,6 +1,6 @@
 {% load static %}
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <title>{% block title %}Reward Game{% endblock %}</title>
     <meta name="description" content="Motivate kids with rewards! Roll the dice, climb ladders, earn prizes. A fun family reward system.">
@@ -25,6 +25,13 @@
       gtag('js', new Date());
       gtag('config', 'G-GZ0ENNSBXC');
     </script>
+<style>
+.install-btn-placeholder{
+    visibility:hidden;
+    opacity:0;
+    min-width:120px;
+}
+</style>
 </head>
 
 <body>
@@ -74,7 +81,7 @@
         {% if request.user.is_authenticated %}
             <span class="nav-user">👤 {{ request.user.username }}</span>
             <a href="/logout/" class="nav-link">Logout</a>
-            <button onclick="installApp()" id="installBtn" style="display:none;" class="nav-btn">
+            <button onclick="installApp()" id="installBtn" class="nav-btn install-btn-placeholder" aria-hidden="true">
                 📲 Install
             </button>
         {% else %}
@@ -111,7 +118,10 @@ function installApp() {
 // Show button when game.js sets readiness
 window.addEventListener("beforeinstallprompt", () => {
     const btn = document.getElementById("installBtn");
-    if (btn) btn.style.display = "inline-block";
+    if (btn) {
+        btn.classList.remove("install-btn-placeholder");
+        btn.removeAttribute("aria-hidden");
+    }
 });
 </script>
 
