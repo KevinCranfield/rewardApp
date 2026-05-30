@@ -30,13 +30,14 @@
         </div>
 
         {% if children %}
-        <div class="welcome-stats">
+        <div class="welcome-stats summary-stats">
             <div class="mini-stat">
                 <span class="mini-stat-number">{{ children|length }}</span>
                 <span class="mini-stat-label">Players</span>
             </div>
 
             <div class="mini-stat reward-stat-card">
+                <span class="mini-stat-label">🎯 Current Reward</span>
 
                 {% if children and children.0.main_reward %}
 
