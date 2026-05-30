@@ -85,12 +85,25 @@
 .game-card-body img,
 .reward-stat-image,
 .main-reward-img{
-    max-width:140px;
-    max-height:140px;
+    max-width:100px;
+    max-height:100px;
     width:auto;
     height:auto;
     object-fit:contain;
     display:block;
+    margin:0 auto 10px;
+}
+
+.reward-stat-card{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    text-align:center;
+}
+
+.reward-name{
+    font-weight:700;
+    color:#111827;
 }
 
 .progress-label{
