@@ -373,26 +373,24 @@ function roll(childId){
         console.log("Rolls remaining:", data.rolls_remaining);
 
 // 🔥 Centre the BOARD before movement starts
-const board = document.querySelector(".board");
+const tokenCard = document.querySelector('.child-view') || document.querySelector('.game-board-container') || document.querySelector('.board');
 
-if(board){
-    board.scrollIntoView({
-        behavior: "smooth",
-        block: "center",
-        inline: "center"
+if(tokenCard){
+    tokenCard.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start'
     });
 }
 
 showDice(data.dice, () => {
 
             // 🔥 Re-centre full board before animation starts
-            const boardAgain = document.querySelector(".board");
+            const boardWrapper = document.querySelector('.board-wrapper') || document.querySelector('.game-board-container') || document.querySelector('.board');
 
-            if(boardAgain){
-                boardAgain.scrollIntoView({
-                    behavior: "smooth",
-                    block: "center",
-                    inline: "center"
+            if(boardWrapper){
+                boardWrapper.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
                 });
             }
 
@@ -426,7 +424,7 @@ showDice(data.dice, () => {
                         showReward(data.reward);
                     }, duration);
                 }
-            }, 900);
+            }, 300);
         });
 
         showToast("🎲 Rolled " + data.dice);
