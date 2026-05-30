@@ -150,10 +150,10 @@ function triggerWinOverlay(childId){
 
 // 🐍 Snakes & 🪜 Ladders
 const snakes = {
-    59: 45,
-    50: 33,
-    40: 23,
-    30: 14,
+    62: 44,
+    55: 41,
+    33: 18,
+    27: 10,
 };
 
 const ladders = {
