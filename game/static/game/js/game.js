@@ -21,7 +21,15 @@
 // 19. FIX: board reset uses custom confirm modal — native confirm() blocked in PWA standalone mode
 // =============================================
 
+
 console.log("🔥 GAME JS VERSION: REMOVE CHILD + NAV FIX LIVE v4.0");
+
+// Google Analytics 4 helper
+function trackEvent(name, params = {}){
+    if(typeof window.gtag === "function"){
+        window.gtag("event", name, params);
+    }
+}
 
 
 
@@ -62,6 +70,9 @@ let _winOverlayFired = false;
 
 function triggerWinOverlay(childId){
     console.log('🏆 WIN OVERLAY FIRED', childId);
+    trackEvent("game_win", {
+        child_id: childId
+    });
     const meta = document.getElementById("game-meta");
     const name = meta?.dataset.childName || "Player";
 
@@ -338,6 +349,11 @@ function roll(childId){
         }
 
         console.log("ROLL:", data);
+        trackEvent("roll_dice", {
+            child_id: childId,
+            dice_value: data.dice,
+            position: data.position
+        });
         // 🏆 Backend-confirmed winner
         if(data.winner === true){
             const moveStart = data.from || current;
@@ -1733,6 +1749,10 @@ window.openChest = async function(chestId){
             return;
         }
         console.log("CHEST RESPONSE:", data);
+        trackEvent("chest_open", {
+            chest_id: chestId,
+            rolls_awarded: data.rolls
+        });
 
         // =============================================
         // PREMIUM CHEST REWARD FX
@@ -2237,6 +2257,9 @@ function showReward(reward){
     const name = document.getElementById("reward-name");
 
     if(!display) return;
+    trackEvent("reward_shown", {
+        reward_name: reward.name || "Reward"
+    });
 
     img.src = reward.image || "";
     name.innerText = reward.name || "Reward";
